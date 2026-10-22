@@ -1,0 +1,3062 @@
+{
+  "schema_version": 1,
+  "model": {
+    "name": "Ordered Logit",
+    "link": "logit",
+    "feature_names": [
+      "inflation",
+      "exports",
+      "imports",
+      "corporate_lending",
+      "household_lending",
+      "consumption"
+    ],
+    "class_order": [
+      "Decrease",
+      "Hold",
+      "Increase"
+    ],
+    "score_map": {
+      "Decrease": -1,
+      "Hold": 0,
+      "Increase": 1
+    },
+    "parameters": {
+      "inflation": 0.02199296137093244,
+      "exports": 0.013744691281439453,
+      "imports": -0.007792092949550429,
+      "corporate_lending": -0.04211239603644495,
+      "household_lending": 0.07512542007843497,
+      "consumption": -0.0014785727707736366,
+      "cutpoint[Decrease|Hold]": 0.3537243712880859,
+      "cutpoint[Hold|Increase]": 3.3149380105299433
+    },
+    "coefficient_table": {
+      "inflation": {
+        "coefficient_or_cutpoint": 0.02199296137093244,
+        "hc0_standard_error": 0.07013790331697874,
+        "p_value": 0.7538496075980295,
+        "p_value_holm": 1.0,
+        "p_value_adjusted": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "exports": {
+        "coefficient_or_cutpoint": 0.013744691281439453,
+        "hc0_standard_error": 0.010464238054485528,
+        "p_value": 0.18901726923832896,
+        "p_value_holm": 0.9450863461916448,
+        "p_value_adjusted": 0.9450863461916448,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "imports": {
+        "coefficient_or_cutpoint": -0.007792092949550429,
+        "hc0_standard_error": 0.018044061392098232,
+        "p_value": 0.6658599015103904,
+        "p_value_holm": 1.0,
+        "p_value_adjusted": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "corporate_lending": {
+        "coefficient_or_cutpoint": -0.04211239603644495,
+        "hc0_standard_error": 0.049201105448525705,
+        "p_value": 0.39203994185091573,
+        "p_value_holm": 1.0,
+        "p_value_adjusted": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "household_lending": {
+        "coefficient_or_cutpoint": 0.07512542007843497,
+        "hc0_standard_error": 0.02683617183658186,
+        "p_value": 0.005119624993344942,
+        "p_value_holm": 0.03071774996006965,
+        "p_value_adjusted": 0.03071774996006965,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "consumption": {
+        "coefficient_or_cutpoint": -0.0014785727707736366,
+        "hc0_standard_error": 0.020968646439157686,
+        "p_value": 0.9437849512923012,
+        "p_value_holm": 1.0,
+        "p_value_adjusted": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)"
+      },
+      "cutpoint[Decrease|Hold]": {
+        "coefficient_or_cutpoint": 0.3537243712880859,
+        "hc0_standard_error": 0.7383437429509783,
+        "p_value": 0.6318830170725244,
+        "p_value_holm": 0.6318830170725244,
+        "p_value_adjusted": 0.6318830170725244,
+        "p_value_family": "cutpoint coefficient tests (unadjusted; outside six-slope family)"
+      },
+      "cutpoint[Hold|Increase]": {
+        "coefficient_or_cutpoint": 3.3149380105299433,
+        "hc0_standard_error": 0.7455704247902439,
+        "p_value": 8.741196969927691e-06,
+        "p_value_holm": 8.741196969927691e-06,
+        "p_value_adjusted": 8.741196969927691e-06,
+        "p_value_family": "cutpoint coefficient tests (unadjusted; outside six-slope family)"
+      }
+    },
+    "covariance_names": [
+      "inflation",
+      "exports",
+      "imports",
+      "corporate_lending",
+      "household_lending",
+      "consumption",
+      "cutpoint[Decrease|Hold]",
+      "cutpoint[Hold|Increase]"
+    ],
+    "covariance_hc0": [
+      [
+        0.004919325481701857,
+        0.00020651404199244423,
+        -0.0003463621159593263,
+        -0.0026141307796329425,
+        -0.0002635451588097427,
+        -0.000362255385260935,
+        0.04028074861577909,
+        0.037286623168441405
+      ],
+      [
+        0.00020651404199244423,
+        0.00010950027806094308,
+        -6.648816292814776e-05,
+        -0.00010726396173482685,
+        -8.393991439377551e-05,
+        -1.569572040676515e-05,
+        0.00022641260621172917,
+        0.000452197810066351
+      ],
+      [
+        -0.0003463621159593263,
+        -6.648816292814776e-05,
+        0.00032558815152181,
+        0.00022846907357041929,
+        -0.0001799494786974147,
+        -0.00013344603382555185,
+        -0.003378202619827951,
+        -0.004485359227233721
+      ],
+      [
+        -0.0026141307796329425,
+        -0.00010726396173482685,
+        0.00022846907357041929,
+        0.0024207487773569457,
+        -6.346826707237689e-05,
+        0.0002612622143373725,
+        -0.02273021119592928,
+        -0.021621190694427035
+      ],
+      [
+        -0.0002635451588097427,
+        -8.393991439377551e-05,
+        -0.0001799494786974147,
+        -6.346826707237689e-05,
+        0.0007201801188425493,
+        0.00013392782098983804,
+        0.006593019188618471,
+        0.009006212092666258
+      ],
+      [
+        -0.000362255385260935,
+        -1.569572040676515e-05,
+        -0.00013344603382555185,
+        0.0002612622143373725,
+        0.00013392782098983804,
+        0.0004396841334904003,
+        -0.0014098642709427702,
+        -0.0007906830818819165
+      ],
+      [
+        0.04028074861577909,
+        0.00022641260621172917,
+        -0.003378202619827951,
+        -0.02273021119592928,
+        0.006593019188618471,
+        -0.0014098642709427702,
+        0.5451514827548603,
+        0.4740511768695552
+      ],
+      [
+        0.037286623168441405,
+        0.000452197810066351,
+        -0.004485359227233721,
+        -0.021621190694427035,
+        0.009006212092666258,
+        -0.0007906830818819165,
+        0.4740511768695552,
+        0.5558752583219048
+      ]
+    ],
+    "log_likelihood": -61.812649929215254,
+    "pseudo_r2_mcfadden": 0.10974943047747465,
+    "cutpoints": {
+      "cutpoint[Decrease|Hold]": 0.3537243712880859,
+      "cutpoint[Hold|Increase]": 3.3149380105299433
+    }
+  },
+  "sample": {
+    "usable_n": 88,
+    "dropped_n": 2,
+    "estimation_n": 70,
+    "holdout_n": 18,
+    "usable_start": "2016-03-15",
+    "usable_end": "2026-09-07",
+    "estimation_start": "2016-03-15",
+    "estimation_end": "2024-06-03",
+    "holdout_start": "2024-07-15",
+    "holdout_end": "2026-09-07",
+    "dropped_decisions": [
+      "2015-10-02",
+      "2016-02-02"
+    ],
+    "estimation_rows": [
+      "2016-03-15",
+      "2016-05-06",
+      "2016-06-07",
+      "2016-07-12",
+      "2016-08-16",
+      "2016-10-04",
+      "2016-11-15",
+      "2017-01-10",
+      "2017-02-21",
+      "2017-04-11",
+      "2017-06-06",
+      "2017-07-18",
+      "2017-08-22",
+      "2017-10-10",
+      "2017-11-28",
+      "2018-01-16",
+      "2018-03-06",
+      "2018-04-17",
+      "2018-06-05",
+      "2018-07-10",
+      "2018-09-04",
+      "2018-10-16",
+      "2018-12-05",
+      "2019-01-15",
+      "2019-03-05",
+      "2019-04-16",
+      "2019-06-04",
+      "2019-07-16",
+      "2019-09-10",
+      "2019-10-29",
+      "2019-12-10",
+      "2020-02-04",
+      "2020-03-10",
+      "2020-03-17",
+      "2020-04-06",
+      "2020-04-28",
+      "2020-06-09",
+      "2020-07-21",
+      "2020-09-08",
+      "2020-10-27",
+      "2020-12-15",
+      "2021-01-26",
+      "2021-03-10",
+      "2021-04-27",
+      "2021-06-08",
+      "2021-07-27",
+      "2021-09-14",
+      "2021-10-26",
+      "2021-12-07",
+      "2022-01-25",
+      "2022-02-24",
+      "2022-03-10",
+      "2022-04-26",
+      "2022-06-07",
+      "2022-07-26",
+      "2022-09-06",
+      "2022-10-27",
+      "2022-12-06",
+      "2023-01-16",
+      "2023-02-27",
+      "2023-04-10",
+      "2023-05-29",
+      "2023-07-10",
+      "2023-08-28",
+      "2023-10-09",
+      "2023-11-27",
+      "2024-01-22",
+      "2024-02-26",
+      "2024-04-15",
+      "2024-06-03"
+    ],
+    "holdout_rows": [
+      "2024-07-15",
+      "2024-09-02",
+      "2024-10-14",
+      "2024-12-02",
+      "2025-01-20",
+      "2025-03-11",
+      "2025-04-14",
+      "2025-06-09",
+      "2025-07-14",
+      "2025-09-02",
+      "2025-10-13",
+      "2025-12-01",
+      "2026-01-26",
+      "2026-03-10",
+      "2026-04-27",
+      "2026-06-08",
+      "2026-07-27",
+      "2026-09-07"
+    ]
+  },
+  "estimation_timestamp_utc": "2026-10-16T15:49:12+00:00",
+  "seed": 42,
+  "diagnostics": {
+    "vif": [
+      {
+        "feature": "inflation",
+        "statistic": 2.3300143673701004,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      },
+      {
+        "feature": "exports",
+        "statistic": 1.5577237344253774,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      },
+      {
+        "feature": "imports",
+        "statistic": 1.9652308567918484,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      },
+      {
+        "feature": "corporate_lending",
+        "statistic": 2.555757489777166,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      },
+      {
+        "feature": "household_lending",
+        "statistic": 1.4343802375140131,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      },
+      {
+        "feature": "consumption",
+        "statistic": 1.184253522192253,
+        "p_value": "not applicable (descriptive VIF)",
+        "pass_fail": "PASS",
+        "threshold": "VIF < 5"
+      }
+    ],
+    "parameter_stability": {
+      "name": "LR test of slope equality across 2015-2019 and 2020+",
+      "statistic": 15.217553714524797,
+      "df": 6,
+      "p_value": 0.018630476839132673,
+      "pass_fail": "FAIL",
+      "groups_n": {
+        "2015-2019": 31,
+        "2020+": 39
+      },
+      "unrestricted_log_likelihood": -54.203873071952856,
+      "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+      "p_value_adjusted": 0.018630476839132673,
+      "p_value_holm": 0.018630476839132673
+    },
+    "expanding_window_coefficients": [
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "inflation",
+        "coefficient": -0.2588743397324017,
+        "hc0_se": 0.1854335420444385,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "exports",
+        "coefficient": -0.0286554811689199,
+        "hc0_se": 0.02396437027524091,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "imports",
+        "coefficient": -0.004954195785044959,
+        "hc0_se": 0.04124830602173936,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "corporate_lending",
+        "coefficient": 0.017438283188619237,
+        "hc0_se": 0.07549541291339212,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "household_lending",
+        "coefficient": 0.03208112839786537,
+        "hc0_se": 0.08659741791771072,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 42,
+        "sample_start": "2016-03-15",
+        "sample_end": "2021-01-26",
+        "feature": "consumption",
+        "coefficient": 0.04624835372790646,
+        "hc0_se": 0.04758143177183404,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "inflation",
+        "coefficient": -0.15872099490548727,
+        "hc0_se": 0.14434156522005104,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "exports",
+        "coefficient": 0.0008811717009345372,
+        "hc0_se": 0.013627678978322568,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "imports",
+        "coefficient": -0.02763533306639593,
+        "hc0_se": 0.031101464738615026,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "corporate_lending",
+        "coefficient": 0.053837385779036455,
+        "hc0_se": 0.056927342914443915,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "household_lending",
+        "coefficient": 0.12937866665691153,
+        "hc0_se": 0.035130571910181,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 56,
+        "sample_start": "2016-03-15",
+        "sample_end": "2022-09-06",
+        "feature": "consumption",
+        "coefficient": 0.05090583552902913,
+        "hc0_se": 0.027702638442120682,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "inflation",
+        "coefficient": 0.02199296137093244,
+        "hc0_se": 0.0701379033169086,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "exports",
+        "coefficient": 0.013744691281439453,
+        "hc0_se": 0.010464238054493216,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "imports",
+        "coefficient": -0.007792092949550429,
+        "hc0_se": 0.01804406139209584,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "corporate_lending",
+        "coefficient": -0.04211239603644495,
+        "hc0_se": 0.0492011054484765,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "household_lending",
+        "coefficient": 0.07512542007843497,
+        "hc0_se": 0.02683617183655502,
+        "status": "COMPLETED"
+      },
+      {
+        "sample_n": 70,
+        "sample_start": "2016-03-15",
+        "sample_end": "2024-06-03",
+        "feature": "consumption",
+        "coefficient": -0.0014785727707736366,
+        "hc0_se": 0.02096864643915945,
+        "status": "COMPLETED"
+      }
+    ],
+    "proportional_odds": {
+      "name": "Brant-type robust Wald equality of cumulative-logit slopes",
+      "statistic": 9.612374594086546,
+      "df": 6,
+      "p_value": 0.14195367940218653,
+      "pass_fail": "PASS",
+      "interpretation": "fail to reject proportional odds",
+      "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+      "p_value_adjusted": 0.14195367940218653,
+      "p_value_holm": 0.14195367940218653
+    },
+    "serial_correlation": {
+      "name": "Ljung-Box on standardized Pearson score residuals",
+      "statistic": 14.753387370722729,
+      "df": 10,
+      "p_value": 0.1413149227265809,
+      "lag": 10,
+      "pass_fail": "PASS",
+      "residual_definition": "(observed score - expected score) / sqrt(model score variance)",
+      "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+      "p_value_adjusted": 0.1413149227265809,
+      "p_value_holm": 0.1413149227265809
+    },
+    "joint_slope_lr": {
+      "name": "Joint LR test of all six slopes",
+      "statistic": 15.240435352202809,
+      "df": 6,
+      "p_value": 0.018466879346204394,
+      "p_value_holm": 0.018466879346204394,
+      "p_value_adjusted": 0.018466879346204394,
+      "p_value_family": "pre-specified joint LR test (single primary test; no adjustment)",
+      "pass_fail": "PASS",
+      "criterion": "reject zero-joint-slope null at 10% using raw p-value"
+    },
+    "expected_sign_check": {
+      "name": "Expected-sign check",
+      "statistic": 0,
+      "p_value": "not applicable (joint sign diagnostic)",
+      "p_value_holm": "not applicable",
+      "p_value_adjusted": "not applicable",
+      "p_value_family": "six slope-coefficient p-values (Holm across six)",
+      "pass_fail": "PASS",
+      "opposite_sign_significant_features": [],
+      "expected_signs": {
+        "inflation": "+",
+        "exports": "+",
+        "imports": "+",
+        "corporate_lending": "+",
+        "household_lending": "+",
+        "consumption": "+"
+      },
+      "rule": "fail if coefficient is negative and raw p < 0.05; adjusted p shown for transparency"
+    },
+    "not_applicable_tests": [
+      {
+        "name": "Conventional OLS heteroskedasticity test",
+        "statistic": "not applicable",
+        "p_value": "not applicable",
+        "pass_fail": "NOT APPLICABLE",
+        "reason": "the dependent variable is ordinal/discrete, so OLS residual variance assumptions do not apply; HC0 sandwich covariance is used"
+      },
+      {
+        "name": "Residual normality test",
+        "statistic": "not applicable",
+        "p_value": "not applicable",
+        "pass_fail": "NOT APPLICABLE",
+        "reason": "ordered logit has no normal observed-residual assumption; its latent link distribution is logistic"
+      }
+    ],
+    "estimation_converged": true,
+    "estimation_convergence_details": {
+      "fopt": 0.8830378561316465,
+      "gopt": [
+        1.3410204754289477e-09,
+        -2.17915827257204e-09,
+        6.705102377144738e-10,
+        1.3410204754289477e-09,
+        1.0057653565717108e-09,
+        5.028826782858554e-10,
+        1.4216794744863355e-10,
+        4.632305176862024e-11
+      ],
+      "Hinv": [
+        [
+          0.4154129254667034,
+          0.016492646871389183,
+          -0.0233804279218158,
+          -0.18977643859951335,
+          0.008807575539096581,
+          -0.018623817966963774,
+          3.653665712703865,
+          0.05189262205736235
+        ],
+        [
+          0.01649264687138908,
+          0.007953544798565502,
+          -0.0057142818930519075,
+          -0.007343006542839631,
+          -0.0024426087128231033,
+          -0.0012014720774860181,
+          0.07678246112816042,
+          0.019923429416087216
+        ],
+        [
+          -0.023380427921815963,
+          -0.005714281893051909,
+          0.024094480043911515,
+          0.021539203500112503,
+          -0.0125193036513059,
+          -0.00907138636387871,
+          -0.26848144778799793,
+          -0.011773584348052637
+        ],
+        [
+          -0.18977643859951357,
+          -0.007343006542839651,
+          0.021539203500112503,
+          0.15834689790003348,
+          -0.024220718880663395,
+          0.009256504233371557,
+          -1.7693714783162866,
+          -0.05933302922753701
+        ],
+        [
+          0.008807575539096568,
+          -0.002442608712823094,
+          -0.012519303651305873,
+          -0.024220718880663312,
+          0.05059839364921896,
+          0.003721831720384117,
+          0.7365187712853771,
+          0.08655934502931861
+        ],
+        [
+          -0.018623817966963642,
+          -0.0012014720774860092,
+          -0.009071386363878692,
+          0.009256504233371538,
+          0.003721831720384112,
+          0.043424198194451875,
+          -0.03112766908847131,
+          -0.0018438865005471518
+        ],
+        [
+          3.6536657127038614,
+          0.07678246112816134,
+          -0.2684814477879962,
+          -1.7693714783162835,
+          0.7365187712853755,
+          -0.03112766908847192,
+          47.435990154739414,
+          0.18756430058492357
+        ],
+        [
+          0.05189262205736318,
+          0.019923429416087178,
+          -0.011773584348052714,
+          -0.05933302922753696,
+          0.08655934502931882,
+          -0.001843886500547053,
+          0.18756430058493345,
+          1.5363706665554553
+        ]
+      ],
+      "fcalls": 26,
+      "gcalls": 26,
+      "warnflag": 0,
+      "converged": true
+    },
+    "covariance_type": "HC0 score-based sandwich",
+    "p_value_families": {
+      "slope_coefficients": "Holm adjustment across the six slope-coefficient p-values only",
+      "joint_slope_lr": "single pre-specified primary test; no adjustment",
+      "diagnostics": "raw p-values, no adjustment, flagged at 5%",
+      "robustness_specifications": "report specification count; Holm-adjust coefficient p-values only within each specification",
+      "robustness_specification_count": 9,
+      "total_specifications_including_primary": 10,
+      "cutpoints": "reported raw, not included in the six-slope inferential family"
+    },
+    "unit_root_tests": [
+      {
+        "feature": "inflation",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -2.3032107376978717,
+        "p_value": 0.17093453570326256,
+        "p_value_holm": 0.17093453570326256,
+        "p_value_adjusted": 0.17093453570326256,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "inflation",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.30139586264366186,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "inflation",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -2.3032107376978717,
+        "p_value": 0.17093453570326256,
+        "p_value_holm": 0.17093453570326256,
+        "p_value_adjusted": 0.17093453570326256,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "inflation",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.30139586264366186,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "exports",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -3.0001188539985977,
+        "p_value": 0.03488330229799153,
+        "p_value_holm": 0.03488330229799153,
+        "p_value_adjusted": 0.03488330229799153,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root rejected at 5%",
+        "warning": "",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "exports",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.10493398633564759,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "exports",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -1.2546731566299465,
+        "p_value": 0.649646067135127,
+        "p_value_holm": 0.649646067135127,
+        "p_value_adjusted": 0.649646067135127,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "exports",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.9142961052532907,
+        "p_value": 0.01,
+        "p_value_holm": 0.01,
+        "p_value_adjusted": 0.01,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -4.165000249651045,
+        "p_value": 0.0007547854032639911,
+        "p_value_holm": 0.0007547854032639911,
+        "p_value_adjusted": 0.0007547854032639911,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root rejected at 5%",
+        "warning": "",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "imports",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.2756901733046624,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 4,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "imports",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -1.9127921047669103,
+        "p_value": 0.32606743698435403,
+        "p_value_holm": 0.32606743698435403,
+        "p_value_adjusted": 0.32606743698435403,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 1.079581253195576,
+        "p_value": 0.01,
+        "p_value_holm": 0.01,
+        "p_value_adjusted": 0.01,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -1.2175167766991741,
+        "p_value": 0.6660154127059807,
+        "p_value_holm": 0.6660154127059807,
+        "p_value_adjusted": 0.6660154127059807,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 8,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.42160297365920585,
+        "p_value": 0.06784354583654921,
+        "p_value_holm": 0.06784354583654921,
+        "p_value_adjusted": 0.06784354583654921,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -0.15495548464370695,
+        "p_value": 0.9436821306995684,
+        "p_value_holm": 0.9436821306995684,
+        "p_value_adjusted": 0.9436821306995684,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.3112698241348216,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "household_lending",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -2.3648857722125527,
+        "p_value": 0.151893332916596,
+        "p_value_holm": 0.151893332916596,
+        "p_value_adjusted": 0.151893332916596,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.9825824600040587,
+        "p_value": 0.01,
+        "p_value_holm": 0.01,
+        "p_value_adjusted": 0.01,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": 3.4257660398514465,
+        "p_value": 1.0,
+        "p_value_holm": 1.0,
+        "p_value_adjusted": 1.0,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 11,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root not rejected at 5%",
+        "warning": "",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 1.144329150679855,
+        "p_value": 0.01,
+        "p_value_holm": 0.01,
+        "p_value_adjusted": 0.01,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 5,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is smaller than the p-value returned.",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "consumption",
+        "form": "transformed_model_input",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -5.404000565358334,
+        "p_value": 3.322282400450816e-06,
+        "p_value_holm": 3.322282400450816e-06,
+        "p_value_adjusted": 3.322282400450816e-06,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root rejected at 5%",
+        "warning": "",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "consumption",
+        "form": "transformed_model_input",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.1130429531458583,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "consumption",
+        "form": "raw_level",
+        "test": "ADF",
+        "n": 70,
+        "statistic": -5.404000565358334,
+        "p_value": 3.322282400450816e-06,
+        "p_value_holm": 3.322282400450816e-06,
+        "p_value_adjusted": 3.322282400450816e-06,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 0,
+        "lag_method": "AIC",
+        "max_lag": 12,
+        "interpretation": "unit root rejected at 5%",
+        "warning": "",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "consumption",
+        "form": "raw_level",
+        "test": "KPSS",
+        "n": 70,
+        "statistic": 0.1130429531458583,
+        "p_value": 0.1,
+        "p_value_holm": 0.1,
+        "p_value_adjusted": 0.1,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "lags": 2,
+        "lag_method": "auto",
+        "max_lag": null,
+        "interpretation": "stationarity not rejected at 5%",
+        "warning": "The test statistic is outside of the range of p-values available in the look-up table. The actual p-value is greater than the p-value returned.",
+        "pass_fail": "PASS"
+      }
+    ],
+    "structural_break_checks": [
+      {
+        "feature": "inflation",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "inflation",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 55.054255466213306,
+        "df": 2,
+        "p_value": 1.1094821587525694e-12,
+        "p_value_holm": 1.1094821587525694e-12,
+        "p_value_adjusted": 1.1094821587525694e-12,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "inflation",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 39.01989669266908,
+        "df": 2,
+        "p_value": 3.3646282806213404e-09,
+        "p_value_holm": 3.3646282806213404e-09,
+        "p_value_adjusted": 3.3646282806213404e-09,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "inflation",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "inflation",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 55.054255466213306,
+        "df": 2,
+        "p_value": 1.1094821587525694e-12,
+        "p_value_holm": 1.1094821587525694e-12,
+        "p_value_adjusted": 1.1094821587525694e-12,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "inflation",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 39.01989669266908,
+        "df": 2,
+        "p_value": 3.3646282806213404e-09,
+        "p_value_holm": 3.3646282806213404e-09,
+        "p_value_adjusted": 3.3646282806213404e-09,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "exports",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "exports",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 4.665271570755294,
+        "df": 2,
+        "p_value": 0.09703963405981217,
+        "p_value_holm": 0.09703963405981217,
+        "p_value_adjusted": 0.09703963405981217,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "exports",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 13.997252852328415,
+        "df": 2,
+        "p_value": 0.000913135363383899,
+        "p_value_holm": 0.000913135363383899,
+        "p_value_adjusted": 0.000913135363383899,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "exports",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "exports",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 24.567851347148462,
+        "df": 2,
+        "p_value": 4.625501901824703e-06,
+        "p_value_holm": 4.625501901824703e-06,
+        "p_value_adjusted": 4.625501901824703e-06,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "exports",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 18.504657951927584,
+        "df": 2,
+        "p_value": 9.588807079266489e-05,
+        "p_value_holm": 9.588807079266489e-05,
+        "p_value_adjusted": 9.588807079266489e-05,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "imports",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 20.46993849952014,
+        "df": 2,
+        "p_value": 3.589296474572069e-05,
+        "p_value_holm": 3.589296474572069e-05,
+        "p_value_adjusted": 3.589296474572069e-05,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 7.1055754837050245,
+        "df": 2,
+        "p_value": 0.028644674287264704,
+        "p_value_holm": 0.028644674287264704,
+        "p_value_adjusted": 0.028644674287264704,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "imports",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 24.542285350690463,
+        "df": 2,
+        "p_value": 4.685009215069819e-06,
+        "p_value_holm": 4.685009215069819e-06,
+        "p_value_adjusted": 4.685009215069819e-06,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "imports",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 15.047775283196188,
+        "df": 2,
+        "p_value": 0.0005400290402570834,
+        "p_value_holm": 0.0005400290402570834,
+        "p_value_adjusted": 0.0005400290402570834,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 90.4360995670097,
+        "df": 2,
+        "p_value": 2.3017094278482157e-20,
+        "p_value_holm": 2.3017094278482157e-20,
+        "p_value_adjusted": 2.3017094278482157e-20,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 31.72651354440808,
+        "df": 2,
+        "p_value": 1.2902537168383103e-07,
+        "p_value_holm": 1.2902537168383103e-07,
+        "p_value_adjusted": 1.2902537168383103e-07,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 134.1523492594888,
+        "df": 2,
+        "p_value": 7.399246421387581e-30,
+        "p_value_holm": 7.399246421387581e-30,
+        "p_value_adjusted": 7.399246421387581e-30,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "corporate_lending",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 137.08510410664735,
+        "df": 2,
+        "p_value": 1.707449499786361e-30,
+        "p_value_holm": 1.707449499786361e-30,
+        "p_value_adjusted": 1.707449499786361e-30,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "household_lending",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 11.522792301243214,
+        "df": 2,
+        "p_value": 0.003146715241729727,
+        "p_value_holm": 0.003146715241729727,
+        "p_value_adjusted": 0.003146715241729727,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 37.92650587476828,
+        "df": 2,
+        "p_value": 5.812512372784287e-09,
+        "p_value_holm": 5.812512372784287e-09,
+        "p_value_adjusted": 5.812512372784287e-09,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "household_lending",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 135.32487136173813,
+        "df": 2,
+        "p_value": 4.116968571619368e-30,
+        "p_value_holm": 4.116968571619368e-30,
+        "p_value_adjusted": 4.116968571619368e-30,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "household_lending",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 193.68678943687155,
+        "df": 2,
+        "p_value": 8.73872484523086e-43,
+        "p_value_holm": 8.73872484523086e-43,
+        "p_value_adjusted": 8.73872484523086e-43,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "consumption",
+        "form": "transformed_model_input",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "consumption",
+        "form": "transformed_model_input",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 6.851048814949195,
+        "df": 2,
+        "p_value": 0.032532216377655944,
+        "p_value_holm": 0.032532216377655944,
+        "p_value_adjusted": 0.032532216377655944,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "consumption",
+        "form": "transformed_model_input",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 0.9471464430854439,
+        "df": 2,
+        "p_value": 0.6227729819523372,
+        "p_value_holm": 0.6227729819523372,
+        "p_value_adjusted": 0.6227729819523372,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "PASS"
+      },
+      {
+        "feature": "consumption",
+        "form": "raw_level",
+        "break_year": 2015,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": null,
+        "n_post": null,
+        "statistic": null,
+        "df": 2,
+        "p_value": null,
+        "p_value_holm": null,
+        "p_value_adjusted": null,
+        "p_value_family": null,
+        "status": "NOT APPLICABLE",
+        "reason": "fewer than 8 observations on one side of 2015",
+        "pass_fail": "NOT APPLICABLE"
+      },
+      {
+        "feature": "consumption",
+        "form": "raw_level",
+        "break_year": 2020,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 31,
+        "n_post": 39,
+        "statistic": 6.851048814949195,
+        "df": 2,
+        "p_value": 0.032532216377655944,
+        "p_value_holm": 0.032532216377655944,
+        "p_value_adjusted": 0.032532216377655944,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "FAIL"
+      },
+      {
+        "feature": "consumption",
+        "form": "raw_level",
+        "break_year": 2022,
+        "method": "Gaussian linear-trend split-sample LR; intercept and trend shift",
+        "n_pre": 49,
+        "n_post": 21,
+        "statistic": 0.9471464430854439,
+        "df": 2,
+        "p_value": 0.6227729819523372,
+        "p_value_holm": 0.6227729819523372,
+        "p_value_adjusted": 0.6227729819523372,
+        "p_value_family": "diagnostics (raw p-values; no adjustment; flag at 5%)",
+        "status": "COMPLETED",
+        "pass_fail": "PASS"
+      }
+    ],
+    "parameters": [
+      {
+        "name": "inflation",
+        "estimate": 0.02199296137093244,
+        "hc0_se": 0.07013790331697874,
+        "z_statistic": 0.3135674197664312,
+        "p_value": 0.7538496075980295,
+        "p_value_holm": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 1.0
+      },
+      {
+        "name": "exports",
+        "estimate": 0.013744691281439453,
+        "hc0_se": 0.010464238054485528,
+        "z_statistic": 1.313491838571825,
+        "p_value": 0.18901726923832896,
+        "p_value_holm": 0.9450863461916448,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 0.9450863461916448
+      },
+      {
+        "name": "imports",
+        "estimate": -0.007792092949550429,
+        "hc0_se": 0.018044061392098232,
+        "z_statistic": -0.4318369783957122,
+        "p_value": 0.6658599015103904,
+        "p_value_holm": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 1.0
+      },
+      {
+        "name": "corporate_lending",
+        "estimate": -0.04211239603644495,
+        "hc0_se": 0.049201105448525705,
+        "z_statistic": -0.8559237775765632,
+        "p_value": 0.39203994185091573,
+        "p_value_holm": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 1.0
+      },
+      {
+        "name": "household_lending",
+        "estimate": 0.07512542007843497,
+        "hc0_se": 0.02683617183658186,
+        "z_statistic": 2.799408966968507,
+        "p_value": 0.005119624993344942,
+        "p_value_holm": 0.03071774996006965,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 0.03071774996006965
+      },
+      {
+        "name": "consumption",
+        "estimate": -0.0014785727707736366,
+        "hc0_se": 0.020968646439157686,
+        "z_statistic": -0.07051350572693575,
+        "p_value": 0.9437849512923012,
+        "p_value_holm": 1.0,
+        "p_value_family": "six slope-coefficient p-values (Holm across six)",
+        "p_value_adjusted": 1.0
+      },
+      {
+        "name": "cutpoint[Decrease|Hold]",
+        "estimate": 0.3537243712880859,
+        "hc0_se": 0.7383437429509783,
+        "z_statistic": 0.47907817282277854,
+        "p_value": 0.6318830170725244,
+        "p_value_holm": 0.6318830170725244,
+        "p_value_family": "cutpoint coefficient tests (unadjusted; outside six-slope family)",
+        "p_value_adjusted": 0.6318830170725244
+      },
+      {
+        "name": "cutpoint[Hold|Increase]",
+        "estimate": 3.3149380105299433,
+        "hc0_se": 0.7455704247902439,
+        "z_statistic": 4.446176914089042,
+        "p_value": 8.741196969927691e-06,
+        "p_value_holm": 8.741196969927691e-06,
+        "p_value_family": "cutpoint coefficient tests (unadjusted; outside six-slope family)",
+        "p_value_adjusted": 8.741196969927691e-06
+      }
+    ],
+    "economic_size_plus_one_sd": [
+      {
+        "feature": "inflation",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 4.57040710637602,
+        "probability_change": {
+          "Increase": {
+            "change": 0.012471667633326411,
+            "ci_95_low": -0.0679469203069214,
+            "ci_95_high": 0.09289025557357422,
+            "delta_method_se": 0.041029891806248886
+          },
+          "Decrease": {
+            "change": -0.017997538971764926,
+            "ci_95_low": -0.1289774926663192,
+            "ci_95_high": 0.09298241472278933,
+            "delta_method_se": 0.05662242535436442
+          }
+        }
+      },
+      {
+        "feature": "exports",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 27.869792071367907,
+        "probability_change": {
+          "Increase": {
+            "change": 0.052458258227240706,
+            "ci_95_low": -0.03798172249592964,
+            "ci_95_high": 0.14289823895041104,
+            "delta_method_se": 0.04614284730773997
+          },
+          "Decrease": {
+            "change": -0.06339801023065661,
+            "ci_95_low": -0.14958101137175484,
+            "ci_95_high": 0.022784990910441616,
+            "delta_method_se": 0.04397091894953991
+          }
+        }
+      },
+      {
+        "feature": "imports",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 17.611687153104146,
+        "probability_change": {
+          "Increase": {
+            "change": -0.015624996699645233,
+            "ci_95_low": -0.08332762953684489,
+            "ci_95_high": 0.05207763613755442,
+            "delta_method_se": 0.03454215961081615
+          },
+          "Decrease": {
+            "change": 0.0261080702772713,
+            "ci_95_low": -0.09506106535994378,
+            "ci_95_high": 0.1472772059144864,
+            "delta_method_se": 0.061820987570007695
+          }
+        }
+      },
+      {
+        "feature": "corporate_lending",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 7.989157722989778,
+        "probability_change": {
+          "Increase": {
+            "change": -0.0356049732175312,
+            "ci_95_low": -0.1068519790167362,
+            "ci_95_high": 0.035642032581673797,
+            "delta_method_se": 0.03635051316285969
+          },
+          "Decrease": {
+            "change": 0.06701739746085689,
+            "ci_95_low": -0.10222293710261707,
+            "ci_95_high": 0.23625773202433084,
+            "delta_method_se": 0.08634710947116019
+          }
+        }
+      },
+      {
+        "feature": "household_lending",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 11.243824905461855,
+        "probability_change": {
+          "Increase": {
+            "change": 0.1341041818675367,
+            "ci_95_low": 0.009098036136380161,
+            "ci_95_high": 0.25911032759869324,
+            "delta_method_se": 0.06377864578120232
+          },
+          "Decrease": {
+            "change": -0.1216888631173976,
+            "ci_95_low": -0.19080269592918608,
+            "ci_95_high": -0.0525750303056091,
+            "delta_method_se": 0.03526215959785128
+          }
+        }
+      },
+      {
+        "feature": "consumption",
+        "move": "+1 estimation-sample SD, other factors at their means",
+        "sd": 9.748772394864156,
+        "probability_change": {
+          "Increase": {
+            "change": -0.001716105921315103,
+            "ci_95_low": -0.049103009686956696,
+            "ci_95_high": 0.04567079784432649,
+            "delta_method_se": 0.02417699171716408
+          },
+          "Decrease": {
+            "change": 0.0026595962382084115,
+            "ci_95_low": -0.07170090107643072,
+            "ci_95_high": 0.07702009355284754,
+            "delta_method_se": 0.037939029242162824
+          }
+        }
+      }
+    ]
+  },
+  "benchmark_comparison": {
+    "metric_target": "expected ordinal score: Decrease=-1, Hold=0, Increase=+1",
+    "model": {
+      "rmse": 0.6246822051080606,
+      "mae": 0.47892751242315573,
+      "log_score": 0.939710389728996
+    },
+    "benchmark_always_hold": {
+      "rmse": 0.6236095644623235,
+      "mae": 0.3888888888888889,
+      "log_score": "+Infinity"
+    },
+    "class_frequency_comparator_secondary": {
+      "label": "added after the specification freeze, secondary",
+      "source_sample": "estimation sample only",
+      "class_order": [
+        "Decrease",
+        "Hold",
+        "Increase"
+      ],
+      "training_class_counts": {
+        "Decrease": 20,
+        "Hold": 38,
+        "Increase": 12
+      },
+      "probabilities": {
+        "Decrease": 0.2857142857142857,
+        "Hold": 0.5428571428571428,
+        "Increase": 0.17142857142857143
+      },
+      "log_score": 0.9456565309065696
+    },
+    "rmse_ratio_model_to_hold": 1.0017200516266327,
+    "winner": "Always Hold",
+    "model_class_probabilities_order": [
+      "Decrease",
+      "Hold",
+      "Increase"
+    ],
+    "holdout_n": 18,
+    "actual_score_distribution": {
+      "-1": 4,
+      "0": 11,
+      "1": 3
+    }
+  },
+  "robustness_checks": {
+    "total_specifications_including_primary": 10,
+    "robustness_specification_count": 9,
+    "selection_prohibited": true,
+    "checks": [
+      {
+        "specification_id": "RB01",
+        "name": "Drop decision years 2020-2022",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 61,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-09-07",
+        "estimation_n": 48,
+        "holdout_n": 13,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": 0.030092151604969395,
+            "robust_se": 0.10222502345832264,
+            "z_statistic": 0.29437167717782947,
+            "p_value": 0.7684739069426255,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": -0.009894900049014003,
+            "robust_se": 0.022732198707576187,
+            "z_statistic": -0.43528125793288225,
+            "p_value": 0.6633582872161085,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": 0.008077906766764772,
+            "robust_se": 0.03238094801208554,
+            "z_statistic": 0.24946480145515984,
+            "p_value": 0.8030012647315851,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.05790949628006921,
+            "robust_se": 0.058782742991213235,
+            "z_statistic": -0.9851445055690143,
+            "p_value": 0.32455309487644834,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.007644306245186059,
+            "robust_se": 0.035203722145476644,
+            "z_statistic": 0.21714482956082196,
+            "p_value": 0.8280954784016098,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "consumption",
+            "estimate": 0.11075546900882544,
+            "robust_se": 0.1500247924767706,
+            "z_statistic": 0.7382477734536742,
+            "p_value": 0.4603638969034003,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB01 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.7064525943001164,
+        "rmse_hold": 0.6201736729460423,
+        "rmse_ratio_model_to_hold": 1.139120580440345,
+        "benchmark_conclusion": "Always Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": true,
+        "survives": "No",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2025-01-20",
+        "holdout_start": "2025-03-11",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB02",
+        "name": "Last 60 calendar months",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 42,
+        "sample_start": "2021-09-14",
+        "sample_end": "2026-09-07",
+        "estimation_n": 33,
+        "holdout_n": 9,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": -0.1789843726666711,
+            "robust_se": 0.15938326140376236,
+            "z_statistic": -1.1229809899124454,
+            "p_value": 0.26144556825383813,
+            "p_value_adjusted": 0.7843367047615144,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.08971319376854289,
+            "robust_se": 0.03293340345711326,
+            "z_statistic": 2.724079030743657,
+            "p_value": 0.006448107461861955,
+            "p_value_adjusted": 0.03868864477117173,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "imports",
+            "estimate": 0.11879414195795729,
+            "robust_se": 0.06052785803809771,
+            "z_statistic": 1.9626358144572926,
+            "p_value": 0.049688506109427495,
+            "p_value_adjusted": 0.24844253054713747,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": 0.007485188685384728,
+            "robust_se": 0.0864509242668417,
+            "z_statistic": 0.08658309611914325,
+            "p_value": 0.9310029027772918,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": -0.23014519785563167,
+            "robust_se": 0.11841226776320651,
+            "z_statistic": -1.9435925196185053,
+            "p_value": 0.0519446086032381,
+            "p_value_adjusted": 0.24844253054713747,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "consumption",
+            "estimate": 0.08277773063888548,
+            "robust_se": 0.12433862475407507,
+            "z_statistic": 0.6657442995095739,
+            "p_value": 0.5055745529274166,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB02 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "NONCONVERGED",
+        "rmse_model": 0.9506913026899463,
+        "rmse_hold": 0.6666666666666666,
+        "rmse_ratio_model_to_hold": 1.4260369540349196,
+        "benchmark_conclusion": "Always Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": true,
+        "survives": "No",
+        "estimation_start": "2021-09-14",
+        "estimation_end": "2025-07-14",
+        "holdout_start": "2025-09-02",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": false,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB03",
+        "name": "Binary logit: Increase vs not Increase",
+        "estimator": "Binary Logit",
+        "feature_transformations": null,
+        "n_usable": 88,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-09-07",
+        "estimation_n": 70,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": -0.06686169913647352,
+            "robust_se": 0.13978719727306407,
+            "z_statistic": -0.47831060669929654,
+            "p_value": 0.6324291481956523,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.034525360109189975,
+            "robust_se": 0.022230965063745,
+            "z_statistic": 1.5530301995523839,
+            "p_value": 0.12041592000236478,
+            "p_value_adjusted": 0.6020796000118239,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": 0.03800460231064668,
+            "robust_se": 0.03864299340749126,
+            "z_statistic": 0.9834797710903829,
+            "p_value": 0.32537136652349896,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.09329042157127687,
+            "robust_se": 0.08562019840668234,
+            "z_statistic": -1.0895842722550373,
+            "p_value": 0.2758963142659495,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.18728040337398727,
+            "robust_se": 0.06874533676184726,
+            "z_statistic": 2.7242633783696206,
+            "p_value": 0.0064445091042325845,
+            "p_value_adjusted": 0.038667054625395506,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "consumption",
+            "estimate": 0.03940889037175134,
+            "robust_se": 0.05206149856538791,
+            "z_statistic": 0.7569680369890771,
+            "p_value": 0.4490690119373856,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB03 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.6229140173151069,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.9988846432337574,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": "P(Increase)*1 + P(not Increase)*0, compared with actual ordinal score -1/0/+1"
+      },
+      {
+        "specification_id": "RB04",
+        "name": "Ordered logit: 3-month trailing inflation average",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 88,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-09-07",
+        "estimation_n": 70,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": -0.011612897847523368,
+            "robust_se": 0.07085186472215303,
+            "z_statistic": -0.16390391266431129,
+            "p_value": 0.8698067868976119,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.012514593448041197,
+            "robust_se": 0.010405109536527233,
+            "z_statistic": 1.2027353872737814,
+            "p_value": 0.22907873529184086,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": -0.0058827310789997785,
+            "robust_se": 0.019199151074068783,
+            "z_statistic": -0.3064057913969568,
+            "p_value": 0.759295699389052,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.026933491938784186,
+            "robust_se": 0.04936814389652072,
+            "z_statistic": -0.5455642001700282,
+            "p_value": 0.585365538518813,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.07446553780331013,
+            "robust_se": 0.0268267576069164,
+            "z_statistic": 2.7757934408037306,
+            "p_value": 0.005506718157164572,
+            "p_value_adjusted": 0.03304030894298743,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "consumption",
+            "estimate": -6.04105928633635e-05,
+            "robust_se": 0.021031575114178292,
+            "z_statistic": -0.0028723760600620975,
+            "p_value": 0.9977081786403194,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB04 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.6137618060078706,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.9842084550724559,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB05",
+        "name": "Ordered logit: 6-month trailing inflation average",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 88,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-09-07",
+        "estimation_n": 70,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": -0.10286768954818526,
+            "robust_se": 0.08201484294747338,
+            "z_statistic": -1.2542569838738475,
+            "p_value": 0.20974861369889353,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.009412478492647576,
+            "robust_se": 0.010436438649559463,
+            "z_statistic": 0.9018860560297444,
+            "p_value": 0.36711739929439835,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": 0.0027797012647134195,
+            "robust_se": 0.021937791950799933,
+            "z_statistic": 0.1267083428882669,
+            "p_value": 0.8991712423957723,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": 0.01451494956380953,
+            "robust_se": 0.05048528455918236,
+            "z_statistic": 0.2875085223456371,
+            "p_value": 0.7737229773944716,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.06835168686730772,
+            "robust_se": 0.02823184249543426,
+            "z_statistic": 2.4210848752914997,
+            "p_value": 0.01547426381167491,
+            "p_value_adjusted": 0.09284558287004946,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "consumption",
+            "estimate": 0.004078764736951275,
+            "robust_se": 0.021196085811067075,
+            "z_statistic": 0.19243009173050415,
+            "p_value": 0.847405323047705,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB05 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.5898775898665272,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.9459085034642147,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB06",
+        "name": "Ordered logit: release lag 1 month",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 87,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-07-27",
+        "estimation_n": 69,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": 0.16454139993666111,
+            "robust_se": 0.0843127575041028,
+            "z_statistic": 1.951559939534112,
+            "p_value": 0.05099047334190165,
+            "p_value_adjusted": 0.2039618933676066,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.02687225818719405,
+            "robust_se": 0.011697873172129537,
+            "z_statistic": 2.2971917879241373,
+            "p_value": 0.021607831393847324,
+            "p_value_adjusted": 0.10803915696923662,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": -0.023922240179753213,
+            "robust_se": 0.018703754726028712,
+            "z_statistic": -1.279007372057884,
+            "p_value": 0.2008944598694523,
+            "p_value_adjusted": 0.2039618933676066,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.11566986163882725,
+            "robust_se": 0.05932598582966351,
+            "z_statistic": -1.9497334940364583,
+            "p_value": 0.051207891987298866,
+            "p_value_adjusted": 0.2039618933676066,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.09079122519804216,
+            "robust_se": 0.02798944405033632,
+            "z_statistic": 3.24376665126906,
+            "p_value": 0.001179603409007365,
+            "p_value_adjusted": 0.007077620454044191,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "consumption",
+            "estimate": -0.05678765185345735,
+            "robust_se": 0.031743716660250186,
+            "z_statistic": -1.788941492303812,
+            "p_value": 0.07362423860474789,
+            "p_value_adjusted": 0.2039618933676066,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB06 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.7553639174814669,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 1.2112769920915856,
+        "benchmark_conclusion": "Always Hold",
+        "same_signs_as_primary": true,
+        "same_benchmark_conclusion_as_primary": true,
+        "survives": "Yes",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2024-04-15",
+        "holdout_start": "2024-06-03",
+        "holdout_end": "2026-07-27",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB07",
+        "name": "Ordered logit: release lag 3 months",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 87,
+        "sample_start": "2016-05-06",
+        "sample_end": "2026-09-07",
+        "estimation_n": 69,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": 0.018831946591580592,
+            "robust_se": 0.07208821043518036,
+            "z_statistic": 0.26123476332532536,
+            "p_value": 0.7939114713505575,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.008976772370191916,
+            "robust_se": 0.009773915063532913,
+            "z_statistic": 0.9184418231425823,
+            "p_value": 0.35838760334389796,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": -0.009093067743553899,
+            "robust_se": 0.02042855754747955,
+            "z_statistic": -0.4451155066832308,
+            "p_value": 0.6562362831610105,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.07039198052994296,
+            "robust_se": 0.049715315830779455,
+            "z_statistic": -1.4159013043292845,
+            "p_value": 0.15680440301770818,
+            "p_value_adjusted": 0.7840220150885409,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.08237021589121783,
+            "robust_se": 0.0290687449382035,
+            "z_statistic": 2.8336350972952755,
+            "p_value": 0.004602185039725879,
+            "p_value_adjusted": 0.027613110238355273,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "consumption",
+            "estimate": 0.039656636025950646,
+            "robust_se": 0.0336650132274153,
+            "z_statistic": 1.1779777348685558,
+            "p_value": 0.23880548267858703,
+            "p_value_adjusted": 0.9552219307143481,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB07 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.6090945271886977,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.9767241586710739,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-05-06",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB08",
+        "name": "Ordered logit: 3-month log growth for exports and lending",
+        "estimator": "Ordered Logit",
+        "feature_transformations": null,
+        "n_usable": 88,
+        "sample_start": "2016-03-15",
+        "sample_end": "2026-09-07",
+        "estimation_n": 70,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": -0.010184058979600489,
+            "robust_se": 0.06144759535694352,
+            "z_statistic": -0.16573567965421937,
+            "p_value": 0.8683649660418201,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": -0.015014196988394625,
+            "robust_se": 0.01414627126345927,
+            "z_statistic": -1.0613536746730754,
+            "p_value": 0.2885292013764871,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": 0.005841533433922444,
+            "robust_se": 0.010363174571467598,
+            "z_statistic": 0.5636818518917592,
+            "p_value": 0.5729706704284729,
+            "p_value_adjusted": 1.0,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": -0.010484873945699772,
+            "robust_se": 0.09683302133456945,
+            "z_statistic": -0.10827787671184298,
+            "p_value": 0.9137752712529144,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.327095144099309,
+            "robust_se": 0.09011180323867443,
+            "z_statistic": 3.62988124022942,
+            "p_value": 0.00028355164916658626,
+            "p_value_adjusted": 0.0017013098949995174,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": true
+          },
+          {
+            "name": "consumption",
+            "estimate": -0.012317930811249168,
+            "robust_se": 0.02351879414712079,
+            "z_statistic": -0.5237484002876546,
+            "p_value": 0.6004535468571062,
+            "p_value_adjusted": 1.0,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB08 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.535659436824736,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.8589660379673328,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-03-15",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      },
+      {
+        "specification_id": "RB09",
+        "name": "Differenced non-stationary factors",
+        "estimator": "Ordered Logit",
+        "feature_transformations": {
+          "household_lending": "first difference of 12-month log growth",
+          "corporate_lending": "first difference of 12-month log growth",
+          "inflation": "first difference of inflation",
+          "other factors": "main-model transformations unchanged"
+        },
+        "n_usable": 87,
+        "sample_start": "2016-05-06",
+        "sample_end": "2026-09-07",
+        "estimation_n": 69,
+        "holdout_n": 18,
+        "coefficients": [
+          {
+            "name": "inflation",
+            "estimate": 1.0138111820157358,
+            "robust_se": 0.5820590610838519,
+            "z_statistic": 1.7417668580365686,
+            "p_value": 0.08154924814479453,
+            "p_value_adjusted": 0.3261969925791781,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "exports",
+            "estimate": 0.009968966854497803,
+            "robust_se": 0.01367765918134193,
+            "z_statistic": 0.7288503626480725,
+            "p_value": 0.46609320077637706,
+            "p_value_adjusted": 0.6508124804742613,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "imports",
+            "estimate": 0.04194204390765071,
+            "robust_se": 0.02050597994879637,
+            "z_statistic": 2.045356720936059,
+            "p_value": 0.04081970246069701,
+            "p_value_adjusted": 0.24491821476418205,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "corporate_lending",
+            "estimate": 0.1222859694025358,
+            "robust_se": 0.05994795443583143,
+            "z_statistic": 2.0398689255265796,
+            "p_value": 0.04136338251821682,
+            "p_value_adjusted": 0.24491821476418205,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "household_lending",
+            "estimate": 0.31004857943976666,
+            "robust_se": 0.28756104213730105,
+            "z_statistic": 1.0782009173959264,
+            "p_value": 0.28094410263690495,
+            "p_value_adjusted": 0.6508124804742613,
+            "sign": "positive",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          },
+          {
+            "name": "consumption",
+            "estimate": -0.038090141693761424,
+            "robust_se": 0.030849399616915338,
+            "z_statistic": -1.2347125768008738,
+            "p_value": 0.21693749349142044,
+            "p_value_adjusted": 0.6508124804742613,
+            "sign": "negative",
+            "p_value_family": "robustness specification RB09 coefficient p-values (Holm within specification)",
+            "significant_at_5pct_adjusted": false
+          }
+        ],
+        "status": "COMPLETED",
+        "rmse_model": 0.6083577002448778,
+        "rmse_hold": 0.6236095644623235,
+        "rmse_ratio_model_to_hold": 0.9755426069665947,
+        "benchmark_conclusion": "Model beats Hold",
+        "same_signs_as_primary": false,
+        "same_benchmark_conclusion_as_primary": false,
+        "survives": "No",
+        "estimation_start": "2016-05-06",
+        "estimation_end": "2024-06-03",
+        "holdout_start": "2024-07-15",
+        "holdout_end": "2026-09-07",
+        "estimator_converged": true,
+        "binary_score_definition": null
+      }
+    ]
+  },
+  "falsification_verdicts": [
+    {
+      "rule": "Joint LR test of all six slopes is not rejected at 10% (raw p-value)",
+      "statistic": 15.240435352202809,
+      "threshold": "raw p >= 0.10",
+      "verdict": "not falsified",
+      "raw_p_value": 0.018466879346204394,
+      "adjusted_p_value": 0.018466879346204394,
+      "p_value_family": "pre-specified joint LR test (single primary test; no adjustment)",
+      "adjusted_transparency_verdict": "not falsified"
+    },
+    {
+      "rule": "Any factor has an opposite-sign coefficient significant at 5% (raw p-value)",
+      "statistic": "no opposite-sign significant factors",
+      "threshold": "opposite sign and raw p < 0.05",
+      "verdict": "not falsified",
+      "raw_p_value": {
+        "inflation": 0.7538496075980295,
+        "exports": 0.18901726923832896,
+        "imports": 0.6658599015103904,
+        "corporate_lending": 0.39203994185091573,
+        "household_lending": 0.005119624993344942,
+        "consumption": 0.9437849512923012
+      },
+      "adjusted_p_value": {
+        "inflation": 1.0,
+        "exports": 0.9450863461916448,
+        "imports": 1.0,
+        "corporate_lending": 1.0,
+        "household_lending": 0.03071774996006965,
+        "consumption": 1.0
+      },
+      "p_value_family": "six slope-coefficient p-values (Holm across six)",
+      "adjusted_transparency_verdict": "not falsified"
+    },
+    {
+      "rule": "Holdout expected-score RMSE ratio is >= 1",
+      "statistic": 1.0017200516266327,
+      "threshold": "RMSE_model / RMSE_Always_Hold >= 1",
+      "verdict": "falsified",
+      "raw_p_value": "not applicable",
+      "adjusted_p_value": "not applicable",
+      "p_value_family": "not applicable (RMSE criterion has no p-value)",
+      "adjusted_transparency_verdict": "same rule; p-value adjustment not applicable"
+    }
+  ],
+  "economic_size_plus_one_sd": [
+    {
+      "feature": "inflation",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 4.57040710637602,
+      "probability_change": {
+        "Increase": {
+          "change": 0.012471667633326411,
+          "ci_95_low": -0.0679469203069214,
+          "ci_95_high": 0.09289025557357422,
+          "delta_method_se": 0.041029891806248886
+        },
+        "Decrease": {
+          "change": -0.017997538971764926,
+          "ci_95_low": -0.1289774926663192,
+          "ci_95_high": 0.09298241472278933,
+          "delta_method_se": 0.05662242535436442
+        }
+      }
+    },
+    {
+      "feature": "exports",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 27.869792071367907,
+      "probability_change": {
+        "Increase": {
+          "change": 0.052458258227240706,
+          "ci_95_low": -0.03798172249592964,
+          "ci_95_high": 0.14289823895041104,
+          "delta_method_se": 0.04614284730773997
+        },
+        "Decrease": {
+          "change": -0.06339801023065661,
+          "ci_95_low": -0.14958101137175484,
+          "ci_95_high": 0.022784990910441616,
+          "delta_method_se": 0.04397091894953991
+        }
+      }
+    },
+    {
+      "feature": "imports",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 17.611687153104146,
+      "probability_change": {
+        "Increase": {
+          "change": -0.015624996699645233,
+          "ci_95_low": -0.08332762953684489,
+          "ci_95_high": 0.05207763613755442,
+          "delta_method_se": 0.03454215961081615
+        },
+        "Decrease": {
+          "change": 0.0261080702772713,
+          "ci_95_low": -0.09506106535994378,
+          "ci_95_high": 0.1472772059144864,
+          "delta_method_se": 0.061820987570007695
+        }
+      }
+    },
+    {
+      "feature": "corporate_lending",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 7.989157722989778,
+      "probability_change": {
+        "Increase": {
+          "change": -0.0356049732175312,
+          "ci_95_low": -0.1068519790167362,
+          "ci_95_high": 0.035642032581673797,
+          "delta_method_se": 0.03635051316285969
+        },
+        "Decrease": {
+          "change": 0.06701739746085689,
+          "ci_95_low": -0.10222293710261707,
+          "ci_95_high": 0.23625773202433084,
+          "delta_method_se": 0.08634710947116019
+        }
+      }
+    },
+    {
+      "feature": "household_lending",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 11.243824905461855,
+      "probability_change": {
+        "Increase": {
+          "change": 0.1341041818675367,
+          "ci_95_low": 0.009098036136380161,
+          "ci_95_high": 0.25911032759869324,
+          "delta_method_se": 0.06377864578120232
+        },
+        "Decrease": {
+          "change": -0.1216888631173976,
+          "ci_95_low": -0.19080269592918608,
+          "ci_95_high": -0.0525750303056091,
+          "delta_method_se": 0.03526215959785128
+        }
+      }
+    },
+    {
+      "feature": "consumption",
+      "move": "+1 estimation-sample SD, other factors at their means",
+      "sd": 9.748772394864156,
+      "probability_change": {
+        "Increase": {
+          "change": -0.001716105921315103,
+          "ci_95_low": -0.049103009686956696,
+          "ci_95_high": 0.04567079784432649,
+          "delta_method_se": 0.02417699171716408
+        },
+        "Decrease": {
+          "change": 0.0026595962382084115,
+          "ci_95_low": -0.07170090107643072,
+          "ci_95_high": 0.07702009355284754,
+          "delta_method_se": 0.037939029242162824
+        }
+      }
+    }
+  ],
+  "per_factor_contribution_to_latest_score_change": [
+    {
+      "feature": "inflation",
+      "latest_value": 10.2,
+      "previous_usable_decision_value": 10.4,
+      "expected_score_contribution_to_latest_change": -0.0013397648594346,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    },
+    {
+      "feature": "exports",
+      "latest_value": 40.20941134441269,
+      "previous_usable_decision_value": -11.421425016077436,
+      "expected_score_contribution_to_latest_change": 0.21758745430380505,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    },
+    {
+      "feature": "imports",
+      "latest_value": -2.2429789251940946,
+      "previous_usable_decision_value": -5.293223348478193,
+      "expected_score_contribution_to_latest_change": -0.007237273098096519,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    },
+    {
+      "feature": "corporate_lending",
+      "latest_value": 10.470105478448488,
+      "previous_usable_decision_value": 14.856638414746826,
+      "expected_score_contribution_to_latest_change": 0.056428740192372706,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    },
+    {
+      "feature": "household_lending",
+      "latest_value": 13.602262941544296,
+      "previous_usable_decision_value": 15.193561505579822,
+      "expected_score_contribution_to_latest_change": -0.0363502496650534,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    },
+    {
+      "feature": "consumption",
+      "latest_value": 5.6,
+      "previous_usable_decision_value": 4.3,
+      "expected_score_contribution_to_latest_change": -0.0005854872498857744,
+      "method": "latest expected score minus one-factor counterfactual reset to prior usable decision; contributions are not additive"
+    }
+  ],
+  "units": {
+    "inflation": "year-on-year rate per draft spec; exact definition and units UNKNOWN",
+    "consumption": "year-on-year rate per draft spec; exact definition and units UNKNOWN",
+    "exports": "12-month log change, percent; underlying source units UNKNOWN",
+    "imports": "12-month log change, percent; underlying source units UNKNOWN",
+    "corporate_lending": "12-month log change, percent; underlying source units UNKNOWN",
+    "household_lending": "12-month log change, percent; underlying source units UNKNOWN"
+  },
+  "latest_feature_vector": {
+    "inflation": 10.2,
+    "exports": 40.20941134441269,
+    "imports": -2.2429789251940946,
+    "corporate_lending": 10.470105478448488,
+    "household_lending": 13.602262941544296,
+    "consumption": 5.6
+  },
+  "latest_prediction": {
+    "date": "2026-09-07",
+    "expected_score": -0.14151640940874505,
+    "class_probabilities": {
+      "Decrease": 0.26631074058261256,
+      "Hold": 0.6088949282435199,
+      "Increase": 0.12479433117386751
+    },
+    "class_order": [
+      "Decrease",
+      "Hold",
+      "Increase"
+    ]
+  },
+  "package_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.16.1",
+    "statsmodels": "0.15.0"
+  },
+  "data_sha256_normalized_crlf_to_lf": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59",
+  "replication_tolerance": {
+    "coefficients_absolute": 1e-06,
+    "headline_score_absolute": 0.01,
+    "headline_score_name": "holdout RMSE ratio"
+  },
+  "specification": {
+    "source": "docs/model_spec.md",
+    "transformation": "inflation and consumption levels; 12-month log growth on exports, imports, corporate lending, household lending; all aligned to decision month minus two (assumption)",
+    "holdout_fraction": 0.2,
+    "holdout_rule": "ceil(20 percent of usable n), last observations chronologically",
+    "prior_exploration_disclosed": true,
+    "not_preregistered": true
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "assumed_release_lag_months": 2,
+  "meaning": "Every factor enters a decision with its value for the calendar month this many months before the decision month. This is an assumption used by src/ingest.py and src/model.py, not a verified publication lag.",
+  "real_lag_source": "docs/facts_to_fill.csv column release_lag_days: calendar days from the last day of the reference month to the publication date. python run.py facts compares them in outputs/release_lag_check.md; the estimation is not changed."
+}

@@ -1,0 +1,1199 @@
+{
+  "input": {
+    "path": "data\\processed\\nbk_decisions_clean.csv",
+    "sha256": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59"
+  },
+  "features": [
+    "inflation",
+    "exports",
+    "imports",
+    "corporate_lending",
+    "household_lending",
+    "consumption"
+  ],
+  "classes": [
+    "Decrease",
+    "Hold",
+    "Increase"
+  ],
+  "split": {
+    "train_n": 74,
+    "train_start": "2015-10-02",
+    "train_end": "2024-09-02",
+    "cutoff": "2024-09-07",
+    "test_n": 16,
+    "test_start": "2024-10-14",
+    "test_end": "2026-09-07"
+  },
+  "model_parameters": {
+    "Logistic Regression": {
+      "C": 1.0,
+      "class_weight": "balanced",
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": 0.0,
+      "max_iter": 2000,
+      "n_jobs": null,
+      "penalty": "deprecated",
+      "random_state": 42,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "Random Forest (additional comparison)": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": "balanced",
+      "criterion": "gini",
+      "max_depth": 4,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 3,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 300,
+      "n_jobs": null,
+      "oob_score": false,
+      "random_state": 42,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "pipeline": [
+      "median imputer",
+      "standard scaler",
+      "classifier"
+    ],
+    "Hold benchmark": {
+      "rule": "predict Hold for every test observation"
+    }
+  },
+  "metrics": [
+    {
+      "Model": "Hold benchmark",
+      "Test observations": 16,
+      "Accuracy": 0.625,
+      "Balanced accuracy": 0.3333333333333333,
+      "Macro F1": 0.25641025641025644
+    },
+    {
+      "Model": "Logistic Regression",
+      "Test observations": 16,
+      "Accuracy": 0.1875,
+      "Balanced accuracy": 0.3333333333333333,
+      "Macro F1": 0.10526315789473684
+    },
+    {
+      "Model": "Random Forest (additional comparison)",
+      "Test observations": 16,
+      "Accuracy": 0.1875,
+      "Balanced accuracy": 0.3333333333333333,
+      "Macro F1": 0.10526315789473684
+    }
+  ],
+  "period_comparison": [
+    {
+      "test_period_months": 24,
+      "cutoff": "2024-09-07",
+      "train_n": 74,
+      "train_start": "2015-10-02",
+      "train_end": "2024-09-02",
+      "test_n": 16,
+      "test_start": "2024-10-14",
+      "test_end": "2026-09-07",
+      "train_class_distribution": {
+        "Increase": {
+          "count": 14,
+          "share": 0.1891891891891892
+        },
+        "Hold": {
+          "count": 39,
+          "share": 0.527027027027027
+        },
+        "Decrease": {
+          "count": 21,
+          "share": 0.28378378378378377
+        }
+      },
+      "actual_class_distribution": {
+        "Increase": {
+          "count": 3,
+          "share": 0.1875
+        },
+        "Hold": {
+          "count": 10,
+          "share": 0.625
+        },
+        "Decrease": {
+          "count": 3,
+          "share": 0.1875
+        }
+      },
+      "train_test_overlap": false,
+      "status": "EVALUATED",
+      "models": [
+        {
+          "model": "Hold benchmark",
+          "n": 16,
+          "accuracy": 0.625,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.25641025641025644,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 16,
+              "share": 1.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.1875
+            },
+            "Hold": {
+              "count": 10,
+              "share": 0.625
+            },
+            "Decrease": {
+              "count": 3,
+              "share": 0.1875
+            }
+          }
+        },
+        {
+          "model": "Logistic Regression",
+          "n": 16,
+          "accuracy": 0.1875,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.10526315789473684,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              10
+            ],
+            [
+              0,
+              0,
+              3
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Decrease": {
+              "count": 16,
+              "share": 1.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.1875
+            },
+            "Hold": {
+              "count": 10,
+              "share": 0.625
+            },
+            "Decrease": {
+              "count": 3,
+              "share": 0.1875
+            }
+          }
+        },
+        {
+          "model": "Random Forest",
+          "n": 16,
+          "accuracy": 0.1875,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.10526315789473684,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              10
+            ],
+            [
+              0,
+              0,
+              3
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Decrease": {
+              "count": 16,
+              "share": 1.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.1875
+            },
+            "Hold": {
+              "count": 10,
+              "share": 0.625
+            },
+            "Decrease": {
+              "count": 3,
+              "share": 0.1875
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_period_months": 36,
+      "cutoff": "2023-09-07",
+      "train_n": 66,
+      "train_start": "2015-10-02",
+      "train_end": "2023-08-28",
+      "test_n": 24,
+      "test_start": "2023-10-09",
+      "test_end": "2026-09-07",
+      "train_class_distribution": {
+        "Increase": {
+          "count": 14,
+          "share": 0.21212121212121213
+        },
+        "Hold": {
+          "count": 37,
+          "share": 0.5606060606060606
+        },
+        "Decrease": {
+          "count": 15,
+          "share": 0.22727272727272727
+        }
+      },
+      "actual_class_distribution": {
+        "Increase": {
+          "count": 3,
+          "share": 0.125
+        },
+        "Hold": {
+          "count": 12,
+          "share": 0.5
+        },
+        "Decrease": {
+          "count": 9,
+          "share": 0.375
+        }
+      },
+      "train_test_overlap": false,
+      "status": "EVALUATED",
+      "models": [
+        {
+          "model": "Hold benchmark",
+          "n": 24,
+          "accuracy": 0.5,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 24,
+              "share": 1.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.125
+            },
+            "Hold": {
+              "count": 12,
+              "share": 0.5
+            },
+            "Decrease": {
+              "count": 9,
+              "share": 0.375
+            }
+          }
+        },
+        {
+          "model": "Logistic Regression",
+          "n": 24,
+          "accuracy": 0.25,
+          "balanced_accuracy": 0.2222222222222222,
+          "macro_f1": 0.13333333333333333,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              12
+            ],
+            [
+              2,
+              1,
+              6
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 2,
+              "share": 0.08333333333333333
+            },
+            "Hold": {
+              "count": 1,
+              "share": 0.041666666666666664
+            },
+            "Decrease": {
+              "count": 21,
+              "share": 0.875
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.125
+            },
+            "Hold": {
+              "count": 12,
+              "share": 0.5
+            },
+            "Decrease": {
+              "count": 9,
+              "share": 0.375
+            }
+          }
+        },
+        {
+          "model": "Random Forest",
+          "n": 24,
+          "accuracy": 0.5,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              9,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 24,
+              "share": 1.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 3,
+              "share": 0.125
+            },
+            "Hold": {
+              "count": 12,
+              "share": 0.5
+            },
+            "Decrease": {
+              "count": 9,
+              "share": 0.375
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_period_months": 48,
+      "cutoff": "2022-09-07",
+      "train_n": 58,
+      "train_start": "2015-10-02",
+      "train_end": "2022-09-06",
+      "test_n": 32,
+      "test_start": "2022-10-27",
+      "test_end": "2026-09-07",
+      "train_class_distribution": {
+        "Increase": {
+          "count": 12,
+          "share": 0.20689655172413793
+        },
+        "Hold": {
+          "count": 32,
+          "share": 0.5517241379310345
+        },
+        "Decrease": {
+          "count": 14,
+          "share": 0.2413793103448276
+        }
+      },
+      "actual_class_distribution": {
+        "Increase": {
+          "count": 5,
+          "share": 0.15625
+        },
+        "Hold": {
+          "count": 17,
+          "share": 0.53125
+        },
+        "Decrease": {
+          "count": 10,
+          "share": 0.3125
+        }
+      },
+      "train_test_overlap": false,
+      "status": "EVALUATED",
+      "models": [
+        {
+          "model": "Hold benchmark",
+          "n": 32,
+          "accuracy": 0.53125,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.23129251700680273,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              10,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Hold": {
+              "count": 32,
+              "share": 1.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 5,
+              "share": 0.15625
+            },
+            "Hold": {
+              "count": 17,
+              "share": 0.53125
+            },
+            "Decrease": {
+              "count": 10,
+              "share": 0.3125
+            }
+          }
+        },
+        {
+          "model": "Logistic Regression",
+          "n": 32,
+          "accuracy": 0.15625,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.0900900900900901,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              5,
+              0,
+              0
+            ],
+            [
+              17,
+              0,
+              0
+            ],
+            [
+              10,
+              0,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 32,
+              "share": 1.0
+            },
+            "Hold": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 5,
+              "share": 0.15625
+            },
+            "Hold": {
+              "count": 17,
+              "share": 0.53125
+            },
+            "Decrease": {
+              "count": 10,
+              "share": 0.3125
+            }
+          }
+        },
+        {
+          "model": "Random Forest",
+          "n": 32,
+          "accuracy": 0.15625,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.0900900900900901,
+          "confusion_matrix_labels": [
+            "Increase",
+            "Hold",
+            "Decrease"
+          ],
+          "confusion_matrix_actual_rows_predicted_columns": [
+            [
+              5,
+              0,
+              0
+            ],
+            [
+              17,
+              0,
+              0
+            ],
+            [
+              10,
+              0,
+              0
+            ]
+          ],
+          "predicted_class_distribution": {
+            "Increase": {
+              "count": 32,
+              "share": 1.0
+            },
+            "Hold": {
+              "count": 0,
+              "share": 0.0
+            },
+            "Decrease": {
+              "count": 0,
+              "share": 0.0
+            }
+          },
+          "actual_class_distribution": {
+            "Increase": {
+              "count": 5,
+              "share": 0.15625
+            },
+            "Hold": {
+              "count": 17,
+              "share": 0.53125
+            },
+            "Decrease": {
+              "count": 10,
+              "share": 0.3125
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "out_of_sample_probability_analysis": {
+    "24": {
+      "Logistic Regression": {
+        "n": 16,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.002988250937619719,
+            "n": 16
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.03311018433821994,
+            "n": 16
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.9639015647241603,
+            "n": 16
+          }
+        ],
+        "maximum_probability": {
+          "n": 16,
+          "minimum": 0.8574884985817375,
+          "median": 0.9822320090980161,
+          "maximum": 0.9974715486298433
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 16,
+            "Share of forecasts": 1.0,
+            "Correct / n": "3 / 16",
+            "Accuracy": 0.1875
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 16,
+            "Share of forecasts": 1.0,
+            "Correct / n": "3 / 16",
+            "Accuracy": 0.1875
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 14,
+            "Share of forecasts": 0.875,
+            "Correct / n": "3 / 14",
+            "Accuracy": 0.21428571428571427
+          }
+        ],
+        "multiclass_brier": 1.514411820723385,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      },
+      "Random Forest": {
+        "n": 16,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.0493499253474018,
+            "n": 16
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.23887699426506362,
+            "n": 16
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.7117730803875348,
+            "n": 16
+          }
+        ],
+        "maximum_probability": {
+          "n": 16,
+          "minimum": 0.5943769719487599,
+          "median": 0.7307070943762122,
+          "maximum": 0.7741113886113888
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 16,
+            "Share of forecasts": 1.0,
+            "Correct / n": "3 / 16",
+            "Accuracy": 0.1875
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 12,
+            "Share of forecasts": 0.75,
+            "Correct / n": "2 / 12",
+            "Accuracy": 0.16666666666666666
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 0,
+            "Share of forecasts": 0.0,
+            "Correct / n": "Insufficient n (<5)",
+            "Accuracy": null
+          }
+        ],
+        "multiclass_brier": 0.9784389543738078,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      }
+    },
+    "36": {
+      "Logistic Regression": {
+        "n": 24,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.13755283815897265,
+            "n": 24
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.2137861303900511,
+            "n": 24
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.6486610314509762,
+            "n": 24
+          }
+        ],
+        "maximum_probability": {
+          "n": 24,
+          "minimum": 0.3814060261140544,
+          "median": 0.7152706528259101,
+          "maximum": 0.9684173567317605
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 15,
+            "Share of forecasts": 0.625,
+            "Correct / n": "3 / 15",
+            "Accuracy": 0.2
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 13,
+            "Share of forecasts": 0.5416666666666666,
+            "Correct / n": "3 / 13",
+            "Accuracy": 0.23076923076923078
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 5,
+            "Share of forecasts": 0.20833333333333334,
+            "Correct / n": "3 / 5",
+            "Accuracy": 0.6
+          }
+        ],
+        "multiclass_brier": 0.9894460024175965,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      },
+      "Random Forest": {
+        "n": 24,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.27713043649184954,
+            "n": 24
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.4945793614681746,
+            "n": 24
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.2282902020399756,
+            "n": 24
+          }
+        ],
+        "maximum_probability": {
+          "n": 24,
+          "minimum": 0.41618772531815995,
+          "median": 0.4945166417720763,
+          "maximum": 0.5602296869796866
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 9,
+            "Share of forecasts": 0.375,
+            "Correct / n": "6 / 9",
+            "Accuracy": 0.6666666666666666
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 0,
+            "Share of forecasts": 0.0,
+            "Correct / n": "Insufficient n (<5)",
+            "Accuracy": null
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 0,
+            "Share of forecasts": 0.0,
+            "Correct / n": "Insufficient n (<5)",
+            "Accuracy": null
+          }
+        ],
+        "multiclass_brier": 0.6337186064453735,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      }
+    },
+    "48": {
+      "Logistic Regression": {
+        "n": 32,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.9465664032179051,
+            "n": 32
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.053116511934762994,
+            "n": 32
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.000317084847331891,
+            "n": 32
+          }
+        ],
+        "maximum_probability": {
+          "n": 32,
+          "minimum": 0.8598804176007102,
+          "median": 0.9568764590868746,
+          "maximum": 0.9936831350747273
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 32,
+            "Share of forecasts": 1.0,
+            "Correct / n": "5 / 32",
+            "Accuracy": 0.15625
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 32,
+            "Share of forecasts": 1.0,
+            "Correct / n": "5 / 32",
+            "Accuracy": 0.15625
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 28,
+            "Share of forecasts": 0.875,
+            "Correct / n": "3 / 28",
+            "Accuracy": 0.10714285714285714
+          }
+        ],
+        "multiclass_brier": 1.5588795606748453,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      },
+      "Random Forest": {
+        "n": 32,
+        "mean_probabilities": [
+          {
+            "Class": "Increase",
+            "Mean predicted probability": 0.6090846809257997,
+            "n": 32
+          },
+          {
+            "Class": "Hold",
+            "Mean predicted probability": 0.2847554606303785,
+            "n": 32
+          },
+          {
+            "Class": "Decrease",
+            "Mean predicted probability": 0.10615985844382227,
+            "n": 32
+          }
+        ],
+        "maximum_probability": {
+          "n": 32,
+          "minimum": 0.5806336718836724,
+          "median": 0.6059406704406709,
+          "maximum": 0.6772586117586118
+        },
+        "thresholds": [
+          {
+            "Threshold": "> 50%",
+            "n above threshold": 32,
+            "Share of forecasts": 1.0,
+            "Correct / n": "5 / 32",
+            "Accuracy": 0.15625
+          },
+          {
+            "Threshold": "> 70%",
+            "n above threshold": 0,
+            "Share of forecasts": 0.0,
+            "Correct / n": "Insufficient n (<5)",
+            "Accuracy": null
+          },
+          {
+            "Threshold": "> 90%",
+            "n above threshold": 0,
+            "Share of forecasts": 0.0,
+            "Correct / n": "Insufficient n (<5)",
+            "Accuracy": null
+          }
+        ],
+        "multiclass_brier": 0.9015074312051841,
+        "calibration_note": "Descriptive only; sample sizes are small and no calibration fit or claim is made."
+      }
+    }
+  },
+  "primary_period_months": 24,
+  "primary_period_justification": "Retain the existing final 24-month sealed test as the primary estimate; 36- and 48-month windows are sensitivity analyses, not selected by performance.",
+  "class_metrics": {
+    "Hold benchmark": [
+      {
+        "Class": "Increase",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 3,
+        "Predicted observations": 0
+      },
+      {
+        "Class": "Hold",
+        "Precision": 0.625,
+        "Recall": 1.0,
+        "F1-score": 0.7692307692307693,
+        "Actual observations": 10,
+        "Predicted observations": 16
+      },
+      {
+        "Class": "Decrease",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 3,
+        "Predicted observations": 0
+      }
+    ],
+    "Logistic Regression": [
+      {
+        "Class": "Increase",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 3,
+        "Predicted observations": 0
+      },
+      {
+        "Class": "Hold",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 10,
+        "Predicted observations": 0
+      },
+      {
+        "Class": "Decrease",
+        "Precision": 0.1875,
+        "Recall": 1.0,
+        "F1-score": 0.3157894736842105,
+        "Actual observations": 3,
+        "Predicted observations": 16
+      }
+    ],
+    "Random Forest": [
+      {
+        "Class": "Increase",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 3,
+        "Predicted observations": 0
+      },
+      {
+        "Class": "Hold",
+        "Precision": 0.0,
+        "Recall": 0.0,
+        "F1-score": 0.0,
+        "Actual observations": 10,
+        "Predicted observations": 0
+      },
+      {
+        "Class": "Decrease",
+        "Precision": 0.1875,
+        "Recall": 1.0,
+        "F1-score": 0.3157894736842105,
+        "Actual observations": 3,
+        "Predicted observations": 16
+      }
+    ]
+  },
+  "confusion_matrices": {
+    "Hold benchmark": [
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        10,
+        0
+      ],
+      [
+        0,
+        3,
+        0
+      ]
+    ],
+    "Logistic Regression": [
+      [
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        10
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ],
+    "Random Forest": [
+      [
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        10
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ]
+  },
+  "test_class_counts": {
+    "Hold": 10,
+    "Increase": 3,
+    "Decrease": 3
+  },
+  "limitations": [
+    "Only 16 observations are in the final test; reported metrics are descriptive.",
+    "Predictor availability uses the existing month t-2 approximation; exact release dates are unverified.",
+    "No hyperparameter search or model selection uses final-test observations.",
+    "Random Forest remains an additional comparison in the existing backtest, not a claimed improvement."
+  ]
+}

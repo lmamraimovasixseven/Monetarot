@@ -1,0 +1,898 @@
+{
+  "forecast": {
+    "origin": "2026-09",
+    "target_period": "2026-10",
+    "value": 16.20175310253724,
+    "lower_95": 14.864043859871252,
+    "upper_95": 17.539462345203226
+  },
+  "benchmark_forecast": 16.25,
+  "backtest_metrics": {
+    "model": {
+      "n": 96,
+      "mae": 0.36523644698087826,
+      "rmse": 0.6744016973970519,
+      "bias": 0.03362790836715479
+    },
+    "benchmark": {
+      "n": 96,
+      "mae": 0.23177083333333334,
+      "rmse": 0.6097087761109123,
+      "bias": -0.07552083333333333
+    }
+  },
+  "robustness": {
+    "macro_lag_1": {
+      "model": {
+        "n": 96,
+        "mae": 0.3765566715547372,
+        "rmse": 0.6922647001955072,
+        "bias": 0.057136698395623874
+      },
+      "benchmark": {
+        "n": 96,
+        "mae": 0.23177083333333334,
+        "rmse": 0.6097087761109123,
+        "bias": -0.07552083333333333
+      }
+    },
+    "macro_lag_3": {
+      "model": {
+        "n": 96,
+        "mae": 0.33770453431525566,
+        "rmse": 0.6508913025028188,
+        "bias": 0.015392838688415048
+      },
+      "benchmark": {
+        "n": 96,
+        "mae": 0.23177083333333334,
+        "rmse": 0.6097087761109123,
+        "bias": -0.07552083333333333
+      }
+    }
+  },
+  "backtest_predictions": [
+    {
+      "origin": "2018-08",
+      "target_period": "2018-09",
+      "actual": 9.25,
+      "model": 9.429785693213534,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2018-09",
+      "target_period": "2018-10",
+      "actual": 9.25,
+      "model": 9.086879288340358,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2018-10",
+      "target_period": "2018-11",
+      "actual": 9.25,
+      "model": 9.084796931559193,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2018-11",
+      "target_period": "2018-12",
+      "actual": 9.25,
+      "model": 9.796126907140085,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2018-12",
+      "target_period": "2019-01",
+      "actual": 9.25,
+      "model": 9.861770496777096,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-01",
+      "target_period": "2019-02",
+      "actual": 9.25,
+      "model": 9.018123881901799,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-02",
+      "target_period": "2019-03",
+      "actual": 9.0,
+      "model": 9.768621977546845,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-03",
+      "target_period": "2019-04",
+      "actual": 9.0,
+      "model": 9.540865537440483,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2019-04",
+      "target_period": "2019-05",
+      "actual": 9.0,
+      "model": 9.472449065935516,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2019-05",
+      "target_period": "2019-06",
+      "actual": 9.0,
+      "model": 8.765627672235102,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2019-06",
+      "target_period": "2019-07",
+      "actual": 9.0,
+      "model": 9.360871036912759,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2019-07",
+      "target_period": "2019-08",
+      "actual": 9.25,
+      "model": 9.184630203803305,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2019-08",
+      "target_period": "2019-09",
+      "actual": 9.25,
+      "model": 9.620080346048113,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-09",
+      "target_period": "2019-10",
+      "actual": 9.25,
+      "model": 9.346256468143924,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-10",
+      "target_period": "2019-11",
+      "actual": 9.25,
+      "model": 9.360790985691375,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-11",
+      "target_period": "2019-12",
+      "actual": 9.25,
+      "model": 9.438017807854816,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2019-12",
+      "target_period": "2020-01",
+      "actual": 9.25,
+      "model": 9.44612349983821,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2020-01",
+      "target_period": "2020-02",
+      "actual": 12.0,
+      "model": 9.2915493278424,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2020-02",
+      "target_period": "2020-03",
+      "actual": 9.5,
+      "model": 12.220664944052778,
+      "benchmark": 12.0
+    },
+    {
+      "origin": "2020-03",
+      "target_period": "2020-04",
+      "actual": 9.5,
+      "model": 9.691204812136325,
+      "benchmark": 9.5
+    },
+    {
+      "origin": "2020-04",
+      "target_period": "2020-05",
+      "actual": 9.5,
+      "model": 10.097368509397874,
+      "benchmark": 9.5
+    },
+    {
+      "origin": "2020-05",
+      "target_period": "2020-06",
+      "actual": 9.0,
+      "model": 11.258205796319894,
+      "benchmark": 9.5
+    },
+    {
+      "origin": "2020-06",
+      "target_period": "2020-07",
+      "actual": 9.0,
+      "model": 8.938900245688572,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-07",
+      "target_period": "2020-08",
+      "actual": 9.0,
+      "model": 9.128327139388626,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-08",
+      "target_period": "2020-09",
+      "actual": 9.0,
+      "model": 9.004772087096814,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-09",
+      "target_period": "2020-10",
+      "actual": 9.0,
+      "model": 8.923838915423618,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-10",
+      "target_period": "2020-11",
+      "actual": 9.0,
+      "model": 9.023306076161333,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-11",
+      "target_period": "2020-12",
+      "actual": 9.0,
+      "model": 9.016406455496648,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2020-12",
+      "target_period": "2021-01",
+      "actual": 9.0,
+      "model": 9.104759305956728,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-01",
+      "target_period": "2021-02",
+      "actual": 9.0,
+      "model": 9.106291846034962,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-02",
+      "target_period": "2021-03",
+      "actual": 9.0,
+      "model": 9.021278340266864,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-03",
+      "target_period": "2021-04",
+      "actual": 9.0,
+      "model": 8.784035508232808,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-04",
+      "target_period": "2021-05",
+      "actual": 9.0,
+      "model": 9.014587523465941,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-05",
+      "target_period": "2021-06",
+      "actual": 9.25,
+      "model": 9.04014947130767,
+      "benchmark": 9.0
+    },
+    {
+      "origin": "2021-06",
+      "target_period": "2021-07",
+      "actual": 9.25,
+      "model": 9.41545528797298,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2021-07",
+      "target_period": "2021-08",
+      "actual": 9.5,
+      "model": 9.367251537083245,
+      "benchmark": 9.25
+    },
+    {
+      "origin": "2021-08",
+      "target_period": "2021-09",
+      "actual": 9.75,
+      "model": 9.666532437362335,
+      "benchmark": 9.5
+    },
+    {
+      "origin": "2021-09",
+      "target_period": "2021-10",
+      "actual": 9.75,
+      "model": 9.878810689738888,
+      "benchmark": 9.75
+    },
+    {
+      "origin": "2021-10",
+      "target_period": "2021-11",
+      "actual": 9.75,
+      "model": 9.83200019574576,
+      "benchmark": 9.75
+    },
+    {
+      "origin": "2021-11",
+      "target_period": "2021-12",
+      "actual": 10.25,
+      "model": 9.833974794170244,
+      "benchmark": 9.75
+    },
+    {
+      "origin": "2021-12",
+      "target_period": "2022-01",
+      "actual": 13.5,
+      "model": 10.457133017399366,
+      "benchmark": 10.25
+    },
+    {
+      "origin": "2022-01",
+      "target_period": "2022-02",
+      "actual": 13.5,
+      "model": 13.927949709929248,
+      "benchmark": 13.5
+    },
+    {
+      "origin": "2022-02",
+      "target_period": "2022-03",
+      "actual": 14.0,
+      "model": 13.39680430639836,
+      "benchmark": 13.5
+    },
+    {
+      "origin": "2022-03",
+      "target_period": "2022-04",
+      "actual": 14.0,
+      "model": 14.221567854534474,
+      "benchmark": 14.0
+    },
+    {
+      "origin": "2022-04",
+      "target_period": "2022-05",
+      "actual": 14.0,
+      "model": 13.83352437075212,
+      "benchmark": 14.0
+    },
+    {
+      "origin": "2022-05",
+      "target_period": "2022-06",
+      "actual": 14.5,
+      "model": 13.9323989279194,
+      "benchmark": 14.0
+    },
+    {
+      "origin": "2022-06",
+      "target_period": "2022-07",
+      "actual": 14.5,
+      "model": 14.510441399423364,
+      "benchmark": 14.5
+    },
+    {
+      "origin": "2022-07",
+      "target_period": "2022-08",
+      "actual": 14.5,
+      "model": 14.613865549714232,
+      "benchmark": 14.5
+    },
+    {
+      "origin": "2022-08",
+      "target_period": "2022-09",
+      "actual": 16.0,
+      "model": 14.785115277853585,
+      "benchmark": 14.5
+    },
+    {
+      "origin": "2022-09",
+      "target_period": "2022-10",
+      "actual": 16.0,
+      "model": 16.156297066191428,
+      "benchmark": 16.0
+    },
+    {
+      "origin": "2022-10",
+      "target_period": "2022-11",
+      "actual": 16.75,
+      "model": 16.10466752246939,
+      "benchmark": 16.0
+    },
+    {
+      "origin": "2022-11",
+      "target_period": "2022-12",
+      "actual": 16.75,
+      "model": 16.949819420866646,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2022-12",
+      "target_period": "2023-01",
+      "actual": 16.75,
+      "model": 17.09759280872482,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-01",
+      "target_period": "2023-02",
+      "actual": 16.75,
+      "model": 16.73374844877749,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-02",
+      "target_period": "2023-03",
+      "actual": 16.75,
+      "model": 16.538636634442096,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-03",
+      "target_period": "2023-04",
+      "actual": 16.75,
+      "model": 16.525088288551625,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-04",
+      "target_period": "2023-05",
+      "actual": 16.75,
+      "model": 16.68443362529283,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-05",
+      "target_period": "2023-06",
+      "actual": 16.75,
+      "model": 16.83745132708383,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-06",
+      "target_period": "2023-07",
+      "actual": 16.5,
+      "model": 17.001338841290483,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2023-07",
+      "target_period": "2023-08",
+      "actual": 16.5,
+      "model": 16.630498823774012,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2023-08",
+      "target_period": "2023-09",
+      "actual": 16.0,
+      "model": 16.903315068961223,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2023-09",
+      "target_period": "2023-10",
+      "actual": 15.75,
+      "model": 16.20672871061886,
+      "benchmark": 16.0
+    },
+    {
+      "origin": "2023-10",
+      "target_period": "2023-11",
+      "actual": 15.75,
+      "model": 15.889140943951563,
+      "benchmark": 15.75
+    },
+    {
+      "origin": "2023-11",
+      "target_period": "2023-12",
+      "actual": 15.25,
+      "model": 15.762140234965027,
+      "benchmark": 15.75
+    },
+    {
+      "origin": "2023-12",
+      "target_period": "2024-01",
+      "actual": 14.75,
+      "model": 15.498584339808858,
+      "benchmark": 15.25
+    },
+    {
+      "origin": "2024-01",
+      "target_period": "2024-02",
+      "actual": 14.75,
+      "model": 14.807408609645776,
+      "benchmark": 14.75
+    },
+    {
+      "origin": "2024-02",
+      "target_period": "2024-03",
+      "actual": 14.75,
+      "model": 14.844082320577673,
+      "benchmark": 14.75
+    },
+    {
+      "origin": "2024-03",
+      "target_period": "2024-04",
+      "actual": 14.75,
+      "model": 14.820250182514043,
+      "benchmark": 14.75
+    },
+    {
+      "origin": "2024-04",
+      "target_period": "2024-05",
+      "actual": 14.5,
+      "model": 14.811689243753504,
+      "benchmark": 14.75
+    },
+    {
+      "origin": "2024-05",
+      "target_period": "2024-06",
+      "actual": 14.25,
+      "model": 14.401716038726788,
+      "benchmark": 14.5
+    },
+    {
+      "origin": "2024-06",
+      "target_period": "2024-07",
+      "actual": 14.25,
+      "model": 14.275839170652228,
+      "benchmark": 14.25
+    },
+    {
+      "origin": "2024-07",
+      "target_period": "2024-08",
+      "actual": 14.25,
+      "model": 14.373721213307563,
+      "benchmark": 14.25
+    },
+    {
+      "origin": "2024-08",
+      "target_period": "2024-09",
+      "actual": 14.25,
+      "model": 14.34884369063153,
+      "benchmark": 14.25
+    },
+    {
+      "origin": "2024-09",
+      "target_period": "2024-10",
+      "actual": 14.25,
+      "model": 14.37839816015729,
+      "benchmark": 14.25
+    },
+    {
+      "origin": "2024-10",
+      "target_period": "2024-11",
+      "actual": 15.25,
+      "model": 14.165820764216507,
+      "benchmark": 14.25
+    },
+    {
+      "origin": "2024-11",
+      "target_period": "2024-12",
+      "actual": 15.25,
+      "model": 15.332074923597872,
+      "benchmark": 15.25
+    },
+    {
+      "origin": "2024-12",
+      "target_period": "2025-01",
+      "actual": 15.25,
+      "model": 15.474483477840275,
+      "benchmark": 15.25
+    },
+    {
+      "origin": "2025-01",
+      "target_period": "2025-02",
+      "actual": 16.5,
+      "model": 15.19463906708109,
+      "benchmark": 15.25
+    },
+    {
+      "origin": "2025-02",
+      "target_period": "2025-03",
+      "actual": 16.5,
+      "model": 16.59752996567379,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-03",
+      "target_period": "2025-04",
+      "actual": 16.5,
+      "model": 16.459997035009344,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-04",
+      "target_period": "2025-05",
+      "actual": 16.5,
+      "model": 16.528631368298836,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-05",
+      "target_period": "2025-06",
+      "actual": 16.5,
+      "model": 16.46481588221921,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-06",
+      "target_period": "2025-07",
+      "actual": 16.5,
+      "model": 16.50496926815368,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-07",
+      "target_period": "2025-08",
+      "actual": 16.5,
+      "model": 16.56450162206379,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-08",
+      "target_period": "2025-09",
+      "actual": 18.0,
+      "model": 16.58715978116539,
+      "benchmark": 16.5
+    },
+    {
+      "origin": "2025-09",
+      "target_period": "2025-10",
+      "actual": 18.0,
+      "model": 18.30379691195589,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2025-10",
+      "target_period": "2025-11",
+      "actual": 18.0,
+      "model": 17.91013912115385,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2025-11",
+      "target_period": "2025-12",
+      "actual": 18.0,
+      "model": 17.97577282347286,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2025-12",
+      "target_period": "2026-01",
+      "actual": 18.0,
+      "model": 18.02057880934941,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2026-01",
+      "target_period": "2026-02",
+      "actual": 18.0,
+      "model": 17.83543948564225,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2026-02",
+      "target_period": "2026-03",
+      "actual": 18.0,
+      "model": 17.922053531812644,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2026-03",
+      "target_period": "2026-04",
+      "actual": 18.0,
+      "model": 17.955221920613667,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2026-04",
+      "target_period": "2026-05",
+      "actual": 17.0,
+      "model": 17.8966540641399,
+      "benchmark": 18.0
+    },
+    {
+      "origin": "2026-05",
+      "target_period": "2026-06",
+      "actual": 16.75,
+      "model": 16.974903117843578,
+      "benchmark": 17.0
+    },
+    {
+      "origin": "2026-06",
+      "target_period": "2026-07",
+      "actual": 16.75,
+      "model": 16.633890099347553,
+      "benchmark": 16.75
+    },
+    {
+      "origin": "2026-07",
+      "target_period": "2026-08",
+      "actual": 16.25,
+      "model": 16.423485966208933,
+      "benchmark": 16.75
+    }
+  ],
+  "diagnostics": {
+    "stationarity": {
+      "base_rate": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 133,
+        "longest_contiguous_run_n": 133,
+        "adf_constant_aic": 0.7540318334795888,
+        "kpss_constant_auto": 0.01
+      },
+      "inflation": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 141,
+        "longest_contiguous_run_n": 141,
+        "adf_constant_aic": 0.26848852203267726,
+        "kpss_constant_auto": 0.1
+      },
+      "exports": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 139,
+        "longest_contiguous_run_n": 139,
+        "adf_constant_aic": 0.8596157703159584,
+        "kpss_constant_auto": 0.01
+      },
+      "imports": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 139,
+        "longest_contiguous_run_n": 139,
+        "adf_constant_aic": 0.8605311678785866,
+        "kpss_constant_auto": 0.01
+      },
+      "loans_individuals": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 140,
+        "longest_contiguous_run_n": 140,
+        "adf_constant_aic": 0.7215098103252283,
+        "kpss_constant_auto": 0.01
+      },
+      "loans_legal_entities": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 140,
+        "longest_contiguous_run_n": 140,
+        "adf_constant_aic": 0.9971788569489788,
+        "kpss_constant_auto": 0.01
+      },
+      "consumption_yoy": {
+        "status": "computed_on_longest_contiguous_monthly_run",
+        "observed_n": 140,
+        "longest_contiguous_run_n": 140,
+        "adf_constant_aic": 9.307678446405289e-10,
+        "kpss_constant_auto": 0.07615732188710336
+      }
+    },
+    "residual": {
+      "ljung_box_p_lag6": 0.347082039394947,
+      "breusch_pagan_p": 0.4740227084886872,
+      "r_squared": 0.9595912829092668
+    },
+    "multicollinearity": {
+      "rate_lag": 1.8991567274222316,
+      "inflation_lag2": 1.8907519667438617,
+      "consumption_lag2": 1.261522420844346,
+      "exports_growth_lag2": 1.0199052089478076,
+      "loans_growth_lag2": 1.2372536873576547
+    },
+    "structural_breaks": {
+      "2020-03": {
+        "status": "computed",
+        "F": 1.0364434501054647,
+        "p_value": 0.4051853862350739,
+        "n_pre": 54,
+        "n_post": 78
+      },
+      "2022-02": {
+        "status": "computed",
+        "F": 0.5335931663134086,
+        "p_value": 0.7818259083767769,
+        "n_pre": 77,
+        "n_post": 55
+      }
+    },
+    "limitations": [
+      "KPSS p-values are table-bounded; reported 0.01/0.10 values are lookup bounds, not precise tail probabilities.",
+      "Chow tests use supplied data and known break dates; no real-time vintages, unknown-date search correction, or coefficient stability procedure is available."
+    ]
+  },
+  "validity": [
+    {
+      "name": "Data validity",
+      "status": "limited",
+      "evidence": {
+        "rows": 141,
+        "missing_cells": 15,
+        "date_duplicates_after_alignment": 0,
+        "identical_duplicate_rows_collapsed": {
+          "inflation": 0,
+          "exports": 0,
+          "imports": 0,
+          "loans_individuals": 0,
+          "loans_legal_entities": 0,
+          "consumption_yoy": 0,
+          "base_rate": 0
+        }
+      },
+      "limitation": "Two identical duplicate base-rate records (March and April 2020) are collapsed deterministically; conflicting duplicates fail validation. Source units, month-end semantics and publication vintages are not independently verified."
+    },
+    {
+      "name": "Statistical validity",
+      "status": "limited",
+      "evidence": {
+        "ljung_box_p_lag6": 0.347082039394947,
+        "breusch_pagan_p": 0.4740227084886872,
+        "r_squared": 0.9595912829092668,
+        "structural_breaks": {
+          "2020-03": {
+            "status": "computed",
+            "F": 1.0364434501054647,
+            "p_value": 0.4051853862350739,
+            "n_pre": 54,
+            "n_post": 78
+          },
+          "2022-02": {
+            "status": "computed",
+            "F": 0.5335931663134086,
+            "p_value": 0.7818259083767769,
+            "n_pre": 77,
+            "n_post": 55
+          }
+        }
+      },
+      "limitation": "Residual and known-date Chow checks do not establish structural validity; model is provisional small-sample OLS with no unknown-break search or real-time vintages."
+    },
+    {
+      "name": "Predictive validity",
+      "status": "fail",
+      "evidence": {
+        "model": {
+          "n": 96,
+          "mae": 0.36523644698087826,
+          "rmse": 0.6744016973970519,
+          "bias": 0.03362790836715479
+        },
+        "benchmark": {
+          "n": 96,
+          "mae": 0.23177083333333334,
+          "rmse": 0.6097087761109123,
+          "bias": -0.07552083333333333
+        }
+      },
+      "limitation": "Expanding-window evaluation is not a separately approved sealed test; no preregistered criterion was available."
+    },
+    {
+      "name": "Stability validity",
+      "status": "limited",
+      "evidence": {
+        "backtest_periods": 96,
+        "coefficient_stability": "not established"
+      },
+      "limitation": "No approved sealed period or full structural-break stability analysis; 2020/2022 regimes need review."
+    }
+  ],
+  "quickscore": {
+    "model_mae": 0.36523644698087826,
+    "benchmark_mae": 0.23177083333333334,
+    "mae_skill_vs_benchmark": -0.5758516364118791,
+    "n": 96
+  },
+  "metadata": {
+    "processed_file": "data\\processed\\macro_factors_monthly.csv",
+    "data_cutoff": "2026-09"
+  }
+}

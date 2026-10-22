@@ -1,0 +1,205 @@
+{
+  "split": {
+    "cutoff": "2024-09-07",
+    "train_n": 74,
+    "train_start": "2015-10-02",
+    "train_end": "2024-09-02",
+    "test_n": 16,
+    "test_start": "2024-10-14",
+    "test_end": "2026-09-07"
+  },
+  "definition": "Out of range means a held-out raw feature value is strictly below the training minimum or strictly above the training maximum. No significance or causal claim is made.",
+  "class_summary": [
+    {
+      "actual_class": "Increase",
+      "n": 3,
+      "correct_n": 0,
+      "incorrect_n": 3,
+      "mean_out_of_range_features": 2.0,
+      "median_out_of_range_features": 2.0,
+      "out_of_range_count_distribution": {
+        "2": 3
+      }
+    },
+    {
+      "actual_class": "Hold",
+      "n": 10,
+      "correct_n": 0,
+      "incorrect_n": 10,
+      "mean_out_of_range_features": 2.2,
+      "median_out_of_range_features": 2.0,
+      "out_of_range_count_distribution": {
+        "2": 8,
+        "3": 2
+      }
+    },
+    {
+      "actual_class": "Decrease",
+      "n": 3,
+      "correct_n": 3,
+      "incorrect_n": 0,
+      "mean_out_of_range_features": 2.6666666666666665,
+      "median_out_of_range_features": 3.0,
+      "out_of_range_count_distribution": {
+        "2": 1,
+        "3": 2
+      }
+    }
+  ],
+  "overall_correct_n": 3,
+  "overall_incorrect_n": 13,
+  "out_of_range_features_correct": {
+    "n": 8,
+    "observations": 3,
+    "mean_per_observation": 2.6666666666666665
+  },
+  "out_of_range_features_incorrect": {
+    "n": 28,
+    "observations": 13,
+    "mean_per_observation": 2.1538461538461537
+  },
+  "feature_summary": [
+    {
+      "feature": "inflation",
+      "outside_n": 0,
+      "outside_pct": 0.0,
+      "below_n": 0,
+      "above_n": 0,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 0
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 0
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 0
+        }
+      }
+    },
+    {
+      "feature": "exports",
+      "outside_n": 1,
+      "outside_pct": 6.25,
+      "below_n": 0,
+      "above_n": 1,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 0
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 0
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 1
+        }
+      }
+    },
+    {
+      "feature": "imports",
+      "outside_n": 3,
+      "outside_pct": 18.75,
+      "below_n": 0,
+      "above_n": 3,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 0
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 2
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 1
+        }
+      }
+    },
+    {
+      "feature": "corporate_lending",
+      "outside_n": 16,
+      "outside_pct": 100.0,
+      "below_n": 0,
+      "above_n": 16,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 3
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 10
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 3
+        }
+      }
+    },
+    {
+      "feature": "household_lending",
+      "outside_n": 16,
+      "outside_pct": 100.0,
+      "below_n": 0,
+      "above_n": 16,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 3
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 10
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 3
+        }
+      }
+    },
+    {
+      "feature": "consumption",
+      "outside_n": 0,
+      "outside_pct": 0.0,
+      "below_n": 0,
+      "above_n": 0,
+      "by_actual_class": {
+        "Increase": {
+          "n": 3,
+          "outside_n": 0
+        },
+        "Hold": {
+          "n": 10,
+          "outside_n": 0
+        },
+        "Decrease": {
+          "n": 3,
+          "outside_n": 0
+        }
+      }
+    }
+  ],
+  "units_and_timing": {
+    "processed_dataset_columns": [
+      "decision_date",
+      "base_rate_before",
+      "base_rate_after",
+      "decision",
+      "inflation",
+      "exports",
+      "imports",
+      "corporate_lending",
+      "household_lending",
+      "consumption"
+    ],
+    "unit_verification": "Not established for the current cleaned dataset. Current app labels exports and imports as million KZT; SOURCES.md instead describes the legacy export/import source columns as thousand USD and different transforms. The raw source files are absent in this working tree, so those claims cannot be reconciled with current values.",
+    "availability_dates": "No predictor-specific publication/availability dates are present; exact as-of timing cannot be verified."
+  }
+}

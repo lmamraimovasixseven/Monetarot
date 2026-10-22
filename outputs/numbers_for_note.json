@@ -1,0 +1,1852 @@
+{
+  "description": "Every number quoted in the 4-page note. 'source' is a JSON Pointer into model/artifact.json, or the inputs and method of a derived value. 'display' is the text the note and README use.",
+  "generated_by": "python -m src.report",
+  "inputs": [
+    "model/artifact.json",
+    "data/processed/nbk_decisions_clean.csv",
+    "data/processed/model_panel.csv"
+  ],
+  "verdict_sentence": "Ordered logit does not beat Always Hold on the holdout (RMSE ratio 1.002).",
+  "numbers": {
+    "latest_decision_date": {
+      "value": "2026-09-07",
+      "display": "2026-09-07",
+      "kind": "text",
+      "source": "model/artifact.json#/latest_prediction/date"
+    },
+    "headline_score": {
+      "value": -0.14151640940874505,
+      "display": "-0.142",
+      "kind": "score",
+      "source": "model/artifact.json#/latest_prediction/expected_score"
+    },
+    "headline_score_band_low": {
+      "value": -0.5307389892279127,
+      "display": "-0.531",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/parameters",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/latest_feature_vector"
+        ],
+        "method": "95% delta-method band using HC0 covariance (src.app.score_and_delta_band), clipped to [-1, 1]"
+      }
+    },
+    "headline_score_band_high": {
+      "value": 0.24770617041042264,
+      "display": "+0.248",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/parameters",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/latest_feature_vector"
+        ],
+        "method": "95% delta-method band using HC0 covariance (src.app.score_and_delta_band), clipped to [-1, 1]"
+      }
+    },
+    "next_round_probability_increase": {
+      "value": 0.12479433117386751,
+      "display": "12.5%",
+      "kind": "prob",
+      "source": "model/artifact.json#/latest_prediction/class_probabilities/Increase",
+      "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
+    },
+    "next_round_probability_hold": {
+      "value": 0.6088949282435199,
+      "display": "60.9%",
+      "kind": "prob",
+      "source": "model/artifact.json#/latest_prediction/class_probabilities/Hold",
+      "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
+    },
+    "next_round_probability_decrease": {
+      "value": 0.26631074058261256,
+      "display": "26.6%",
+      "kind": "prob",
+      "source": "model/artifact.json#/latest_prediction/class_probabilities/Decrease",
+      "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
+    },
+    "latest_score_change": {
+      "value": 0.2282994210491998,
+      "display": "+0.228",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/latest_prediction/expected_score",
+          "model/artifact.json#/per_factor_contribution_to_latest_score_change/*/previous_usable_decision_value"
+        ],
+        "method": "latest expected score minus the expected score at the previous usable decision's factor values"
+      }
+    },
+    "driver_1_factor": {
+      "value": "exports",
+      "display": "exports",
+      "kind": "factor",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/feature"
+    },
+    "driver_1_contribution": {
+      "value": 0.21758745430380505,
+      "display": "+0.218",
+      "kind": "score",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/expected_score_contribution_to_latest_change"
+    },
+    "driver_2_factor": {
+      "value": "corporate_lending",
+      "display": "corporate lending",
+      "kind": "factor",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/3/feature"
+    },
+    "driver_2_contribution": {
+      "value": 0.056428740192372706,
+      "display": "+0.056",
+      "kind": "score",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/3/expected_score_contribution_to_latest_change"
+    },
+    "driver_3_factor": {
+      "value": "household_lending",
+      "display": "household lending",
+      "kind": "factor",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/feature"
+    },
+    "driver_3_contribution": {
+      "value": -0.0363502496650534,
+      "display": "-0.036",
+      "kind": "score",
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/expected_score_contribution_to_latest_change"
+    },
+    "n_usable": {
+      "value": 88,
+      "display": "88",
+      "kind": "int",
+      "source": "model/artifact.json#/sample/usable_n"
+    },
+    "n_dropped": {
+      "value": 2,
+      "display": "2",
+      "kind": "int",
+      "source": "model/artifact.json#/sample/dropped_n"
+    },
+    "n_estimation": {
+      "value": 70,
+      "display": "70",
+      "kind": "int",
+      "source": "model/artifact.json#/sample/estimation_n"
+    },
+    "n_holdout": {
+      "value": 18,
+      "display": "18",
+      "kind": "int",
+      "source": "model/artifact.json#/sample/holdout_n"
+    },
+    "sample_usable_start": {
+      "value": "2016-03-15",
+      "display": "2016-03-15",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/usable_start"
+    },
+    "sample_usable_end": {
+      "value": "2026-09-07",
+      "display": "2026-09-07",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/usable_end"
+    },
+    "sample_estimation_start": {
+      "value": "2016-03-15",
+      "display": "2016-03-15",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/estimation_start"
+    },
+    "sample_estimation_end": {
+      "value": "2024-06-03",
+      "display": "2024-06-03",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/estimation_end"
+    },
+    "sample_holdout_start": {
+      "value": "2024-07-15",
+      "display": "2024-07-15",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/holdout_start"
+    },
+    "sample_holdout_end": {
+      "value": "2026-09-07",
+      "display": "2026-09-07",
+      "kind": "text",
+      "source": "model/artifact.json#/sample/holdout_end"
+    },
+    "holdout_fraction": {
+      "value": 0.2,
+      "display": "0.200",
+      "kind": "ratio",
+      "source": "model/artifact.json#/specification/holdout_fraction"
+    },
+    "holdout_actual_decrease_count": {
+      "value": 4,
+      "display": "4",
+      "kind": "int",
+      "source": "model/artifact.json#/benchmark_comparison/actual_score_distribution/-1"
+    },
+    "holdout_actual_hold_count": {
+      "value": 11,
+      "display": "11",
+      "kind": "int",
+      "source": "model/artifact.json#/benchmark_comparison/actual_score_distribution/0"
+    },
+    "holdout_actual_increase_count": {
+      "value": 3,
+      "display": "3",
+      "kind": "int",
+      "source": "model/artifact.json#/benchmark_comparison/actual_score_distribution/1"
+    },
+    "coef_inflation": {
+      "value": 0.02199296137093244,
+      "display": "0.0220",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/inflation/coefficient_or_cutpoint"
+    },
+    "se_inflation": {
+      "value": 0.07013790331697874,
+      "display": "0.0701",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/inflation/hc0_standard_error"
+    },
+    "p_raw_inflation": {
+      "value": 0.7538496075980295,
+      "display": "0.754",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/inflation/p_value"
+    },
+    "p_holm_inflation": {
+      "value": 1.0,
+      "display": "1.000",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/inflation/p_value_holm"
+    },
+    "coef_exports": {
+      "value": 0.013744691281439453,
+      "display": "0.0137",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/exports/coefficient_or_cutpoint"
+    },
+    "se_exports": {
+      "value": 0.010464238054485528,
+      "display": "0.0105",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/exports/hc0_standard_error"
+    },
+    "p_raw_exports": {
+      "value": 0.18901726923832896,
+      "display": "0.189",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/exports/p_value"
+    },
+    "p_holm_exports": {
+      "value": 0.9450863461916448,
+      "display": "0.945",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/exports/p_value_holm"
+    },
+    "coef_imports": {
+      "value": -0.007792092949550429,
+      "display": "-0.0078",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/imports/coefficient_or_cutpoint"
+    },
+    "se_imports": {
+      "value": 0.018044061392098232,
+      "display": "0.0180",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/imports/hc0_standard_error"
+    },
+    "p_raw_imports": {
+      "value": 0.6658599015103904,
+      "display": "0.666",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/imports/p_value"
+    },
+    "p_holm_imports": {
+      "value": 1.0,
+      "display": "1.000",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/imports/p_value_holm"
+    },
+    "coef_corporate_lending": {
+      "value": -0.04211239603644495,
+      "display": "-0.0421",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/corporate_lending/coefficient_or_cutpoint"
+    },
+    "se_corporate_lending": {
+      "value": 0.049201105448525705,
+      "display": "0.0492",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/corporate_lending/hc0_standard_error"
+    },
+    "p_raw_corporate_lending": {
+      "value": 0.39203994185091573,
+      "display": "0.392",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/corporate_lending/p_value"
+    },
+    "p_holm_corporate_lending": {
+      "value": 1.0,
+      "display": "1.000",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/corporate_lending/p_value_holm"
+    },
+    "coef_household_lending": {
+      "value": 0.07512542007843497,
+      "display": "0.0751",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/household_lending/coefficient_or_cutpoint"
+    },
+    "se_household_lending": {
+      "value": 0.02683617183658186,
+      "display": "0.0268",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/household_lending/hc0_standard_error"
+    },
+    "p_raw_household_lending": {
+      "value": 0.005119624993344942,
+      "display": "0.005",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/household_lending/p_value"
+    },
+    "p_holm_household_lending": {
+      "value": 0.03071774996006965,
+      "display": "0.031",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/household_lending/p_value_holm"
+    },
+    "coef_consumption": {
+      "value": -0.0014785727707736366,
+      "display": "-0.0015",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/consumption/coefficient_or_cutpoint"
+    },
+    "se_consumption": {
+      "value": 0.020968646439157686,
+      "display": "0.0210",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/consumption/hc0_standard_error"
+    },
+    "p_raw_consumption": {
+      "value": 0.9437849512923012,
+      "display": "0.944",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/consumption/p_value"
+    },
+    "p_holm_consumption": {
+      "value": 1.0,
+      "display": "1.000",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/consumption/p_value_holm"
+    },
+    "cutpoint_1": {
+      "value": 0.3537243712880859,
+      "display": "0.3537",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/coefficient_or_cutpoint"
+    },
+    "cutpoint_1_se": {
+      "value": 0.7383437429509783,
+      "display": "0.7383",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/hc0_standard_error"
+    },
+    "cutpoint_1_p_raw": {
+      "value": 0.6318830170725244,
+      "display": "0.632",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/p_value"
+    },
+    "cutpoint_2": {
+      "value": 3.3149380105299433,
+      "display": "3.3149",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/coefficient_or_cutpoint"
+    },
+    "cutpoint_2_se": {
+      "value": 0.7455704247902439,
+      "display": "0.7456",
+      "kind": "coef",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/hc0_standard_error"
+    },
+    "cutpoint_2_p_raw": {
+      "value": 8.741196969927691e-06,
+      "display": "8.7e-06",
+      "kind": "p",
+      "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/p_value"
+    },
+    "pseudo_r2_mcfadden": {
+      "value": 0.10974943047747465,
+      "display": "0.110",
+      "kind": "ratio",
+      "source": "model/artifact.json#/model/pseudo_r2_mcfadden"
+    },
+    "oos_model_rmse": {
+      "value": 0.6246822051080606,
+      "display": "0.625",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/model/rmse"
+    },
+    "oos_model_mae": {
+      "value": 0.47892751242315573,
+      "display": "0.479",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/model/mae"
+    },
+    "oos_model_log_score": {
+      "value": 0.939710389728996,
+      "display": "0.940",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/model/log_score"
+    },
+    "oos_hold_rmse": {
+      "value": 0.6236095644623235,
+      "display": "0.624",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/benchmark_always_hold/rmse"
+    },
+    "oos_hold_mae": {
+      "value": 0.3888888888888889,
+      "display": "0.389",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/benchmark_always_hold/mae"
+    },
+    "oos_hold_log_score": {
+      "value": "+Infinity",
+      "display": "undefined",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/benchmark_always_hold/log_score"
+    },
+    "oos_frequency_log_score": {
+      "value": 0.9456565309065696,
+      "display": "0.946",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/class_frequency_comparator_secondary/log_score"
+    },
+    "oos_frequency_label": {
+      "value": "added after the specification freeze, secondary",
+      "display": "added after the specification freeze, secondary",
+      "kind": "text",
+      "source": "model/artifact.json#/benchmark_comparison/class_frequency_comparator_secondary/label"
+    },
+    "rmse_ratio": {
+      "value": 1.0017200516266327,
+      "display": "1.002",
+      "kind": "ratio",
+      "source": "model/artifact.json#/benchmark_comparison/rmse_ratio_model_to_hold"
+    },
+    "oos_winner": {
+      "value": "Always Hold",
+      "display": "Always Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/benchmark_comparison/winner"
+    },
+    "joint_lr_statistic": {
+      "value": 15.240435352202809,
+      "display": "15.240",
+      "kind": "stat",
+      "source": "model/artifact.json#/diagnostics/joint_slope_lr/statistic"
+    },
+    "joint_lr_p": {
+      "value": 0.018466879346204394,
+      "display": "0.018",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/joint_slope_lr/p_value"
+    },
+    "stability_lr_statistic": {
+      "value": 15.217553714524797,
+      "display": "15.218",
+      "kind": "stat",
+      "source": "model/artifact.json#/diagnostics/parameter_stability/statistic"
+    },
+    "stability_lr_p": {
+      "value": 0.018630476839132673,
+      "display": "0.019",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/parameter_stability/p_value"
+    },
+    "stability_lr_flag": {
+      "value": "FAIL",
+      "display": "FAIL",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/parameter_stability/pass_fail"
+    },
+    "stability_split_n_early": {
+      "value": 31,
+      "display": "31",
+      "kind": "int",
+      "source": "model/artifact.json#/diagnostics/parameter_stability/groups_n/2015-2019"
+    },
+    "stability_split_n_late": {
+      "value": 39,
+      "display": "39",
+      "kind": "int",
+      "source": "model/artifact.json#/diagnostics/parameter_stability/groups_n/2020+"
+    },
+    "proportional_odds_p": {
+      "value": 0.14195367940218653,
+      "display": "0.142",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/proportional_odds/p_value"
+    },
+    "serial_correlation_p": {
+      "value": 0.1413149227265809,
+      "display": "0.141",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/serial_correlation/p_value"
+    },
+    "unit_root_inflation_adf_p": {
+      "value": 0.17093453570326256,
+      "display": "0.171",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/0/p_value"
+    },
+    "unit_root_inflation_adf_flag": {
+      "value": "FAIL",
+      "display": "FAIL",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/0/pass_fail"
+    },
+    "unit_root_inflation_kpss_p": {
+      "value": 0.1,
+      "display": "0.100",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/1/p_value"
+    },
+    "unit_root_inflation_kpss_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/1/pass_fail"
+    },
+    "unit_root_exports_adf_p": {
+      "value": 0.03488330229799153,
+      "display": "0.035",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/4/p_value"
+    },
+    "unit_root_exports_adf_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/4/pass_fail"
+    },
+    "unit_root_exports_kpss_p": {
+      "value": 0.1,
+      "display": "0.100",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/5/p_value"
+    },
+    "unit_root_exports_kpss_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/5/pass_fail"
+    },
+    "unit_root_imports_adf_p": {
+      "value": 0.0007547854032639911,
+      "display": "7.5e-04",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/8/p_value"
+    },
+    "unit_root_imports_adf_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/8/pass_fail"
+    },
+    "unit_root_imports_kpss_p": {
+      "value": 0.1,
+      "display": "0.100",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/9/p_value"
+    },
+    "unit_root_imports_kpss_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/9/pass_fail"
+    },
+    "unit_root_corporate_lending_adf_p": {
+      "value": 0.6660154127059807,
+      "display": "0.666",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/12/p_value"
+    },
+    "unit_root_corporate_lending_adf_flag": {
+      "value": "FAIL",
+      "display": "FAIL",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/12/pass_fail"
+    },
+    "unit_root_corporate_lending_kpss_p": {
+      "value": 0.06784354583654921,
+      "display": "0.068",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/13/p_value"
+    },
+    "unit_root_corporate_lending_kpss_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/13/pass_fail"
+    },
+    "unit_root_household_lending_adf_p": {
+      "value": 0.151893332916596,
+      "display": "0.152",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/16/p_value"
+    },
+    "unit_root_household_lending_adf_flag": {
+      "value": "FAIL",
+      "display": "FAIL",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/16/pass_fail"
+    },
+    "unit_root_household_lending_kpss_p": {
+      "value": 0.01,
+      "display": "0.010",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/17/p_value"
+    },
+    "unit_root_household_lending_kpss_flag": {
+      "value": "FAIL",
+      "display": "FAIL",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/17/pass_fail"
+    },
+    "unit_root_consumption_adf_p": {
+      "value": 3.322282400450816e-06,
+      "display": "3.3e-06",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/20/p_value"
+    },
+    "unit_root_consumption_adf_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/20/pass_fail"
+    },
+    "unit_root_consumption_kpss_p": {
+      "value": 0.1,
+      "display": "0.100",
+      "kind": "p",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/21/p_value"
+    },
+    "unit_root_consumption_kpss_flag": {
+      "value": "PASS",
+      "display": "PASS",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/unit_root_tests/21/pass_fail"
+    },
+    "falsification_1_rule": {
+      "value": "Joint LR test of all six slopes is not rejected at 10% (raw p-value)",
+      "display": "Joint LR test of all six slopes is not rejected at 10% (raw p-value)",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/0/rule"
+    },
+    "falsification_1_verdict": {
+      "value": "not falsified",
+      "display": "not falsified",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/0/verdict"
+    },
+    "falsification_2_rule": {
+      "value": "Any factor has an opposite-sign coefficient significant at 5% (raw p-value)",
+      "display": "Any factor has an opposite-sign coefficient significant at 5% (raw p-value)",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/1/rule"
+    },
+    "falsification_2_verdict": {
+      "value": "not falsified",
+      "display": "not falsified",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/1/verdict"
+    },
+    "falsification_3_rule": {
+      "value": "Holdout expected-score RMSE ratio is >= 1",
+      "display": "Holdout expected-score RMSE ratio is >= 1",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/2/rule"
+    },
+    "falsification_3_verdict": {
+      "value": "falsified",
+      "display": "falsified",
+      "kind": "text",
+      "source": "model/artifact.json#/falsification_verdicts/2/verdict"
+    },
+    "robustness_RB01_name": {
+      "value": "Drop decision years 2020-2022",
+      "display": "Drop decision years 2020-2022",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/0/name"
+    },
+    "robustness_RB01_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/0/survives"
+    },
+    "robustness_RB01_rmse_ratio": {
+      "value": 1.139120580440345,
+      "display": "1.139",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/0/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB01_n_usable": {
+      "value": 61,
+      "display": "61",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/0/n_usable"
+    },
+    "robustness_RB01_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/0/estimator_converged"
+    },
+    "robustness_RB01_benchmark_conclusion": {
+      "value": "Always Hold",
+      "display": "Always Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/0/benchmark_conclusion"
+    },
+    "robustness_RB01_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/0/same_signs_as_primary"
+    },
+    "robustness_RB02_name": {
+      "value": "Last 60 calendar months",
+      "display": "Last 60 calendar months",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/1/name"
+    },
+    "robustness_RB02_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/1/survives"
+    },
+    "robustness_RB02_rmse_ratio": {
+      "value": 1.4260369540349196,
+      "display": "1.426",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/1/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB02_n_usable": {
+      "value": 42,
+      "display": "42",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/1/n_usable"
+    },
+    "robustness_RB02_converged": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/1/estimator_converged"
+    },
+    "robustness_RB02_benchmark_conclusion": {
+      "value": "Always Hold",
+      "display": "Always Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/1/benchmark_conclusion"
+    },
+    "robustness_RB02_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/1/same_signs_as_primary"
+    },
+    "robustness_RB03_name": {
+      "value": "Binary logit: Increase vs not Increase",
+      "display": "Binary logit: Increase vs not Increase",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/2/name"
+    },
+    "robustness_RB03_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/2/survives"
+    },
+    "robustness_RB03_rmse_ratio": {
+      "value": 0.9988846432337574,
+      "display": "0.999",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/2/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB03_n_usable": {
+      "value": 88,
+      "display": "88",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/2/n_usable"
+    },
+    "robustness_RB03_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/2/estimator_converged"
+    },
+    "robustness_RB03_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/2/benchmark_conclusion"
+    },
+    "robustness_RB03_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/2/same_signs_as_primary"
+    },
+    "robustness_RB04_name": {
+      "value": "Ordered logit: 3-month trailing inflation average",
+      "display": "Ordered logit: 3-month trailing inflation average",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/3/name"
+    },
+    "robustness_RB04_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/3/survives"
+    },
+    "robustness_RB04_rmse_ratio": {
+      "value": 0.9842084550724559,
+      "display": "0.984",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/3/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB04_n_usable": {
+      "value": 88,
+      "display": "88",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/3/n_usable"
+    },
+    "robustness_RB04_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/3/estimator_converged"
+    },
+    "robustness_RB04_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/3/benchmark_conclusion"
+    },
+    "robustness_RB04_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/3/same_signs_as_primary"
+    },
+    "robustness_RB05_name": {
+      "value": "Ordered logit: 6-month trailing inflation average",
+      "display": "Ordered logit: 6-month trailing inflation average",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/4/name"
+    },
+    "robustness_RB05_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/4/survives"
+    },
+    "robustness_RB05_rmse_ratio": {
+      "value": 0.9459085034642147,
+      "display": "0.946",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/4/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB05_n_usable": {
+      "value": 88,
+      "display": "88",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/4/n_usable"
+    },
+    "robustness_RB05_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/4/estimator_converged"
+    },
+    "robustness_RB05_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/4/benchmark_conclusion"
+    },
+    "robustness_RB05_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/4/same_signs_as_primary"
+    },
+    "robustness_RB06_name": {
+      "value": "Ordered logit: release lag 1 month",
+      "display": "Ordered logit: release lag 1 month",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/5/name"
+    },
+    "robustness_RB06_survives": {
+      "value": "Yes",
+      "display": "Yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/5/survives"
+    },
+    "robustness_RB06_rmse_ratio": {
+      "value": 1.2112769920915856,
+      "display": "1.211",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/5/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB06_n_usable": {
+      "value": 87,
+      "display": "87",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/5/n_usable"
+    },
+    "robustness_RB06_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/5/estimator_converged"
+    },
+    "robustness_RB06_benchmark_conclusion": {
+      "value": "Always Hold",
+      "display": "Always Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/5/benchmark_conclusion"
+    },
+    "robustness_RB06_same_signs": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/5/same_signs_as_primary"
+    },
+    "robustness_RB07_name": {
+      "value": "Ordered logit: release lag 3 months",
+      "display": "Ordered logit: release lag 3 months",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/6/name"
+    },
+    "robustness_RB07_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/6/survives"
+    },
+    "robustness_RB07_rmse_ratio": {
+      "value": 0.9767241586710739,
+      "display": "0.977",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/6/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB07_n_usable": {
+      "value": 87,
+      "display": "87",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/6/n_usable"
+    },
+    "robustness_RB07_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/6/estimator_converged"
+    },
+    "robustness_RB07_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/6/benchmark_conclusion"
+    },
+    "robustness_RB07_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/6/same_signs_as_primary"
+    },
+    "robustness_RB08_name": {
+      "value": "Ordered logit: 3-month log growth for exports and lending",
+      "display": "Ordered logit: 3-month log growth for exports and lending",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/7/name"
+    },
+    "robustness_RB08_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/7/survives"
+    },
+    "robustness_RB08_rmse_ratio": {
+      "value": 0.8589660379673328,
+      "display": "0.859",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/7/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB08_n_usable": {
+      "value": 88,
+      "display": "88",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/7/n_usable"
+    },
+    "robustness_RB08_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/7/estimator_converged"
+    },
+    "robustness_RB08_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/7/benchmark_conclusion"
+    },
+    "robustness_RB08_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/7/same_signs_as_primary"
+    },
+    "robustness_RB09_name": {
+      "value": "Differenced non-stationary factors",
+      "display": "Differenced non-stationary factors",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/8/name"
+    },
+    "robustness_RB09_survives": {
+      "value": "No",
+      "display": "No",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/8/survives"
+    },
+    "robustness_RB09_rmse_ratio": {
+      "value": 0.9755426069665947,
+      "display": "0.976",
+      "kind": "ratio",
+      "source": "model/artifact.json#/robustness_checks/checks/8/rmse_ratio_model_to_hold"
+    },
+    "robustness_RB09_n_usable": {
+      "value": 87,
+      "display": "87",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/checks/8/n_usable"
+    },
+    "robustness_RB09_converged": {
+      "value": true,
+      "display": "yes",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/8/estimator_converged"
+    },
+    "robustness_RB09_benchmark_conclusion": {
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/8/benchmark_conclusion"
+    },
+    "robustness_RB09_same_signs": {
+      "value": false,
+      "display": "no",
+      "kind": "text",
+      "source": "model/artifact.json#/robustness_checks/checks/8/same_signs_as_primary"
+    },
+    "robustness_survivor_count": {
+      "value": 1,
+      "display": "1",
+      "kind": "int",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/survives"
+        ],
+        "method": "count of checks with survives == Yes"
+      }
+    },
+    "robustness_survivors": {
+      "value": "RB06",
+      "display": "RB06",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/survives"
+        ],
+        "method": "specification ids with survives == Yes"
+      }
+    },
+    "robustness_flipped_benchmark_count": {
+      "value": 6,
+      "display": "6",
+      "kind": "int",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion",
+          "model/artifact.json#/benchmark_comparison/winner"
+        ],
+        "method": "count of checks whose benchmark conclusion differs from the main model's winner"
+      }
+    },
+    "robustness_flipped_benchmark_ids": {
+      "value": "RB03, RB04, RB05, RB07, RB08, RB09",
+      "display": "RB03, RB04, RB05, RB07, RB08, RB09",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion",
+          "model/artifact.json#/benchmark_comparison/winner"
+        ],
+        "method": "specification ids whose benchmark conclusion differs from the main model's winner"
+      }
+    },
+    "family_slope_coefficients": {
+      "value": "Holm adjustment across the six slope-coefficient p-values only",
+      "display": "Holm adjustment across the six slope-coefficient p-values only",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/p_value_families/slope_coefficients"
+    },
+    "family_joint_slope_lr": {
+      "value": "single pre-specified primary test; no adjustment",
+      "display": "single pre-specified primary test; no adjustment",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/p_value_families/joint_slope_lr"
+    },
+    "family_diagnostics": {
+      "value": "raw p-values, no adjustment, flagged at 5%",
+      "display": "raw p-values, no adjustment, flagged at 5%",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/p_value_families/diagnostics"
+    },
+    "family_robustness_specifications": {
+      "value": "report specification count; Holm-adjust coefficient p-values only within each specification",
+      "display": "report specification count; Holm-adjust coefficient p-values only within each specification",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/p_value_families/robustness_specifications"
+    },
+    "family_cutpoints": {
+      "value": "reported raw, not included in the six-slope inferential family",
+      "display": "reported raw, not included in the six-slope inferential family",
+      "kind": "text",
+      "source": "model/artifact.json#/diagnostics/p_value_families/cutpoints"
+    },
+    "robustness_check_count": {
+      "value": 9,
+      "display": "9",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/robustness_specification_count"
+    },
+    "total_specifications": {
+      "value": 10,
+      "display": "10",
+      "kind": "int",
+      "source": "model/artifact.json#/robustness_checks/total_specifications_including_primary"
+    },
+    "seed": {
+      "value": 42,
+      "display": "42",
+      "kind": "int",
+      "source": "model/artifact.json#/seed"
+    },
+    "tolerance_coefficients": {
+      "value": 1e-06,
+      "display": "1e-06",
+      "kind": "tol",
+      "source": "model/artifact.json#/replication_tolerance/coefficients_absolute"
+    },
+    "tolerance_headline": {
+      "value": 0.01,
+      "display": "0.01",
+      "kind": "tol",
+      "source": "model/artifact.json#/replication_tolerance/headline_score_absolute"
+    },
+    "tolerance_headline_name": {
+      "value": "holdout RMSE ratio",
+      "display": "holdout RMSE ratio",
+      "kind": "text",
+      "source": "model/artifact.json#/replication_tolerance/headline_score_name"
+    },
+    "data_sha256": {
+      "value": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59",
+      "display": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59",
+      "kind": "text",
+      "source": "model/artifact.json#/data_sha256_normalized_crlf_to_lf"
+    },
+    "econ_typical_score_move": {
+      "value": 0.04308263385847183,
+      "display": "0.043",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "median absolute change of the model score between consecutive estimation-sample decisions"
+      }
+    },
+    "econ_inflation_sd": {
+      "value": 4.57040710637602,
+      "display": "4.5704",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/0/sd"
+    },
+    "econ_inflation_score_change": {
+      "value": 0.03046920660509142,
+      "display": "+0.030",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/0",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_inflation_band_low": {
+      "value": -0.16073201918890537,
+      "display": "-0.161",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/0",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_inflation_band_high": {
+      "value": 0.2216704323990882,
+      "display": "+0.222",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/0",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_inflation_meaningful": {
+      "value": "no",
+      "display": "no",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/0",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_exports_sd": {
+      "value": 27.869792071367907,
+      "display": "27.8698",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/1/sd"
+    },
+    "econ_exports_score_change": {
+      "value": 0.11585626845789729,
+      "display": "+0.116",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/1",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_exports_band_low": {
+      "value": -0.057431435637746636,
+      "display": "-0.057",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/1",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_exports_band_high": {
+      "value": 0.2891439725535412,
+      "display": "+0.289",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/1",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_exports_meaningful": {
+      "value": "no",
+      "display": "no",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/1",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_imports_sd": {
+      "value": 17.611687153104146,
+      "display": "17.6117",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/2/sd"
+    },
+    "econ_imports_score_change": {
+      "value": -0.04173306697691653,
+      "display": "-0.042",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/2",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_imports_band_low": {
+      "value": -0.23022909115152498,
+      "display": "-0.230",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/2",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_imports_band_high": {
+      "value": 0.14676295719769192,
+      "display": "+0.147",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/2",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_imports_meaningful": {
+      "value": "no",
+      "display": "no",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/2",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_corporate_lending_sd": {
+      "value": 7.989157722989778,
+      "display": "7.9892",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/3/sd"
+    },
+    "econ_corporate_lending_score_change": {
+      "value": -0.10262237067838798,
+      "display": "-0.103",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/3",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_corporate_lending_band_low": {
+      "value": -0.34132036598258086,
+      "display": "-0.341",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/3",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_corporate_lending_band_high": {
+      "value": 0.13607562462580491,
+      "display": "+0.136",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/3",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_corporate_lending_meaningful": {
+      "value": "no",
+      "display": "no",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/3",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_household_lending_sd": {
+      "value": 11.243824905461855,
+      "display": "11.2438",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/4/sd"
+    },
+    "econ_household_lending_score_change": {
+      "value": 0.2557930449849343,
+      "display": "+0.256",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/4",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_household_lending_band_low": {
+      "value": 0.0792339483964882,
+      "display": "+0.079",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/4",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_household_lending_band_high": {
+      "value": 0.4323521415733804,
+      "display": "+0.432",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/4",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_household_lending_meaningful": {
+      "value": "yes",
+      "display": "yes",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/4",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_consumption_sd": {
+      "value": 9.748772394864156,
+      "display": "9.7488",
+      "kind": "coef",
+      "source": "model/artifact.json#/economic_size_plus_one_sd/5/sd"
+    },
+    "econ_consumption_score_change": {
+      "value": -0.004375702159523459,
+      "display": "-0.004",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/5",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_consumption_band_low": {
+      "value": -0.12611459123199398,
+      "display": "-0.126",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/5",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_consumption_band_high": {
+      "value": 0.11736318691294705,
+      "display": "+0.117",
+      "kind": "score",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/5",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv"
+        ],
+        "method": "score at estimation means + 1 SD minus score at means; 95% delta-method band"
+      }
+    },
+    "econ_consumption_meaningful": {
+      "value": "no",
+      "display": "no",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/economic_size_plus_one_sd/5",
+          "model/artifact.json#/model/covariance_hc0",
+          "model/artifact.json#/sample/estimation_rows",
+          "model/artifact.json#/model/parameters",
+          "data/processed/model_panel.csv",
+          "econ_typical_score_move"
+        ],
+        "method": "yes if the 95% band excludes zero and |change| >= the typical decision-to-decision move"
+      }
+    },
+    "econ_meaningful_factors": {
+      "value": "household lending",
+      "display": "household lending",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "econ_*_meaningful"
+        ],
+        "method": "factors whose one-SD move is economically meaningful by the stated rule"
+      }
+    },
+    "econ_meaningful_count": {
+      "value": 1,
+      "display": "1",
+      "kind": "int",
+      "source": {
+        "derived_from": [
+          "econ_*_meaningful"
+        ],
+        "method": "number of factors whose one-SD move is economically meaningful by the stated rule"
+      }
+    },
+    "robustness_short_alternative_sample": {
+      "value": "RB01",
+      "display": "RB01",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/0/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/1/estimator_converged"
+        ],
+        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+      }
+    },
+    "robustness_short_alternative_specification": {
+      "value": "RB03",
+      "display": "RB03",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/2/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/5/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/6/estimator_converged"
+        ],
+        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+      }
+    },
+    "robustness_short_alternative_measure": {
+      "value": "RB04",
+      "display": "RB04",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/3/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/4/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/7/estimator_converged",
+          "model/artifact.json#/robustness_checks/checks/8/estimator_converged"
+        ],
+        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+      }
+    },
+    "robustness_RB09_household_lending_coef": {
+      "value": 0.31004857943976666,
+      "display": "0.3100",
+      "kind": "coef",
+      "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/estimate"
+    },
+    "robustness_RB09_household_lending_p_raw": {
+      "value": 0.28094410263690495,
+      "display": "0.281",
+      "kind": "p",
+      "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/p_value"
+    },
+    "robustness_RB09_household_lending_p_holm": {
+      "value": 0.6508124804742613,
+      "display": "0.651",
+      "kind": "p",
+      "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/p_value_adjusted"
+    },
+    "robustness_RB09_household_lending_loses_significance": {
+      "value": "yes",
+      "display": "yes",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/8/coefficients/4/p_value_adjusted",
+          "model/artifact.json#/model/coefficient_table/household_lending/p_value_holm"
+        ],
+        "method": "yes if Holm p < 0.05 in the main model and >= 0.05 in RB09"
+      }
+    },
+    "power_multiplier": {
+      "value": 2.8,
+      "display": "2.800",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "stated approximation"
+        ],
+        "method": "z(0.975) + z(0.80) = 1.96 + 0.84, rounded to 2.8 (5% two-sided test, 80% power)"
+      }
+    },
+    "power_inflation_mde": {
+      "value": 0.19638612928754046,
+      "display": "0.1964",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/inflation/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/inflation/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_inflation_ratio": {
+      "value": 0.11198836420229687,
+      "display": "0.112",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/inflation/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/inflation/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "power_exports_mde": {
+      "value": 0.029299866552559475,
+      "display": "0.0293",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/exports/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/exports/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_exports_ratio": {
+      "value": 0.46910422806136615,
+      "display": "0.469",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/exports/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/exports/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "power_imports_mde": {
+      "value": 0.05052337189787505,
+      "display": "0.0505",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/imports/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/imports/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_imports_ratio": {
+      "value": -0.15422749228418295,
+      "display": "-0.154",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/imports/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/imports/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "power_corporate_lending_mde": {
+      "value": 0.13776309525587196,
+      "display": "0.1378",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/corporate_lending/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/corporate_lending/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_corporate_lending_ratio": {
+      "value": -0.3056870634202012,
+      "display": "-0.306",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/corporate_lending/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/corporate_lending/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "power_household_lending_mde": {
+      "value": 0.0751412811424292,
+      "display": "0.0751",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/household_lending/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/household_lending/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_household_lending_ratio": {
+      "value": 0.9997889167744669,
+      "display": "1.000",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/household_lending/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/household_lending/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "power_consumption_mde": {
+      "value": 0.05871221002964152,
+      "display": "0.0587",
+      "kind": "coef",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/consumption/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/consumption/hc0_standard_error"
+        ],
+        "method": "power_multiplier x HC0 standard error"
+      }
+    },
+    "power_consumption_ratio": {
+      "value": -0.025183394902477056,
+      "display": "-0.025",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/model/coefficient_table/consumption/coefficient_or_cutpoint",
+          "model/artifact.json#/model/coefficient_table/consumption/hc0_standard_error"
+        ],
+        "method": "estimate / minimum detectable effect"
+      }
+    },
+    "headline_score_band_width": {
+      "value": 0.7784451596383354,
+      "display": "0.778",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "headline_score_band_low",
+          "headline_score_band_high"
+        ],
+        "method": "band high minus band low"
+      }
+    }
+  }
+}
