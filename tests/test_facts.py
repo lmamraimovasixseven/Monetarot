@@ -673,7 +673,7 @@ def test_drivers_helper_line_is_under_the_slider(tmp_path):
 
 FACTOR_ORDER = list(ingest.FEATURE_RULES)
 
-# ------------------------------------------- "Why these probabilities?" and dedication
+# ------------------------------------------- "Why these probabilities?"
 
 
 def _walk(node):
@@ -707,24 +707,6 @@ def test_why_panel_explains_with_generated_numbers_and_unknown_fallbacks(tmp_pat
     overview = next(tab for tab in at.tabs if tab.label == "Overview")
     panel = next(box for box in overview.expander if box.label == "Why these probabilities?")
     assert [item.value for item in panel.markdown] == [f"- {item}" for item in items]
-
-
-def test_dedication_is_static_above_the_score_and_changes_no_number(tmp_path):
-    from src import app as dashboard
-
-    assert not re.search(r"\d", dashboard.DEDICATION)
-    at = AppTest.from_file(str(_app_copy(tmp_path)), default_timeout=30).run()
-    nodes = list(_walk(at.main))
-    kinds = [(getattr(node, "type", None), getattr(node, "value", None), getattr(node, "label", None)) for node in nodes]
-    title = next(i for i, (kind, value, _) in enumerate(kinds) if kind == "title")
-    dedication = next(i for i, (kind, value, _) in enumerate(kinds) if kind == "markdown" and value == dashboard.DEDICATION)
-    score = next(i for i, (kind, _, label) in enumerate(kinds) if kind == "metric" and label == "Policy pressure score")
-    assert title < dedication < score
-    artifact = dashboard.load_artifact()
-    expected = dashboard.policy_pressure_score(dashboard.ordered_probabilities(artifact, artifact["latest_feature_vector"]))
-    assert next(m.value for m in at.metric if m.label == "Policy pressure score") == f"{expected:+.3f}"
-    for relative in ("model/artifact.json", "outputs/numbers_for_note.json"):
-        assert dashboard.DEDICATION not in (ROOT / relative).read_text(encoding="utf-8")
 
 
 def test_demo_answers_on_rounds_and_hold_use_the_generated_numbers():

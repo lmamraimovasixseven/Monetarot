@@ -21,6 +21,7 @@ ARTIFACT = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf
 TEMPLATE_LITERALS = {
     "3.14": "tested Python version (Windows)",
     "3.13": "tested Python version (Linux)",
+    "3.11": "minimum required Python version",
     "8503": "default dashboard port",
     "95": "confidence level of the delta-method band",
     "0": "score scale definition",

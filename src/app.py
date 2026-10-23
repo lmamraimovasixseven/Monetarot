@@ -38,8 +38,6 @@ TARGET_SERIES_FILE = "base_rate_history.csv"
 SCENARIO_DEFAULT_FACTOR = "household_lending"
 SIGNIFICANCE_LEVEL = 0.05  # the 5% level used for the Holm-adjusted slope tests
 JOINT_TEST_LEVEL = 0.10  # falsification criterion 1 uses the joint LR test at 10%
-# Static dedication requested by the team; not a result and not stored in any artifact or output.
-DEDICATION = "ДИАС КУМАРБЕКОВ ЛУЧШИЙ ПРОФЕССОР"
 ARTIFACT_PATH = PROJECT_DIR / "model" / "artifact.json"
 ROUNDS_PATH = PROJECT_DIR / "config" / "forecast_rounds.json"
 FEATURES = [
@@ -1019,7 +1017,6 @@ def main() -> None:
                 ".stTabs [aria-selected='true'] {color:#174a7e;}\n"
                 "</style>", unsafe_allow_html=True)
     st.title("NBK Base-Rate Decision Forecast")
-    st.markdown(DEDICATION)
     headline_cols = st.columns([1.25, 1.0, 1.4])
     headline_cols[0].metric("Policy pressure score", f"{latest_score:+.3f}")
     headline_cols[0].caption(f"95% band: {band_low:+.3f} to {band_high:+.3f}")
