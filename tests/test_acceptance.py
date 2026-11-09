@@ -407,10 +407,12 @@ def test_src_check_reproduces_committed_results(tmp_path):
     for item in ("headline: holdout RMSE ratio", "headline: latest policy pressure score",
                  "coefficient household_lending", "outputs/annex_diagnostics.md", "outputs/results_table.md",
                  "outputs/oos_comparison.md", "outputs/economic_size.md", "outputs/robustness_table_short.md",
-                 "outputs/numbers_for_note.json headline_score",
-                 "outputs/fig_history.png", "outputs/fig_oos.png", "outputs/fig_contributions.png", "README.md",
+                 "outputs/numbers_for_note.json headline_score", "outputs/robust_evaluation.md", "README.md",
                  "facts: data/raw/SOURCES.md", "facts: data/processed/provenance.json", "facts: docs/indicator_card.md"):
         assert re.search(rf"^PASS\s+{re.escape(item)}", result.stdout, re.M), item
+    # Figures pass exactly on the machine that drew them and WARN (font rasterization, D16) elsewhere.
+    for item in ("outputs/fig_history.png", "outputs/fig_oos.png", "outputs/fig_contributions.png"):
+        assert re.search(rf"^(PASS|WARN)\s+{re.escape(item)}", result.stdout, re.M), item
     assert not re.search(r"^(FAIL|SKIP)\s", result.stdout, re.M)
 
 

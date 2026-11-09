@@ -78,9 +78,32 @@ def _git(*args: str) -> str:
     return result.stdout.decode("utf-8", errors="replace")
 
 
+def _is_git_repository() -> bool:
+    try:
+        return _git("rev-parse", "--is-inside-work-tree").strip() == "true"
+    except (OSError, subprocess.CalledProcessError):
+        return False
+
+
+# Folders skipped when the project is not a git checkout (for example a "Download ZIP" copy).
+NON_GIT_SKIP_DIRS = {".git", ".venv", "venv", "__pycache__", ".pytest_cache", "node_modules"}
+
+
+def _tracked_names() -> list[str]:
+    """Files to scan: git's view when available, otherwise every file under the project root."""
+    if _is_git_repository():
+        return _git("ls-files", "-z", "--cached", "--others", "--exclude-standard").split("\0")
+    names = []
+    for path in sorted(ROOT.rglob("*")):
+        relative = path.relative_to(ROOT)
+        if path.is_file() and not set(relative.parts) & NON_GIT_SKIP_DIRS:
+            names.append(relative.as_posix())
+    return names
+
+
 def scan_working_tree() -> list[Finding]:
     findings = []
-    for name in _git("ls-files", "-z", "--cached", "--others", "--exclude-standard").split("\0"):
+    for name in _tracked_names():
         path = ROOT / name
         if not name or not path.is_file() or path.suffix.lower() in SKIP_SUFFIXES:
             continue
@@ -93,7 +116,12 @@ def scan_working_tree() -> list[Finding]:
 
 
 def scan_history() -> tuple[list[Finding], set[str], int]:
-    """Scan every commit's message and diff; return content findings and author identities."""
+    """Scan every commit's message and diff; return content findings and author identities.
+
+    Outside a git checkout there is no history to scan; that is reported, not treated as a failure.
+    """
+    if not _is_git_repository():
+        return [], set(), 0
     log = _git("log", "-p", "--all", "--no-color", "--format=commit %H%nAuthor: %an <%ae>%nCommit: %cn <%ce>%n%n%B")
     findings, identities, commits = [], set(), 0
     commit, file_name = "?", "?"
@@ -131,7 +159,10 @@ def main(argv: list[str] | None = None) -> int:
             "commit_identities": sorted(identities),
         }, indent=2, ensure_ascii=False))
     else:
-        print(f"Scanned working tree and {commits} commits of `git log -p --all`.")
+        if _is_git_repository():
+            print(f"Scanned working tree and {commits} commits of `git log -p --all`.")
+        else:
+            print("Not a git checkout: scanned every file under the project folder; no git history to scan.")
         print(f"Content findings: {len(findings)}")
         for f in findings:
             print(f"  FAIL  [{f.where}] {f.location}: {f.kind}: {f.value}")

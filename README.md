@@ -86,14 +86,19 @@ This one command starts the dashboard at <http://localhost:8503> and opens a bro
 ```text
 python run.py data      # rebuild data/processed/ from data/raw/
 python run.py model     # re-estimate; rewrites model/artifact.json and the annexes in outputs/
+python run.py robust    # exploratory stress tests -> model/robust_eval.json, outputs/robust_evaluation.md
 python run.py report    # tables, figures and numbers for the note, then this README
 python run.py facts     # validate docs/facts_to_fill.* and regenerate SOURCES.md, provenance, card, rule, validity facts
-python run.py all       # data, model, report, facts, then the tests
+python run.py all       # data, model, robust, report, facts, then the tests
 ```
 
 `python run.py report` writes `outputs/results_table.md`, `outputs/oos_comparison.md`, `outputs/economic_size.md`, `outputs/robustness_table_short.md`, `outputs/fig_history.png`, `outputs/fig_oos.png`, `outputs/fig_contributions.png` and `outputs/numbers_for_note.json`. Each entry in the numbers file has a `source` field that points to the artifact field it came from.
 
 Facts that only a person can supply (publishers, URLs, retrieval dates, real release lags, the origin and status of the indicator, the named user) go into `docs/facts_to_fill.csv` and `docs/facts_to_fill.md`. `python run.py facts` validates them (dates must be `YYYY-MM-DD` and not in the future; lags must be whole days) and regenerates `data/raw/SOURCES.md`, `data/processed/provenance.json` (shown in the dashboard), `outputs/release_lag_check.md`, `docs/indicator_card.md`, `docs/decision_rule.md` and `docs/validity_facts.md`. The release-lag check compares the assumed offset in `config/release_lag.json` with the real lags; it never changes the estimation.
+
+### Exploratory stress tests (added in review, after the holdout had been seen)
+
+`python run.py robust` (`src/robust_eval.py`) leaves the main model and its verdict untouched and asks how far the verdict can be trusted. It reports a moving-block bootstrap interval and a Harvey–Leybourne–Newbold-corrected Diebold–Mariano test for the holdout RMSE ratio; the ranked probability score (RPS), a proper score for ordered probability forecasts that, unlike the log score, is finite for Always Hold; a rolling-origin, one-step-ahead evaluation inside the estimation sample, which uses no holdout data and is the fair basis for comparing specifications; two alternative specifications motivated by policy-rule reasoning (the NBK's previous decision, the ex-post real rate and the recent change in inflation) and a ridge-penalized version of the main model whose penalty is chosen at every forecast origin from earlier decisions only; and a raw-data anomaly screen (modified z-scores of monthly changes) that flags source values worth re-checking. Results are in `outputs/robust_evaluation.md` and in the Evidence tab of the site under "Stress tests". All holdout numbers there are non-confirmatory.
 
 ## Checks and tolerance
 
@@ -104,7 +109,7 @@ python run.py check      # same as python -m src.check
 python run.py regression # re-estimate the main model in memory and compare it with the artifact; writes nothing
 ```
 
-`python -m src.check` re-runs ingest, model and report in a temporary directory and compares the results with the committed files. It prints PASS, FAIL or WARN for each item (WARN only for results of optimizer runs that did not converge, which can differ slightly across platforms; see `docs/deviations.md`, D14): both processed panels, the headline scores, every coefficient, every number in `outputs/*.md`, every entry of `outputs/numbers_for_note.json`, the three figures (pixel by pixel), this README, and every file generated from the fact forms. Tolerances are stored in the artifact: 0.01 for the headline (holdout RMSE ratio and the latest policy pressure score), and 1e-06 for coefficients and every other number. The model uses a fixed random seed (42), which is also recorded in the artifact.
+`python -m src.check` re-runs ingest, model and report in a temporary directory and compares the results with the committed files. It also re-runs the exploratory stress tests. It prints PASS, FAIL or WARN for each item (WARN only for results of optimizer runs that did not converge, which can differ slightly across platforms, and for figures whose pixels differ only through font rasterization on another operating system; see `docs/deviations.md`, D14 and D16): both processed panels, the headline scores, every coefficient, every number in `outputs/*.md`, every entry of `outputs/numbers_for_note.json`, the three figures (pixel by pixel, then on small-block averages), this README, and every file generated from the fact forms. Tolerances are stored in the artifact: 0.01 for the headline (holdout RMSE ratio and the latest policy pressure score), and 1e-06 for coefficients and every other number. The model uses a fixed random seed (42), which is also recorded in the artifact.
 
 `python run.py regression` re-fits only the main ordered logit, in memory, on the estimation sample recorded in `model/artifact.json`, and prints one PASS or FAIL line per estimate, robust standard error and p-value (and the log-likelihood) at the coefficient tolerance 1e-06; it writes nothing and exits with code 1 if any line fails.
 
@@ -113,9 +118,10 @@ Acceptance checks: `python -m pytest -q tests/test_acceptance.py`. Set `KZ_SKIP_
 ## Project structure
 
 ```text
-run.py                    one entry point: site, data, model, report, check, test
+run.py                    one entry point: site, data, model, robust, report, check, test
 src/ingest.py             raw CSVs -> data/processed/ panels
 src/model.py              ordered logit, diagnostics, robustness -> model/artifact.json, outputs/annex_*
+src/robust_eval.py        exploratory stress tests -> model/robust_eval.json, outputs/robust_evaluation.md
 src/report.py             artifact + processed data -> note tables, figures, numbers
 src/readme.py             docs/README.template.md + numbers -> README.md
 src/facts.py              fact forms + numbers -> SOURCES.md, provenance.json, card, rule, validity facts

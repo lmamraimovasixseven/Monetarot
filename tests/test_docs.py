@@ -100,7 +100,10 @@ def test_demo_script_has_six_steps_eighteen_questions_and_real_file_references()
         if not path.endswith("/"):
             assert (ROOT / path).exists(), path
     remote = "https://github.com/lmamraimovasixseven/monetarot.git"
-    assert remote in text and remote in (ROOT / ".git" / "config").read_text(encoding="utf-8")
+    assert remote in text
+    git_config = ROOT / ".git" / "config"
+    if git_config.is_file():  # a "Download ZIP" copy has no .git folder; the remote is then checked in the text only
+        assert remote in git_config.read_text(encoding="utf-8")
 
 
 def test_demo_answers_that_state_results_match_the_numbers():

@@ -1,0 +1,1437 @@
+{
+  "label": "Exploratory: added on 2026-11-06 after the holdout had been seen. The pre-specified main model and its verdict are unchanged; holdout numbers here are non-confirmatory.",
+  "seed": 42,
+  "settings": {
+    "first_rolling_origin": 40,
+    "lambda_grid": [
+      0.0001,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0
+    ],
+    "inner_window": 12,
+    "safeguard_penalty": 0.0001,
+    "bootstrap_block_length": 3,
+    "bootstrap_draws": 10000,
+    "modified_z_threshold": 3.5,
+    "feature_labels": {
+      "inflation": "Inflation",
+      "exports": "Exports",
+      "imports": "Imports",
+      "corporate_lending": "Corporate lending",
+      "household_lending": "Household lending",
+      "consumption": "Consumption",
+      "inflation_change_3m": "Inflation change over 3 months",
+      "real_rate": "Ex-post real rate (base rate before decision − inflation)",
+      "previous_decision": "Previous decision (−1/0/+1)"
+    }
+  },
+  "designs": {
+    "rolling_origin_estimation_sample": {
+      "description": "One-step-ahead forecasts for usable decisions 41-70 (inside the estimation sample), each model refitted on all earlier decisions. Uses no holdout data, so it is the fair basis for comparing specifications.",
+      "n": 30,
+      "first_date": "2020-12-15",
+      "last_date": "2024-06-03",
+      "specifications": [
+        {
+          "n": 30,
+          "rmse": 0.7071067811865476,
+          "rmse_ratio_to_hold": 1.0,
+          "mae": 0.5,
+          "rps": 0.25,
+          "rps_skill_vs_hold": 0.0,
+          "brier": 1.0,
+          "log_score": null,
+          "hit_rate": 0.5,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0,
+            "ci_low": 1.0,
+            "ci_high": 1.0,
+            "share_below_one": 0.0,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "B0",
+          "name": "Always Hold (pre-specified benchmark)",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 30,
+          "rmse": 0.7622393877050604,
+          "rmse_ratio_to_hold": 1.07796927986746,
+          "mae": 0.5971267244736655,
+          "rps": 0.20973347046860782,
+          "rps_skill_vs_hold": 0.1610661181255687,
+          "brier": 0.6773919386426617,
+          "log_score": 1.1700825320247303,
+          "hit_rate": 0.5,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": 0.08100888416898529,
+            "statistic": 2.393128160629304,
+            "p_value": 0.023400724305282627,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.0402665295313922,
+            "statistic": -2.0944077328273725,
+            "p_value": 0.04507394132224045,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0779692798674603,
+            "ci_low": 0.9978218050368575,
+            "ci_high": 1.1748278114578037,
+            "share_below_one": 0.0273,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "B1",
+          "name": "Class frequencies of the estimation window",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 30,
+          "rmse": 0.6582805886043833,
+          "rmse_ratio_to_hold": 0.9309493362512627,
+          "mae": 0.43333333333333335,
+          "rps": 0.21666666666666667,
+          "rps_skill_vs_hold": 0.1333333333333333,
+          "brier": 0.8666666666666667,
+          "log_score": null,
+          "hit_rate": 0.5666666666666667,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.06666666666666667,
+            "statistic": -0.5280588545286914,
+            "p_value": 0.6014762511281211,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.03333333333333333,
+            "statistic": -0.5280588545286914,
+            "p_value": 0.6014762511281211,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9309493362512627,
+            "ci_low": 0.6708203932499369,
+            "ci_high": 1.1832159566199232,
+            "share_below_one": 0.6921,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "B2",
+          "name": "Persistence: repeat the previous decision",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 30,
+          "rmse": 0.740570756876425,
+          "rmse_ratio_to_hold": 1.0473252082715483,
+          "mae": 0.6005311327298652,
+          "rps": 0.20741823955469588,
+          "rps_skill_vs_hold": 0.1703270417812165,
+          "brier": 0.6960643913876545,
+          "log_score": 1.214808591098103,
+          "hit_rate": 0.43333333333333335,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": 0.04844504594052104,
+            "statistic": 0.5772060863236471,
+            "p_value": 0.5682546393417048,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.042581760445304075,
+            "statistic": -1.16205517450502,
+            "p_value": 0.25468779943088304,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0473252082715485,
+            "ci_low": 0.8613493516153091,
+            "ci_high": 1.1936002327863262,
+            "share_below_one": 0.2898,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "M0",
+          "name": "Main ordered logit, six factors (unpenalized)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 30,
+          "rmse": 0.6905698744213449,
+          "rmse_ratio_to_hold": 0.976613282172951,
+          "mae": 0.5836192828281178,
+          "rps": 0.1869129423294596,
+          "rps_skill_vs_hold": 0.2523482306821616,
+          "brier": 0.6445909025184452,
+          "log_score": 1.0475612675609893,
+          "hit_rate": 0.4666666666666667,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.023113248541687833,
+            "statistic": -0.3433661987310867,
+            "p_value": 0.7337998825701101,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.06308705767054043,
+            "statistic": -1.8475600096733253,
+            "p_value": 0.07489047190983578,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9766132821729511,
+            "ci_low": 0.8219195205734859,
+            "ci_high": 1.1068953407963271,
+            "share_below_one": 0.6306,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "M1",
+          "name": "Main ordered logit, six factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.3,
+            1.0,
+            3.0,
+            10.0,
+            30.0
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 30,
+          "rmse": 0.662707088339543,
+          "rmse_ratio_to_hold": 0.9372093522105663,
+          "mae": 0.5075539541807209,
+          "rps": 0.16940201184901255,
+          "rps_skill_vs_hold": 0.3223919526039498,
+          "brier": 0.5772313861586003,
+          "log_score": 1.002085848544957,
+          "hit_rate": 0.6,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.06081931506452513,
+            "statistic": -0.6412349525103239,
+            "p_value": 0.5264058073143151,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.08059798815098747,
+            "statistic": -2.011776744676245,
+            "p_value": 0.053616747466374,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9372093522105666,
+            "ci_low": 0.6937245766948988,
+            "ci_high": 1.1775478753421467,
+            "share_below_one": 0.6608,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "P0",
+          "name": "Policy-rule ordered logit: inflation, its 3-month change, real rate, previous decision",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 30,
+          "rmse": 0.6426037090973307,
+          "rmse_ratio_to_hold": 0.9087788806367,
+          "mae": 0.5629014885336164,
+          "rps": 0.17542669243498857,
+          "rps_skill_vs_hold": 0.2982932302600457,
+          "brier": 0.6396206276642843,
+          "log_score": 0.9832428109842543,
+          "hit_rate": 0.4,
+          "dm_squared_error_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.08706047305435319,
+            "statistic": -1.1526865711615988,
+            "p_value": 0.2584523617301041,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 30,
+            "mean_loss_difference": -0.07457330756501147,
+            "statistic": -1.914561164420947,
+            "p_value": 0.06546085338344507,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9087788806367001,
+            "ci_low": 0.7759230859419094,
+            "ci_high": 1.0701924151591047,
+            "share_below_one": 0.8698,
+            "block_length": 3,
+            "draws": 10000,
+            "seed": 42
+          },
+          "id": "P1",
+          "name": "Policy-rule features plus the five other factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001,
+            0.3,
+            1.0,
+            3.0,
+            10.0,
+            30.0
+          ],
+          "all_fits_converged": true
+        }
+      ]
+    },
+    "holdout_fixed_origin": {
+      "description": "Same protocol as the main model: fit once on the 70 estimation decisions, forecast the 18 holdout decisions. Non-confirmatory (holdout already seen).",
+      "n": 18,
+      "first_date": "2024-07-15",
+      "last_date": "2026-09-07",
+      "specifications": [
+        {
+          "n": 18,
+          "rmse": 0.6236095644623235,
+          "rmse_ratio_to_hold": 1.0,
+          "mae": 0.3888888888888889,
+          "rps": 0.19444444444444445,
+          "rps_skill_vs_hold": 0.0,
+          "brier": 0.7777777777777778,
+          "log_score": null,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0,
+            "ci_low": 1.0,
+            "ci_high": 1.0,
+            "share_below_one": 0.0,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B0",
+          "name": "Always Hold (pre-specified benchmark)",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6239003932361896,
+          "rmse_ratio_to_hold": 1.0004663635557238,
+          "mae": 0.45238095238095244,
+          "rps": 0.157891156462585,
+          "rps_skill_vs_hold": 0.18798833819242,
+          "brier": 0.5580952380952381,
+          "log_score": 0.9456565309065696,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0003628117913832089,
+            "statistic": 0.010536622236905836,
+            "p_value": 0.9917158119780483,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.03655328798185942,
+            "statistic": -1.2488996357274065,
+            "p_value": 0.22862651113977503,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0004663635557238,
+            "ci_low": 0.9262608615684188,
+            "ci_high": 1.1432142299281463,
+            "share_below_one": 0.22034406881376276,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B1",
+          "name": "Class frequencies of the estimation window",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6666666666666666,
+          "rmse_ratio_to_hold": 1.0690449676496976,
+          "mae": 0.4444444444444444,
+          "rps": 0.2222222222222222,
+          "rps_skill_vs_hold": -0.1428571428571428,
+          "brier": 0.8888888888888888,
+          "log_score": null,
+          "hit_rate": 0.5555555555555556,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.05555555555555555,
+            "statistic": 0.36878177829171543,
+            "p_value": 0.7168430154990374,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.027777777777777776,
+            "statistic": 0.36878177829171543,
+            "p_value": 0.7168430154990374,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0690449676496976,
+            "ci_low": 0.8660254037844386,
+            "ci_high": 1.632993161855452,
+            "share_below_one": 0.09041808361672335,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B2",
+          "name": "Persistence: repeat the previous decision",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6246819336656123,
+          "rmse_ratio_to_hold": 1.0017196163503577,
+          "mae": 0.4789270919912163,
+          "rps": 0.15596552580304424,
+          "rps_skill_vs_hold": 0.19789158158434395,
+          "brier": 0.545565636570057,
+          "log_score": 0.9397096812459087,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0013386293593195542,
+            "statistic": 0.022691292334674994,
+            "p_value": 0.9821607407450931,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.03847891864140022,
+            "statistic": -1.2339388395256567,
+            "p_value": 0.2340133080712792,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0017196163503574,
+            "ci_low": 0.8277544806706899,
+            "ci_high": 1.229992952143026,
+            "share_below_one": 0.34426885377075417,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "M0",
+          "name": "Main ordered logit, six factors (unpenalized)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.6162620394464841,
+          "rmse_ratio_to_hold": 0.9882177480357048,
+          "mae": 0.4455661109335785,
+          "rps": 0.15444995217940213,
+          "rps_skill_vs_hold": 0.20568596022021757,
+          "brier": 0.5469208118136731,
+          "log_score": 0.9291513287930435,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.009109987626148987,
+            "statistic": -0.23791737025618281,
+            "p_value": 0.8147890833102092,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.039994492265042314,
+            "statistic": -1.375377501271265,
+            "p_value": 0.18686886841252712,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9882177480357047,
+            "ci_low": 0.89099365925637,
+            "ci_high": 1.1454843385007132,
+            "share_below_one": 0.3751750350070014,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "M1",
+          "name": "Main ordered logit, six factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            30.0
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.7543331589420903,
+          "rmse_ratio_to_hold": 1.2096241012475117,
+          "mae": 0.6172019376112021,
+          "rps": 0.21003498328833925,
+          "rps_skill_vs_hold": -0.08017991405431601,
+          "brier": 0.6911913850504824,
+          "log_score": 1.183259025648981,
+          "hit_rate": 0.3888888888888889,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.18012962579066405,
+            "statistic": 1.0454844918816346,
+            "p_value": 0.3104379877584569,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.015590538843894802,
+            "statistic": 0.23481964825108584,
+            "p_value": 0.8171537759357348,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.2096241012475115,
+            "ci_low": 0.8808977111800809,
+            "ci_high": 1.9612105172732612,
+            "share_below_one": 0.0692138427685537,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "P0",
+          "name": "Policy-rule ordered logit: inflation, its 3-month change, real rate, previous decision",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.8013430947465765,
+          "rmse_ratio_to_hold": 1.2850077041994936,
+          "mae": 0.6705827793829273,
+          "rps": 0.2415371597955681,
+          "rps_skill_vs_hold": -0.24219110752006445,
+          "brier": 0.8070722032753881,
+          "log_score": 1.402321663445595,
+          "hit_rate": 0.3333333333333333,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.2532618666091317,
+            "statistic": 1.4198637669948504,
+            "p_value": 0.17372609904007943,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.047092715351123665,
+            "statistic": 0.6634979342098256,
+            "p_value": 0.5159092691698489,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.2850077041994936,
+            "ci_low": 0.9330356030870658,
+            "ci_high": 2.1852440192516163,
+            "share_below_one": 0.04310862172434487,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "P1",
+          "name": "Policy-rule features plus the five other factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        }
+      ]
+    },
+    "holdout_recursive": {
+      "description": "Refit before every holdout decision on all earlier decisions, as a real user would. Non-confirmatory (holdout already seen).",
+      "n": 18,
+      "first_date": "2024-07-15",
+      "last_date": "2026-09-07",
+      "specifications": [
+        {
+          "n": 18,
+          "rmse": 0.6236095644623235,
+          "rmse_ratio_to_hold": 1.0,
+          "mae": 0.3888888888888889,
+          "rps": 0.19444444444444445,
+          "rps_skill_vs_hold": 0.0,
+          "brier": 0.7777777777777778,
+          "log_score": null,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.0,
+            "statistic": null,
+            "p_value": null,
+            "note": "not computed (zero variance of loss differences)"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0,
+            "ci_low": 1.0,
+            "ci_high": 1.0,
+            "share_below_one": 0.0,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B0",
+          "name": "Always Hold (pre-specified benchmark)",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6272967988928225,
+          "rmse_ratio_to_hold": 1.0059127291187044,
+          "mae": 0.4428570978092299,
+          "rps": 0.1594858324616629,
+          "rps_skill_vs_hold": 0.17978714734001944,
+          "brier": 0.5634137208687949,
+          "log_score": 0.9554051406147006,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.004612385012293447,
+            "statistic": 0.15436843961191143,
+            "p_value": 0.8791370787072355,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.03495861198278157,
+            "statistic": -1.266851010843969,
+            "p_value": 0.22229052418774284,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0059127291187044,
+            "ci_low": 0.9489490272595709,
+            "ci_high": 1.1288077981898714,
+            "share_below_one": 0.21804360872174436,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B1",
+          "name": "Class frequencies of the estimation window",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6666666666666666,
+          "rmse_ratio_to_hold": 1.0690449676496976,
+          "mae": 0.4444444444444444,
+          "rps": 0.2222222222222222,
+          "rps_skill_vs_hold": -0.1428571428571428,
+          "brier": 0.8888888888888888,
+          "log_score": null,
+          "hit_rate": 0.5555555555555556,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.05555555555555555,
+            "statistic": 0.36878177829171543,
+            "p_value": 0.7168430154990374,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.027777777777777776,
+            "statistic": 0.36878177829171543,
+            "p_value": 0.7168430154990374,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.0690449676496976,
+            "ci_low": 0.8660254037844386,
+            "ci_high": 1.632993161855452,
+            "share_below_one": 0.09041808361672335,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "B2",
+          "name": "Persistence: repeat the previous decision",
+          "kind": "benchmark",
+          "features": null,
+          "penalties_used": null,
+          "all_fits_converged": null
+        },
+        {
+          "n": 18,
+          "rmse": 0.6234151112228238,
+          "rmse_ratio_to_hold": 0.9996881811143045,
+          "mae": 0.43699827802676044,
+          "rps": 0.1568400944923162,
+          "rps_skill_vs_hold": 0.19339379975380244,
+          "brier": 0.5523941660529316,
+          "log_score": 0.9448285934586029,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.00024248798792316414,
+            "statistic": -0.006164019395791253,
+            "p_value": 0.9951536125577998,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.03760434995212823,
+            "statistic": -1.4688207232824464,
+            "p_value": 0.16014294975247495,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9996881811143044,
+            "ci_low": 0.8861116150121525,
+            "ci_high": 1.1482171453154497,
+            "share_below_one": 0.3740748149629926,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "M0",
+          "name": "Main ordered logit, six factors (unpenalized)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.6097142968953707,
+          "rmse_ratio_to_hold": 0.9777180012001045,
+          "mae": 0.42228004639446365,
+          "rps": 0.15375909994432835,
+          "rps_skill_vs_hold": 0.2092389145720257,
+          "brier": 0.550803075827354,
+          "log_score": 0.9286491748205449,
+          "hit_rate": 0.6111111111111112,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.017137365050272704,
+            "statistic": -0.4821816588271495,
+            "p_value": 0.6358264703757075,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.04068534450011607,
+            "statistic": -1.4808214572055298,
+            "p_value": 0.15695016182890145,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9777180012001044,
+            "ci_low": 0.8866746592447952,
+            "ci_high": 1.113769486126975,
+            "share_below_one": 0.4460892178435687,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "M1",
+          "name": "Main ordered logit, six factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001,
+            3.0,
+            30.0
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.6291252153807878,
+          "rmse_ratio_to_hold": 1.008844718286545,
+          "mae": 0.47005785227028873,
+          "rps": 0.1530401653568818,
+          "rps_skill_vs_hold": 0.2129362924503222,
+          "brier": 0.522442455513368,
+          "log_score": 0.9483018972454005,
+          "hit_rate": 0.7222222222222222,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": 0.006909647739033853,
+            "statistic": 0.057686690890417294,
+            "p_value": 0.9546708361422831,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.04140427908756266,
+            "statistic": -0.8396063394590778,
+            "p_value": 0.4127813481071754,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 1.008844718286545,
+            "ci_low": 0.7697832399554752,
+            "ci_high": 1.4551266995706966,
+            "share_below_one": 0.23794758951790357,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "P0",
+          "name": "Policy-rule ordered logit: inflation, its 3-month change, real rate, previous decision",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision"
+          ],
+          "penalties_used": [
+            0.0001
+          ],
+          "all_fits_converged": true
+        },
+        {
+          "n": 18,
+          "rmse": 0.6095271307876635,
+          "rmse_ratio_to_hold": 0.9774178677217661,
+          "mae": 0.4493770290875107,
+          "rps": 0.14517726724061528,
+          "rps_skill_vs_hold": 0.25337405419112147,
+          "brier": 0.49954028027745007,
+          "log_score": 0.9414291178859671,
+          "hit_rate": 0.7222222222222222,
+          "dm_squared_error_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.017365565722647372,
+            "statistic": -0.17526386850735085,
+            "p_value": 0.8629428753899215,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "dm_rps_vs_hold": {
+            "n": 18,
+            "mean_loss_difference": -0.04926717720382916,
+            "statistic": -1.2014600488099996,
+            "p_value": 0.24604426727540288,
+            "note": "HLN-corrected DM; negative mean difference favours the model"
+          },
+          "bootstrap_rmse_ratio_vs_hold": {
+            "ratio": 0.9774178677217661,
+            "ci_low": 0.787585678576782,
+            "ci_high": 1.3577185123198712,
+            "share_below_one": 0.2998599719943989,
+            "block_length": 3,
+            "draws": 9998,
+            "seed": 42
+          },
+          "id": "P1",
+          "name": "Policy-rule features plus the five other factors, ridge (penalty by time-series CV)",
+          "kind": "model",
+          "features": [
+            "inflation",
+            "inflation_change_3m",
+            "real_rate",
+            "previous_decision",
+            "exports",
+            "imports",
+            "corporate_lending",
+            "household_lending",
+            "consumption"
+          ],
+          "penalties_used": [
+            0.0001,
+            3.0,
+            10.0,
+            30.0
+          ],
+          "all_fits_converged": true
+        }
+      ]
+    }
+  },
+  "reproduction_of_main_model": {
+    "main_model_holdout_rmse": 0.6246822051080606,
+    "m0_holdout_rmse": 0.6246819336656123,
+    "absolute_difference": 2.714424482963551e-07,
+    "passes": true
+  },
+  "next_decision_forecasts": {
+    "based_on_decision": "2026-09-07",
+    "previous_decision_used": -1,
+    "base_rate_used": 16.25,
+    "forecasts": [
+      {
+        "id": "B0",
+        "name": "Always Hold (pre-specified benchmark)",
+        "kind": "benchmark",
+        "probabilities": {
+          "Decrease": 0.0,
+          "Hold": 1.0,
+          "Increase": 0.0
+        },
+        "expected_score": 0.0
+      },
+      {
+        "id": "B1",
+        "name": "Class frequencies of the estimation window",
+        "kind": "benchmark",
+        "probabilities": {
+          "Decrease": 0.2727272727272727,
+          "Hold": 0.5568181818181818,
+          "Increase": 0.17045454545454544
+        },
+        "expected_score": -0.10227272727272727
+      },
+      {
+        "id": "B2",
+        "name": "Persistence: repeat the previous decision",
+        "kind": "benchmark",
+        "probabilities": {
+          "Decrease": 1.0,
+          "Hold": 0.0,
+          "Increase": 0.0
+        },
+        "expected_score": -1.0
+      },
+      {
+        "id": "M0",
+        "name": "Main ordered logit, six factors (unpenalized)",
+        "kind": "model",
+        "probabilities": {
+          "Decrease": 0.29322532187644496,
+          "Hold": 0.5960447274973577,
+          "Increase": 0.1107299506261974
+        },
+        "expected_score": -0.18249537125024756,
+        "penalty": 0.0001,
+        "coefficients_standardized": {
+          "inflation": -0.022015633838426675,
+          "exports": 0.1646378379027334,
+          "imports": -0.02295329197792672,
+          "corporate_lending": -0.18522694058666495,
+          "household_lending": 0.8379250646688328,
+          "consumption": 0.07601850881024323
+        }
+      },
+      {
+        "id": "M1",
+        "name": "Main ordered logit, six factors, ridge (penalty by time-series CV)",
+        "kind": "model",
+        "probabilities": {
+          "Decrease": 0.29322532187644496,
+          "Hold": 0.5960447274973577,
+          "Increase": 0.1107299506261974
+        },
+        "expected_score": -0.18249537125024756,
+        "penalty": 0.0001,
+        "coefficients_standardized": {
+          "inflation": -0.022015633838426675,
+          "exports": 0.1646378379027334,
+          "imports": -0.02295329197792672,
+          "corporate_lending": -0.18522694058666495,
+          "household_lending": 0.8379250646688328,
+          "consumption": 0.07601850881024323
+        }
+      },
+      {
+        "id": "P0",
+        "name": "Policy-rule ordered logit: inflation, its 3-month change, real rate, previous decision",
+        "kind": "model",
+        "probabilities": {
+          "Decrease": 0.578105823447424,
+          "Hold": 0.38906500256405185,
+          "Increase": 0.03282917398852414
+        },
+        "expected_score": -0.5452766494588999,
+        "penalty": 0.0001,
+        "coefficients_standardized": {
+          "inflation": -0.523974279457656,
+          "inflation_change_3m": 0.49277194661416296,
+          "real_rate": -0.42099646965365706,
+          "previous_decision": 0.6287292711973281
+        }
+      },
+      {
+        "id": "P1",
+        "name": "Policy-rule features plus the five other factors, ridge (penalty by time-series CV)",
+        "kind": "model",
+        "probabilities": {
+          "Decrease": 0.6661272139535722,
+          "Hold": 0.3200051553315719,
+          "Increase": 0.01386763071485586
+        },
+        "expected_score": -0.6522595832387164,
+        "penalty": 0.3,
+        "coefficients_standardized": {
+          "inflation": -1.4214248942346859,
+          "inflation_change_3m": 0.6923477237994317,
+          "real_rate": -1.0132103535913277,
+          "previous_decision": 0.4176243138103569,
+          "exports": -0.07486424614029943,
+          "imports": 0.382159052022385,
+          "corporate_lending": 0.7099628353957574,
+          "household_lending": 0.6739949782329397,
+          "consumption": 0.23491930937447952
+        }
+      }
+    ]
+  },
+  "anomaly_screen": {
+    "flags": [
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2015-10",
+        "value": 9.4,
+        "previous_value": 4.4,
+        "change": 5.0,
+        "change_definition": "first difference",
+        "modified_z": 11.241666666666674
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2015-11",
+        "value": 12.8,
+        "previous_value": 9.4,
+        "change": 3.4000000000000004,
+        "change_definition": "first difference",
+        "modified_z": 7.644333333333339
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2016-10",
+        "value": 11.5,
+        "previous_value": 16.6,
+        "change": -5.100000000000001,
+        "change_definition": "first difference",
+        "modified_z": -11.46650000000001
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2016-11",
+        "value": 8.7,
+        "previous_value": 11.5,
+        "change": -2.8000000000000007,
+        "change_definition": "first difference",
+        "modified_z": -6.295333333333339
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2022-03",
+        "value": 12.0,
+        "previous_value": 8.7,
+        "change": 3.3000000000000007,
+        "change_definition": "first difference",
+        "modified_z": 7.4195000000000055
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2022-09",
+        "value": 17.7,
+        "previous_value": 16.1,
+        "change": 1.5999999999999979,
+        "change_definition": "first difference",
+        "modified_z": 3.5973333333333306
+      },
+      {
+        "feature": "inflation",
+        "series_file": "inflation_history.csv",
+        "month": "2023-03",
+        "value": 18.1,
+        "previous_value": 21.3,
+        "change": -3.1999999999999993,
+        "change_definition": "first difference",
+        "modified_z": -7.194666666666669
+      },
+      {
+        "feature": "exports",
+        "series_file": "export_history.csv",
+        "month": "2019-04",
+        "value": 5201089.07,
+        "previous_value": 3433642.24,
+        "change": 0.4152464648613705,
+        "change_definition": "monthly log change",
+        "modified_z": 3.5920696436600337
+      },
+      {
+        "feature": "exports",
+        "series_file": "export_history.csv",
+        "month": "2026-06",
+        "value": 9816470.38,
+        "previous_value": 6276443.18,
+        "change": 0.44725817856430794,
+        "change_definition": "monthly log change",
+        "modified_z": 3.8719092103630537
+      },
+      {
+        "feature": "imports",
+        "series_file": "import_history.csv",
+        "month": "2016-01",
+        "value": 1594493.32,
+        "previous_value": 2319829.46,
+        "change": -0.3749376562975044,
+        "change_definition": "monthly log change",
+        "modified_z": -4.475980662918702
+      },
+      {
+        "feature": "imports",
+        "series_file": "import_history.csv",
+        "month": "2020-01",
+        "value": 2553506.17,
+        "previous_value": 3525114.55,
+        "change": -0.32244554879612686,
+        "change_definition": "monthly log change",
+        "modified_z": -3.878980582115633
+      },
+      {
+        "feature": "imports",
+        "series_file": "import_history.csv",
+        "month": "2021-01",
+        "value": 2182365.23,
+        "previous_value": 3582678.38,
+        "change": -0.49570141498664455,
+        "change_definition": "monthly log change",
+        "modified_z": -5.849443781990592
+      },
+      {
+        "feature": "imports",
+        "series_file": "import_history.csv",
+        "month": "2022-01",
+        "value": 2847284.44,
+        "previous_value": 4320583.01,
+        "change": -0.41702463718763383,
+        "change_definition": "monthly log change",
+        "modified_z": -4.954641783383432
+      },
+      {
+        "feature": "imports",
+        "series_file": "import_history.csv",
+        "month": "2026-01",
+        "value": 4689133.01,
+        "previous_value": 7115016.38,
+        "change": -0.4169598276231081,
+        "change_definition": "monthly log change",
+        "modified_z": -4.953904695141022
+      },
+      {
+        "feature": "corporate_lending",
+        "series_file": "loans_legal_entities_history.csv",
+        "month": "2015-06",
+        "value": 6713193.904,
+        "previous_value": 8094079.269,
+        "change": -0.18705801056674964,
+        "change_definition": "monthly log change",
+        "modified_z": -10.794953748381586
+      },
+      {
+        "feature": "corporate_lending",
+        "series_file": "loans_legal_entities_history.csv",
+        "month": "2015-08",
+        "value": 7258226.679,
+        "previous_value": 6634131.684,
+        "change": 0.08990774971749538,
+        "change_definition": "monthly log change",
+        "modified_z": 5.007490876221116
+      },
+      {
+        "feature": "corporate_lending",
+        "series_file": "loans_legal_entities_history.csv",
+        "month": "2019-01",
+        "value": 7150898.553,
+        "previous_value": 7789143.844,
+        "change": -0.0854929287916395,
+        "change_definition": "monthly log change",
+        "modified_z": -5.000098171658801
+      },
+      {
+        "feature": "corporate_lending",
+        "series_file": "loans_legal_entities_history.csv",
+        "month": "2023-12",
+        "value": 9685852.04158524,
+        "previous_value": 9034012.56194344,
+        "change": 0.06966964062257475,
+        "change_definition": "monthly log change",
+        "modified_z": 3.8527936387325012
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2020-04",
+        "value": -44.7,
+        "previous_value": -4.5,
+        "change": -40.2,
+        "change_definition": "first difference",
+        "modified_z": -11.297875
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2020-05",
+        "value": -30.8,
+        "previous_value": -44.7,
+        "change": 13.900000000000002,
+        "change_definition": "first difference",
+        "modified_z": 3.9064791666666663
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2020-06",
+        "value": 1.6,
+        "previous_value": -30.8,
+        "change": 32.4,
+        "change_definition": "first difference",
+        "modified_z": 9.105749999999999
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2021-04",
+        "value": 41.7,
+        "previous_value": 2.2,
+        "change": 39.5,
+        "change_definition": "first difference",
+        "modified_z": 11.101145833333332
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2021-05",
+        "value": 13.3,
+        "previous_value": 41.7,
+        "change": -28.400000000000002,
+        "change_definition": "first difference",
+        "modified_z": -7.981583333333333
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2022-01",
+        "value": -15.9,
+        "previous_value": 6.4,
+        "change": -22.3,
+        "change_definition": "first difference",
+        "modified_z": -6.267229166666666
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2022-02",
+        "value": 0.6,
+        "previous_value": -15.9,
+        "change": 16.5,
+        "change_definition": "first difference",
+        "modified_z": 4.637187499999999
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2023-01",
+        "value": 20.8,
+        "previous_value": 1.0,
+        "change": 19.8,
+        "change_definition": "first difference",
+        "modified_z": 5.5646249999999995
+      },
+      {
+        "feature": "consumption",
+        "series_file": "consumption_history_updated.csv",
+        "month": "2023-02",
+        "value": 6.5,
+        "previous_value": 20.8,
+        "change": -14.3,
+        "change_definition": "first difference",
+        "modified_z": -4.018895833333333
+      }
+    ],
+    "affecting_latest_score": [
+      {
+        "feature": "exports",
+        "series_file": "export_history.csv",
+        "month": "2026-06",
+        "value": 9816470.38,
+        "previous_value": 6276443.18,
+        "change": 0.44725817856430794,
+        "change_definition": "monthly log change",
+        "modified_z": 3.8719092103630537
+      }
+    ],
+    "latest_decision": "2026-09-07",
+    "assumed_lag_months": 2
+  }
+}

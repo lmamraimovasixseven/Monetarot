@@ -40,6 +40,12 @@ SIGNIFICANCE_LEVEL = 0.05  # the 5% level used for the Holm-adjusted slope tests
 JOINT_TEST_LEVEL = 0.10  # falsification criterion 1 uses the joint LR test at 10%
 ARTIFACT_PATH = PROJECT_DIR / "model" / "artifact.json"
 ROUNDS_PATH = PROJECT_DIR / "config" / "forecast_rounds.json"
+ROBUST_PATH = PROJECT_DIR / "model" / "robust_eval.json"
+ROBUST_DESIGN_LABELS = {
+    "rolling_origin_estimation_sample": "Rolling origin inside the estimation sample (fair comparison)",
+    "holdout_fixed_origin": "Holdout, fit once (main protocol, non-confirmatory)",
+    "holdout_recursive": "Holdout, refit before each decision (non-confirmatory)",
+}
 FEATURES = [
     "inflation",
     "exports",
@@ -398,6 +404,7 @@ def _target_publisher(provenance: dict) -> str:
 
 def _render_history(frame: pd.DataFrame, provenance: dict) -> None:
     st.subheader("History")
+    _render_base_rate(frame)
     chart = frame[["decision_date", "ordinal_score"]].rename(columns={
         "decision_date": "Decision date",
         "ordinal_score": "Ordinal decision score",
@@ -971,6 +978,265 @@ def _render_evidence(artifact: dict, provenance: dict) -> None:
     st.caption("Generated from config/release_lag.json, docs/facts_to_fill.csv and the raw files by `python run.py facts`.")
 
 
+
+# ---------------------------------------------------------------------------
+# Additions of 2026-11-06: data freshness, track record, exploratory stress tests
+# ---------------------------------------------------------------------------
+
+def load_robust_eval(path_string: str = str(ROBUST_PATH)) -> dict:
+    """Read the optional exploratory evaluation written by `python run.py robust`; {} if absent."""
+    path = Path(path_string)
+    if not path.is_file():
+        return {}
+    return _read_robust(path_string, _file_version(path))
+
+
+@st.cache_data(show_spinner=False)
+def _read_robust(path_string: str, version: int) -> dict:
+    try:
+        payload = json.loads(Path(path_string).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def passed_rounds_missing_from_data(latest_date: pd.Timestamp, path: Path = ROUNDS_PATH,
+                                    today: date | None = None) -> list[date]:
+    """Calendar meetings that have already happened but are later than the last decision in the data."""
+    if not path.is_file():
+        return []
+    try:
+        schedule = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    today = today or date.today()
+    missing = []
+    for item in schedule.get("rounds", []):
+        try:
+            round_date = date.fromisoformat(str(item["date"]))
+        except (KeyError, TypeError, ValueError):
+            continue
+        if latest_date.date() < round_date < today:
+            missing.append(round_date)
+    return sorted(set(missing))
+
+
+def freshness_warning(missing: list[date], latest_date: pd.Timestamp) -> str:
+    if not missing:
+        return ""
+    listed = ", ".join(day.isoformat() for day in missing)
+    return (f"Data are out of date: the NBK meeting(s) of {listed} already took place, but the data end at the "
+            f"decision of {latest_date.date().isoformat()}. The forecast cards below are therefore not for the "
+            "next meeting after the latest outcome. Add the new decision and factor months to data/raw/ and run "
+            "`python run.py all`.")
+
+
+def anomaly_warning(robust: dict) -> str:
+    flags = (robust.get("anomaly_screen") or {}).get("affecting_latest_score") or []
+    if not flags:
+        return ""
+    parts = []
+    for flag in flags:
+        ratio = flag["value"] / flag["previous_value"] if flag.get("previous_value") else None
+        jump = f" ({(ratio - 1) * 100:+.0f}% month on month)" if ratio else ""
+        parts.append(f"{flag['series_file']} {flag['month']}{jump}, modified z = {flag['modified_z']:.1f}")
+    return ("Check the source data: an unusually large monthly change enters the latest score — "
+            + "; ".join(parts) + ". If the value is a data-entry or unit error, the latest score and its change are "
+            "wrong. See Evidence → Stress tests → Raw-data anomaly screen.")
+
+
+def score_history_frame(artifact: dict, model_panel: pd.DataFrame) -> pd.DataFrame:
+    """Score implied by the stored parameters at every usable decision, next to the actual decision.
+
+    Uses the fitted artifact only (no estimation). Decisions up to the end of the estimation sample are
+    in-sample fits; later ones are genuine holdout forecasts of the frozen model.
+    """
+    estimation_end = pd.Timestamp(artifact["sample"]["estimation_end"])
+    rows = []
+    usable = model_panel.dropna(subset=FEATURES + ["y"])
+    for _, row in usable.iterrows():
+        probabilities = ordered_probabilities(artifact, {name: float(row[name]) for name in FEATURES})
+        rows.append({
+            "Decision date": row["decision_date"],
+            "Policy pressure score": policy_pressure_score(probabilities),
+            "Actual decision": int(row["y"]),
+            "Decision": {-1: "Decrease", 0: "Hold", 1: "Increase"}[int(row["y"])],
+            "Sample": "Estimation (in-sample fit)" if row["decision_date"] <= estimation_end else "Holdout (out-of-sample)",
+        })
+    return pd.DataFrame(rows)
+
+
+def _render_track_record(artifact: dict, model_panel: pd.DataFrame) -> None:
+    st.subheader("Track record of the score")
+    frame = score_history_frame(artifact, model_panel)
+    if frame.empty:
+        st.info("No usable decisions with all six factors are available.")
+        return
+    holdout_start = artifact["sample"]["holdout_start"]
+    spec = {
+        "height": 280,
+        "layer": [
+            {"data": {"values": [{"start": holdout_start, "end": frame["Decision date"].max().date().isoformat()}]},
+             "mark": {"type": "rect", "color": "#fff4d6", "opacity": 0.8},
+             "encoding": {"x": {"field": "start", "type": "temporal"}, "x2": {"field": "end"}}},
+            {"mark": {"type": "rule", "color": "#9aa5b1", "strokeDash": [4, 4]}, "encoding": {"y": {"datum": 0}}},
+            {"mark": {"type": "point", "filled": True, "size": 55, "opacity": 0.85},
+             "encoding": {
+                 "x": {"field": "Decision date", "type": "temporal", "title": "NBK decision date",
+                       "axis": {"format": "%Y", "tickCount": "year"}},
+                 "y": {"field": "Actual decision", "type": "quantitative"},
+                 "color": {"field": "Decision", "type": "nominal",
+                           "scale": {"domain": ["Decrease", "Hold", "Increase"],
+                                     "range": ["#c0504d", "#7f8c99", "#1b7f5b"]},
+                           "legend": {"title": "Actual decision", "orient": "top"}},
+                 "tooltip": [{"field": "Decision date", "type": "temporal"}, {"field": "Decision"}],
+             }},
+            {"mark": {"type": "line", "color": "#174a7e", "strokeWidth": 2, "point": {"size": 18, "color": "#174a7e"}},
+             "encoding": {
+                 "x": {"field": "Decision date", "type": "temporal"},
+                 "y": {"field": "Policy pressure score", "type": "quantitative", "scale": {"domain": [-1.05, 1.05]},
+                       "title": "Score (−1 cut … +1 hike)"},
+                 "tooltip": [{"field": "Decision date", "type": "temporal"},
+                             {"field": "Policy pressure score", "type": "quantitative", "format": "+.3f"},
+                             {"field": "Decision"}, {"field": "Sample"}],
+             }},
+        ],
+    }
+    st.vega_lite_chart(frame, spec, width="stretch")
+    st.caption(f"Blue line: the policy pressure score implied by the stored model at each decision. Dots: what the NBK "
+               f"actually decided (−1 cut, 0 hold, +1 hike). Shaded: holdout from {holdout_start}, where the frozen model "
+               "is forecasting out of sample; earlier values are in-sample fits and flatter the model. A useful score "
+               "would sit above zero before hikes and below zero before cuts.")
+
+
+def _render_base_rate(frame: pd.DataFrame) -> None:
+    if "base_rate_after" not in frame.columns:
+        return
+    rates = frame[["decision_date", "base_rate_after", "decision"]].dropna().rename(columns={
+        "decision_date": "Decision date", "base_rate_after": "Base rate, %", "decision": "Decision"})
+    if rates.empty:
+        return
+    st.vega_lite_chart(rates, {
+        "height": 180,
+        "mark": {"type": "line", "interpolate": "step-after", "color": "#172b4d", "strokeWidth": 2},
+        "encoding": {
+            "x": {"field": "Decision date", "type": "temporal", "title": None,
+                  "axis": {"format": "%Y", "tickCount": "year"}},
+            "y": {"field": "Base rate, %", "type": "quantitative", "scale": {"zero": False}},
+            "tooltip": [{"field": "Decision date", "type": "temporal"}, {"field": "Base rate, %"}, {"field": "Decision"}],
+        },
+    }, width="stretch")
+
+
+def _fmt3(value: object) -> str:
+    return f"{float(value):.3f}" if isinstance(value, (int, float)) and not isinstance(value, bool) else "n/a"
+
+
+def robust_design_frame(design: dict) -> pd.DataFrame:
+    rows = []
+    for row in design.get("specifications", []):
+        boot = row.get("bootstrap_rmse_ratio_vs_hold") or {}
+        is_hold = row.get("id") == "B0"
+        rows.append({
+            "Id": row.get("id"),
+            "Specification": row.get("name"),
+            "RPS (lower is better)": _fmt3(row.get("rps")),
+            "RPS skill vs Hold": "—" if is_hold else _fmt3(row.get("rps_skill_vs_hold")),
+            "DM p-value (RPS)": "—" if is_hold else _fmt3((row.get("dm_rps_vs_hold") or {}).get("p_value")),
+            "RMSE ratio vs Hold": _fmt3(row.get("rmse_ratio_to_hold")),
+            "95% bootstrap CI of ratio": "—" if is_hold else f"{_fmt3(boot.get('ci_low'))}–{_fmt3(boot.get('ci_high'))}",
+            "Hit rate": _fmt3(row.get("hit_rate")),
+        })
+    return pd.DataFrame(rows)
+
+
+def robust_summary_sentences(robust: dict) -> list[str]:
+    """Plain-language findings computed from the stored exploratory results (nothing hard-coded)."""
+    designs = robust.get("designs") or {}
+    sentences = []
+    holdout = designs.get("holdout_fixed_origin", {})
+    main = next((r for r in holdout.get("specifications", []) if r.get("id") == "M0"), None)
+    if main:
+        boot = main.get("bootstrap_rmse_ratio_vs_hold") or {}
+        dm_p = (main.get("dm_squared_error_vs_hold") or {}).get("p_value")
+        sentences.append(
+            f"The headline RMSE ratio {_fmt3(main.get('rmse_ratio_to_hold'))} has a 95% block-bootstrap interval of "
+            f"{_fmt3(boot.get('ci_low'))} to {_fmt3(boot.get('ci_high'))} (Diebold–Mariano p = {_fmt3(dm_p)}): on 18 "
+            "decisions the model and Always Hold cannot be told apart in either direction.")
+        hold = next((r for r in holdout.get("specifications", []) if r.get("id") == "B0"), None)
+        freq = next((r for r in holdout.get("specifications", []) if r.get("id") == "B1"), None)
+        if hold and freq:
+            sentences.append(
+                f"Scored on its probabilities (RPS), the model beats Always Hold ({_fmt3(main.get('rps'))} vs "
+                f"{_fmt3(hold.get('rps'))}), but so do plain class frequencies ({_fmt3(freq.get('rps'))}); most of the "
+                "gain comes from admitting that cuts and hikes happen, not from the six factors.")
+    rolling = designs.get("rolling_origin_estimation_sample", {})
+    models = [r for r in rolling.get("specifications", []) if r.get("kind") == "model" and r.get("rps") is not None]
+    if models:
+        best = min(models, key=lambda r: r["rps"])
+        sentences.append(
+            f"Inside the estimation sample (rolling origin, no holdout data) the lowest RPS belongs to {best['id']} — "
+            f"{best['name']} ({_fmt3(best['rps'])}).")
+    by_id: dict[str, list[float]] = {}
+    for name, design in designs.items():
+        for row in design.get("specifications", []):
+            if row.get("kind") == "model" and row.get("rps_skill_vs_hold") is not None:
+                by_id.setdefault(row["id"], []).append(row["rps_skill_vs_hold"])
+    steady = [key for key, values in by_id.items() if len(values) == len(designs) and min(values) > 0]
+    if steady:
+        sentences.append("Specifications with positive RPS skill in every design: " + ", ".join(sorted(steady)) +
+                         ". Those whose skill turns negative in some design are not robust, whatever their best score.")
+    return sentences
+
+
+def _render_stress_tests(robust: dict) -> None:
+    st.subheader("Stress tests (exploratory)")
+    if not robust:
+        st.info("Exploratory stress tests have not been generated. Run `python run.py robust`.")
+        return
+    st.warning(robust.get("label", "Exploratory results."))
+    for sentence in robust_summary_sentences(robust):
+        st.markdown(f"- {sentence}")
+    designs = robust.get("designs") or {}
+    names = [name for name in ROBUST_DESIGN_LABELS if name in designs]
+    if names:
+        choice = st.radio("Evaluation design", names, format_func=lambda n: ROBUST_DESIGN_LABELS[n],
+                          horizontal=True, key="robust_design")
+        design = designs[choice]
+        st.caption(f"{design.get('description', '')} Decisions {design.get('first_date')} to "
+                   f"{design.get('last_date')} (n = {design.get('n')}).")
+        st.dataframe(robust_design_frame(design), hide_index=True, width="stretch")
+        st.caption("RPS = ranked probability score of the three-class forecast (0 perfect, 0.5 = Always Hold on a cut "
+                   "or hike). RPS skill = 1 − RPS / RPS(Always Hold). DM = Harvey–Leybourne–Newbold-corrected "
+                   "Diebold–Mariano test against Always Hold. Ridge penalties are chosen at each forecast origin from "
+                   "earlier decisions only.")
+    forecasts = (robust.get("next_decision_forecasts") or {}).get("forecasts") or []
+    if forecasts:
+        st.markdown("**Next-meeting probabilities under each specification**")
+        st.dataframe(pd.DataFrame([{
+            "Id": item["id"], "Specification": item["name"],
+            "Decrease": _probability_display(item["probabilities"]["Decrease"]),
+            "Hold": _probability_display(item["probabilities"]["Hold"]),
+            "Increase": _probability_display(item["probabilities"]["Increase"]),
+            "Score": f"{item['expected_score']:+.3f}",
+        } for item in forecasts]), hide_index=True, width="stretch")
+        st.caption("Disagreement between rows is model uncertainty that the single headline band does not show. "
+                   "The policy-rule rows use the NBK's own previous decision and the ex-post real rate.")
+    screen = robust.get("anomaly_screen") or {}
+    flags = screen.get("flags") or []
+    with st.expander(f"Raw-data anomaly screen ({len(flags)} flagged months)"):
+        if flags:
+            affecting = {(f["feature"], f["month"]) for f in screen.get("affecting_latest_score") or []}
+            st.dataframe(pd.DataFrame([{
+                "Series": f["series_file"], "Month": f["month"], "Value": f"{f['value']:,.2f}",
+                "Previous month": f"{f['previous_value']:,.2f}", "Modified z": f"{f['modified_z']:+.1f}",
+                "Enters latest score": "yes" if (f["feature"], f["month"]) in affecting else "no",
+            } for f in flags]), hide_index=True, width="stretch")
+        st.caption("Modified z-score of monthly changes (log change for levels, first difference for rates); "
+                   f"flag at |z| ≥ "
+                   f"{(robust.get('settings') or {}).get('modified_z_threshold', 'UNKNOWN')}. A flag means: re-check this value against the publisher. Nothing is changed.")
+
+
 def main() -> None:
     """Render the read-only dashboard and report its cached render duration."""
     started = time.perf_counter()
@@ -1009,35 +1275,58 @@ def main() -> None:
         st.error("Dashboard data is incomplete or invalid. Check the processed files and model artifact.")
         st.stop()
 
+    robust = load_robust_eval(str(ROBUST_PATH))
+    missing_rounds = passed_rounds_missing_from_data(latest_date)
+
     st.markdown("<style>\n"
                 ".stApp {background:#f6f8fb;}\n"
-                "h1 {color:#172b4d; font-weight:700; letter-spacing:-.025em;}\n"
+                "h1 {color:#172b4d; font-weight:700; letter-spacing:-.025em; margin-bottom:0;}\n"
                 ".stTabs [data-baseweb='tab-list'] {gap:1.15rem; border-bottom:1px solid #d9e0e8;}\n"
                 ".stTabs [data-baseweb='tab'] {color:#667386; font-weight:650; padding:0.75rem 0.15rem;}\n"
                 ".stTabs [aria-selected='true'] {color:#174a7e;}\n"
+                "[data-testid='stMetric'] {background:#ffffff; border:1px solid #dfe5ec; border-radius:12px;"
+                " padding:0.8rem 1rem;}\n"
+                "[data-testid='stMetricValue'] {font-size:1.9rem;}\n"
                 "</style>", unsafe_allow_html=True)
     st.title("NBK Base-Rate Decision Forecast")
-    headline_cols = st.columns([1.25, 1.0, 1.4])
-    headline_cols[0].metric("Policy pressure score", f"{latest_score:+.3f}")
-    headline_cols[0].caption(f"95% band: {band_low:+.3f} to {band_high:+.3f}")
-    headline_cols[0].caption(direction_flag_state(band_low, band_high, provenance))
-    headline_cols[1].metric("Change versus previous decision", f"{score_change:+.3f}")
+    st.caption("How hard are six macro factors pushing the National Bank of Kazakhstan towards a rate hike or a cut? "
+               "Read-only view of a fitted ordered-logit model; nothing is re-estimated here.")
     probabilities = ordered_probabilities(artifact, latest_features)
     most_likely = max(DISPLAY_CLASSES, key=lambda label: probabilities[label])
     top_percent = _probability_display(probabilities[most_likely])
     next_date_text = decision_dates[0].strftime("%d %B %Y") if decision_dates[0] else "date not confirmed"
-    headline_cols[2].caption(f"Most likely at the next decision: {most_likely} ({top_percent})")
-    headline_cols[2].caption(f"Next scheduled decision: {next_date_text}")
-    st.caption(f"Unit: {SCORE_UNIT}")
-    st.caption(
-        f"Period: NBK decision of {latest_date.date().isoformat()}, "
-        f"factor data month {next_data_month} ({lag_label})"
-    )
-    st.caption(f"Latest change: {score_change:+.3f} versus the decision of {previous_date}")
-    cached_as_of = latest_date.date().isoformat()
-    _render_refresh_status(schedule_source, cached_as_of)
-    if schedule_message:
-        st.caption(schedule_message)
+    headline_cols = st.columns(4)
+    headline_cols[0].metric("Policy pressure score", f"{latest_score:+.3f}",
+                            help="P(Increase) − P(Decrease) from the stored model: −1 = a cut is certain, "
+                                 "+1 = a hike is certain, 0 = balanced.")
+    headline_cols[0].caption(f"95% band: {band_low:+.3f} to {band_high:+.3f}")
+    headline_cols[0].caption(direction_flag_state(band_low, band_high, provenance))
+    headline_cols[1].metric("Change versus previous decision", f"{score_change:+.3f}")
+    headline_cols[1].caption(f"Versus the decision of {previous_date}")
+    headline_cols[2].metric("Most likely next outcome", f"{most_likely} · {top_percent}")
+    headline_cols[2].caption(f"Most likely at the next decision: {most_likely} ({top_percent}); "
+                             "conditional model estimate, calibration unverified")
+    headline_cols[3].metric("Next scheduled decision", next_date_text)
+    headline_cols[3].caption("Announcement date from the NBK calendar in config/forecast_rounds.json")
+
+    freshness = freshness_warning(missing_rounds, latest_date)
+    if freshness:
+        st.warning(freshness, icon="⚠️")
+    anomaly = anomaly_warning(robust)
+    if anomaly:
+        st.warning(anomaly)
+
+    with st.container(border=True):
+        st.caption(f"Unit: {SCORE_UNIT}")
+        st.caption(
+            f"Period: NBK decision of {latest_date.date().isoformat()}, "
+            f"factor data month {next_data_month} ({lag_label})"
+        )
+        st.caption(f"Latest change: {score_change:+.3f} versus the decision of {previous_date}")
+        cached_as_of = latest_date.date().isoformat()
+        _render_refresh_status(schedule_source, cached_as_of)
+        if schedule_message:
+            st.caption(schedule_message)
 
     overview_tab, drivers_tab, evidence_tab, provenance_tab = st.tabs(
         ["Overview", "Drivers and scenario", "Evidence", "Data and provenance"]
@@ -1067,6 +1356,7 @@ def main() -> None:
         else:
             st.warning("Holdout benchmark result: UNKNOWN.")
         _render_decision_rule(provenance)
+        _render_track_record(artifact, model_panel)
         _render_history(history, provenance)
     with drivers_tab:
         _render_drivers(artifact)
@@ -1092,11 +1382,18 @@ def main() -> None:
                 scenario_features = dict(latest_features)
                 scenario_features[slider_feature] = float(scenario_value)
                 scenario_score, ci_low, ci_high = score_and_delta_band(artifact, scenario_features)
-                st.metric("Scenario policy pressure score", f"{scenario_score:+.3f}")
+                st.metric("Scenario policy pressure score", f"{scenario_score:+.3f}",
+                          delta=f"{scenario_score - latest_score:+.3f} vs latest", delta_color="off")
                 st.caption(f"95% delta-method band: [{max(-1.0, ci_low):+.3f}, {min(1.0, ci_high):+.3f}]")
+                scenario_probabilities = ordered_probabilities(artifact, scenario_features)
+                for column, label in zip(st.columns(3), DISPLAY_CLASSES):
+                    column.metric(f"Scenario P({label})", _probability_display(scenario_probabilities[label]),
+                                  delta=f"{(scenario_probabilities[label] - probabilities[label]) * 100:+.1f} pp",
+                                  delta_color="off")
                 st.caption("Only the selected factor moves; the other five stay at their latest values.")
     with evidence_tab:
         _render_evidence(artifact, provenance)
+        _render_stress_tests(robust)
     with provenance_tab:
         _render_provenance(artifact, schedule_source, provenance)
     elapsed = time.perf_counter() - started

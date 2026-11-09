@@ -34,7 +34,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src import facts, ingest, model, readme
+from src import facts, ingest, model, readme, robust_eval
 from src import report as report_module
 
 
@@ -103,7 +103,7 @@ CONVERGED_COUNTS = re.compile(r"Robustness checks converged: \d+; nonconverged o
 CONVERGED_COUNTS_NOTE = "platform-sensitive (depends on RB02 convergence)"
 # (3) Rounding-level differences from the optimizer's convergence tolerance, allowed only in these two files.
 CROSS_PLATFORM_TOLERANCE = 1e-4
-CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md"}
+CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md", "robust_evaluation.md"}
 
 
 def _short(values: list[float], limit: int = 8) -> str:
@@ -222,6 +222,25 @@ def compare_numbers(report: Report, committed: Path, rebuilt: Path, tolerance: f
                        item, f"committed={a!r} rebuilt={b!r}")
 
 
+# Figures rendered on another operating system differ in a few per cent of pixels because font
+# rasterization shifts text and the tight layout by a pixel or two (D16). After averaging 16 x 16 pixel
+# blocks such differences stay below about 0.15 on the 0-1 scale, while a changed plot element (a moved
+# series, a missing bar, a block of altered pixels) exceeds 0.25. The data plotted in each figure are
+# compared exactly elsewhere (annex_predictions.csv, numbers_for_note.json, the decision panel).
+FIGURE_BLOCK = 16
+FIGURE_BLOCK_TOLERANCE = 0.25
+FIGURE_NOTE = "platform-sensitive (font rasterization)"
+
+
+def _block_means(image) -> "np.ndarray":
+    import numpy as np
+
+    gray = np.asarray(image, dtype=float)[..., :3].mean(axis=-1)
+    height, width = (gray.shape[0] // FIGURE_BLOCK) * FIGURE_BLOCK, (gray.shape[1] // FIGURE_BLOCK) * FIGURE_BLOCK
+    trimmed = gray[:height, :width]
+    return trimmed.reshape(height // FIGURE_BLOCK, FIGURE_BLOCK, width // FIGURE_BLOCK, FIGURE_BLOCK).mean(axis=(1, 3))
+
+
 def compare_png(report: Report, name: str, committed: Path, rebuilt: Path, tolerance: float) -> None:
     from matplotlib.image import imread
 
@@ -234,8 +253,16 @@ def compare_png(report: Report, name: str, committed: Path, rebuilt: Path, toler
         report.add("FAIL", label, f"image size {left.shape} vs {right.shape}")
         return
     difference = float(abs(left.astype(float) - right.astype(float)).max())
-    report.add("PASS" if difference <= tolerance else "FAIL", label,
-               f"max pixel difference {difference:g} (0-1 scale), tol={tolerance:g}")
+    if difference <= tolerance:
+        report.add("PASS", label, f"max pixel difference {difference:g} (0-1 scale), tol={tolerance:g}")
+        return
+    block_difference = float(abs(_block_means(left) - _block_means(right)).max())
+    if block_difference <= FIGURE_BLOCK_TOLERANCE:
+        report.add("WARN", label, f"{FIGURE_NOTE}: max pixel difference {difference:g}, but max "
+                   f"{FIGURE_BLOCK}x{FIGURE_BLOCK}-block difference {block_difference:.3f} <= {FIGURE_BLOCK_TOLERANCE}")
+        return
+    report.add("FAIL", label, f"max pixel difference {difference:g} (0-1 scale), tol={tolerance:g}; "
+               f"max {FIGURE_BLOCK}x{FIGURE_BLOCK}-block difference {block_difference:.3f} > {FIGURE_BLOCK_TOLERANCE}")
 
 
 def compare_text(report: Report, label: str, committed: Path, rebuilt_text: str) -> None:
@@ -286,6 +313,9 @@ def run(workdir: Path, verbose: bool = False) -> Report:
         model_panel_path=model_panel, source_panel_path=decisions,
     )
     rebuilt = json.loads(artifact_path.read_text(encoding="utf-8"))
+    print("Re-running exploratory robustness evaluation ...\n", flush=True)
+    robust_eval.run(output_dir=outputs, artifact_path=workdir / "model" / "robust_eval.json",
+                    model_panel_path=model_panel, decisions_path=decisions, main_artifact_path=artifact_path)
     print("Re-running report ...\n", flush=True)
     report_module.run(output_dir=outputs, artifact_path=artifact_path,
                       decisions_path=decisions, model_panel_path=model_panel)
@@ -354,7 +384,8 @@ def main(argv: list[str] | None = None) -> int:
     warned = sum(status == "WARN" for status, _, _ in report.rows)
     print(f"\nSummary: {passed} PASS, {report.failed} FAIL, {skipped} SKIP, {warned} WARN")
     if warned:
-        print(f"WARN = {PLATFORM_NOTE}; see docs/deviations.md D14. WARN does not fail the check.")
+        print(f"WARN = {PLATFORM_NOTE} or {FIGURE_NOTE}; see docs/deviations.md D14 and D16. "
+              "WARN does not fail the check.")
     print("RESULT: PASS" if report.failed == 0 else "RESULT: FAIL")
     return 0 if report.failed == 0 else 1
 

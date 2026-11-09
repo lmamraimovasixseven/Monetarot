@@ -1,6 +1,6 @@
 """Cross-platform entry point: `python run.py` starts the dashboard.
 
-Other tasks: `python run.py data|model|report|facts|check|regression|test|all`. The Makefile only
+Other tasks: `python run.py data|model|robust|report|facts|check|regression|test|all`. The Makefile only
 delegates here, so make is optional on every platform.
 """
 
@@ -23,13 +23,14 @@ DEFAULT_PORT = 8503
 TASKS = {
     "data": [[sys.executable, "-m", "src.ingest"]],
     "model": [[sys.executable, "-m", "src.model"]],
+    "robust": [[sys.executable, "-m", "src.robust_eval"]],
     "report": [[sys.executable, "-m", "src.report"], [sys.executable, "-m", "src.readme"]],
     "facts": [[sys.executable, "-m", "src.facts"]],
     "check": [[sys.executable, "-m", "src.check"]],
     "regression": [[sys.executable, "-m", "src.regression"]],
     "test": [[sys.executable, "-m", "pytest", "-q"]],
 }
-TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
+TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
 
 
 def _free_port() -> int:

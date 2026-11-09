@@ -87,3 +87,21 @@ These corrections concern the recorded source metadata in `docs/facts_to_fill.cs
 - **What changed:** No time-stamped Week-4 pre-registration was submitted. The instructor allowed the model specification (docs/model_spec.md) to be accepted with the date of its commit to the repository, 16 October 2026 (commit f763e16). The generated model artifact followed on the same day (commit b42071b). Exploratory backtests were run before the specification was committed; they are disclosed in docs/model_spec.md.
 - **Why:** the specification was written after the project's data and decision history had been explored.
 - **What the original specification produced:** none, because no time-stamped pre-registration exists.
+
+## Changes of 2026-11-06 (review)
+
+### D16. Figures are compared on block averages when pixels differ
+- **What changed:** `src.check` first compares the three figures pixel by pixel, as before. When pixels differ but the image size is the same and no 16 × 16-pixel block average differs by more than 0.25 (0–1 scale), the item is reported as WARN instead of FAIL. Numbers in `outputs/numbers_for_note.json` are compared by the report test within the coefficient tolerance instead of byte by byte.
+- **Why:** on another operating system font rasterization moves text and the tight layout by a pixel or two, so 5–10% of pixels differ although the plotted data are identical; the strict rule made `python run.py check` fail on every machine except the one that produced the committed figures. A changed plot element (an altered block of the image, a moved series) still fails; the data behind each figure are compared exactly elsewhere.
+- **What the original specification produced:** FAIL for all three figures on Linux with the same matplotlib version.
+
+### D17. Exploratory stress tests added after the holdout was seen
+- **What changed:** `src/robust_eval.py` (`python run.py robust`) adds forecast-comparison inference, proper scoring rules, rolling-origin evaluation, alternative specifications (policy-rule features, ridge penalty) and a raw-data anomaly screen.
+- **Why:** the main verdict rests on an RMSE ratio of 18 decisions without a measure of its uncertainty, and the log score cannot score the benchmark.
+- **What the original specification produced:** unchanged. The pre-specified model, its holdout, its verdict, and every number produced by `python run.py model` and `python run.py report`. All holdout results of the new module are labelled non-confirmatory; specification comparisons are based on the rolling-origin evaluation inside the estimation sample.
+
+### D18. The replication tools work on a copy without git
+- **What changed:** `scripts/scan_secrets.py` scans every file under the project folder when the folder is not a git checkout (for example a "Download ZIP" copy) and reports that there is no history to scan; `tests/test_docs.py` checks the git remote in `.git/config` only when that file exists.
+- **Why:** both failed with an error on a copy downloaded as ZIP from GitHub.
+- **What the original specification produced:** a crash of the secret scan and of one documentation test outside a git checkout; results are unchanged inside a checkout.
+

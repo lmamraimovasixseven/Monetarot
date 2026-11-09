@@ -206,6 +206,15 @@ def test_committed_outputs_equal_a_fresh_report(generated):
             check.compare_png(result, name, OUTPUTS / name, out / name, tolerance)
             assert result.failed == 0, f"outputs/{name}: {result.rows[-1][2]}; run `python run.py report`"
             continue
+        if name.endswith(".json"):
+            # Numbers: compared within tolerance, as src.check does; the last binary digit of a float can
+            # differ across platforms (D16), which byte equality would report as a stale file.
+            result = check.Report()
+            check.compare_numbers(result, OUTPUTS / name, out / name, tolerance,
+                                  ARTIFACT["replication_tolerance"]["headline_score_absolute"], check.HEADLINE_NUMBER_KEYS)
+            failed = [row for row in result.rows if row[0] == "FAIL"]
+            assert not failed, f"outputs/{name} is stale: {failed[:3]}; run `python run.py report`"
+            continue
         assert (OUTPUTS / name).read_bytes().replace(b"\r\n", b"\n") == (out / name).read_bytes().replace(b"\r\n", b"\n"), (
             f"outputs/{name} is stale; run `python run.py report`")
 
