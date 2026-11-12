@@ -288,3 +288,37 @@ def test_newton_fallback_recovers_rb02_when_bfgs_stops_early(monkeypatch):
     committed_se = _np.array([c["robust_se"] for c in rb02["coefficients"]])
     assert _np.abs(_np.asarray(fitted.params)[:6] - committed).max() < 1e-6
     assert _np.abs(_np.sqrt(_np.diag(covariance)[:6]) - committed_se).max() < 1e-4
+
+
+def test_nonconvergence_keeps_every_report_line_and_the_stability_result(tmp_path, fitted_artifact, monkeypatch):
+    """D34: when BFGS (and L-BFGS) stop early in the stability, expanding-window and robustness fits, as on some
+    platforms, the annex keeps the same lines and the stability test keeps its result instead of turning into
+    NOT APPLICABLE; the main model is not affected (it is never cut short here)."""
+    from statsmodels.miscmodels.ordinal_model import OrderedModel
+
+    original = OrderedModel.fit
+    main_n = fitted_artifact["artifact"]["sample"]["estimation_n"]
+    stopped = []
+
+    def early_stop(self, *args, **kwargs):
+        stability = self.exog.shape[1] == 2 * len(model.FEATURES) and kwargs.get("method") in ("bfgs", "lbfgs")
+        other = kwargs.get("method") == "bfgs" and self.exog.shape[0] != main_n
+        if stability or other:
+            stopped.append(self.exog.shape)
+            kwargs["maxiter"] = 5
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(OrderedModel, "fit", early_stop)
+    artifact_path = tmp_path / "model" / "artifact.json"
+    model.run_pipeline(output_dir=tmp_path / "outputs", artifact_path=artifact_path,
+                       model_panel_path=tmp_path / "data" / "processed" / "model_panel.csv")
+    assert stopped, "the simulation must cut at least one fit short"
+    rebuilt = json.loads(artifact_path.read_text(encoding="utf-8"))
+    committed = fitted_artifact["artifact"]
+    lines = lambda folder: (folder / "annex_diagnostics.md").read_text(encoding="utf-8").splitlines()
+    assert len(lines(tmp_path / "outputs")) == len(lines(fitted_artifact["output_dir"]))
+    stability, reference = rebuilt["diagnostics"]["parameter_stability"], committed["diagnostics"]["parameter_stability"]
+    assert stability["pass_fail"] == reference["pass_fail"] != "NOT APPLICABLE"
+    assert stability["statistic"] == pytest.approx(reference["statistic"], abs=1e-6)
+    assert rebuilt["model"]["parameters"] == committed["model"]["parameters"]
+    assert all(c["estimator_converged"] for c in rebuilt["robustness_checks"]["checks"])

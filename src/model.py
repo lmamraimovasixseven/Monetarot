@@ -700,7 +700,7 @@ def _expanding_coefficient_rows(train: pd.DataFrame, records: list[dict[str, Any
         window = train.iloc[:size].copy()
         idx = _new_spec(records, run_id, f"expanding ordered logit n={size}", "expanding_window_fit", window)
         try:
-            _, fitted, covariance = _fit_ordered(window)
+            _, fitted, covariance = _fit_ordered(window, newton_fallback=True)  # D34
             params = np.asarray(fitted.params, dtype=float)
             se = np.sqrt(np.maximum(np.diag(covariance)[:len(FEATURES)], 0))
             for feature, estimate, std_error in zip(FEATURES, params[:len(FEATURES)], se):
@@ -981,15 +981,22 @@ def run_pipeline(
         stability_model = OrderedModel(endog, expanded, distr="logit")
         start = np.r_[params[:len(FEATURES)], np.zeros(len(FEATURES)), params[len(FEATURES):]]
         stability_fit = stability_model.fit(start_params=start, method="bfgs", maxiter=2000, disp=False, gtol=1e-8)
-        _finish_spec(records, stable_fit_id, status="COMPLETED" if stability_fit.mle_retvals.get("converged", False) else "NONCONVERGED",
-                     log_likelihood=float(stability_fit.llf), message=f"optimizer=bfgs; converged={stability_fit.mle_retvals.get('converged')}; warnflag={stability_fit.mle_retvals.get('warnflag')}")
+        bfgs_converged = bool(stability_fit.mle_retvals.get("converged", False))
+        attempts = [f"optimizer=bfgs; converged={stability_fit.mle_retvals.get('converged')}; "
+                    f"warnflag={stability_fit.mle_retvals.get('warnflag')}"]
+        # D34: fallbacks are recorded in this row's message, never as extra rows, so the report has the same
+        # lines whether or not BFGS converges on a platform. L-BFGS (D7) and then Newton (analytic Hessian)
+        # continue from the previous end point; when BFGS converges, neither runs.
+        for method, options in (("lbfgs", {"maxiter": 4000, "pgtol": 1e-8}), ("newton", {"maxiter": NEWTON_FALLBACK_MAXITER})):
+            if stability_fit.mle_retvals.get("converged", False):
+                break
+            stability_fit = stability_model.fit(start_params=np.asarray(stability_fit.params, dtype=float),
+                                                method=method, disp=False, **options)
+            attempts.append(f"then {method}; converged={stability_fit.mle_retvals.get('converged')}")
+        _finish_spec(records, stable_fit_id, status="COMPLETED" if bfgs_converged else "NONCONVERGED",
+                     log_likelihood=float(stability_fit.llf), message="; ".join(attempts))
         if not stability_fit.mle_retvals.get("converged", False):
-            retry_id = _new_spec(records, run_id, "LR stability unrestricted model retry with L-BFGS", "parameter_stability_optimizer_retry", train)
-            stability_fit = stability_model.fit(start_params=np.asarray(stability_fit.params), method="lbfgs", maxiter=4000, disp=False, pgtol=1e-8)
-            _finish_spec(records, retry_id, status="COMPLETED" if stability_fit.mle_retvals.get("converged", False) else "NONCONVERGED",
-                         log_likelihood=float(stability_fit.llf), message=f"optimizer=lbfgs; converged={stability_fit.mle_retvals.get('converged')}; warnflag={stability_fit.mle_retvals.get('warnflag')}")
-            if not stability_fit.mle_retvals.get("converged", False):
-                raise RuntimeError("Both BFGS and L-BFGS failed to converge for the stability interaction model")
+            raise RuntimeError("BFGS, L-BFGS and Newton all failed to converge for the stability interaction model")
         stability_lr = max(0.0, float(2 * (stability_fit.llf - fitted.llf)))
         stability_p = float(chi2.sf(stability_lr, len(FEATURES)))
         stability = {"name": "LR test of slope equality across 2015-2019 and 2020+", "statistic": stability_lr, "df": len(FEATURES), "p_value": stability_p, "pass_fail": "PASS" if stability_p >= ALPHA else "FAIL", "groups_n": {"2015-2019": int((post == 0).sum()), "2020+": int((post == 1).sum())}, "unrestricted_log_likelihood": float(stability_fit.llf)}
