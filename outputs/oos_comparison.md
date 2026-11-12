@@ -1,16 +1,18 @@
 # Holdout comparison
 
-Holdout: 18 decisions, 2024-07-15 to 2026-09-07 (4 decreases, 11 holds, 3 increases). Lower is better for every column.
+Holdout: 18 decisions, 2024-09-02 to 2026-10-27 (4 decreases, 11 holds, 3 increases). Lower is better for every column.
 
 | Model | RMSE | MAE | Log score |
 |---|---|---|---|
-| Ordered logit | 0.625 | 0.479 | 0.940 |
+| Ordered logit | 0.620 | 0.498 | 0.931 |
 | Always Hold (pre-specified benchmark) | 0.624 | 0.389 | undefined¹ |
-| Class-frequency comparator (added after the specification freeze, secondary) | not reported | not reported | 0.946 |
+| Class-frequency comparator (added after the specification freeze, secondary) | not reported | not reported | 0.949 |
 
-RMSE ratio (ordered logit / Always Hold): 1.002. Winner: Always Hold.
+RMSE ratio (ordered logit / Always Hold): 0.995. Winner: Ordered Logit.
 
-**Verdict:** Ordered logit does not beat Always Hold on the holdout (RMSE ratio 1.002).
+**Verdict:** Ordered logit meets the pre-specified criterion against Always Hold on the holdout (RMSE ratio 0.995, below 1). This does not show that the model forecasts better. The 95% block-bootstrap interval for the RMSE ratio (0.780 to 1.335) contains 1, and the Diebold–Mariano test (HLN-corrected) gives p = 0.961, so on 18 holdout decisions the model cannot be distinguished from Always Hold in either direction.
+
+Supplementary measure (exploratory, added after the holdout had been seen; the pre-specified verdict stays RMSE-based): the ranked probability score on the same holdout (lower is better) is 0.154 for the model, 0.194 for Always Hold and 0.159 for the class frequencies of the estimation sample. Simple class frequencies do almost as well as the model, so the six factors add little beyond the base rates of cuts, holds and hikes; most of the gain over Always Hold comes from admitting that cuts and hikes happen.
 
 RMSE and MAE are computed on the expected ordinal score (Decrease = −1, Hold = 0, Increase = +1). The log score is the mean negative log probability of the observed class.
 

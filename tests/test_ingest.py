@@ -9,6 +9,7 @@ from src.hashing import normalized_sha256
 
 
 ROOT = Path(__file__).resolve().parents[1]
+N_CALENDAR_DECISIONS = len(pd.read_csv(ROOT / "config" / "nbk_decision_dates.csv"))
 
 
 def test_read_monthly_series_parses_values_and_rejects_non_numeric(tmp_path):
@@ -82,11 +83,11 @@ def test_build_model_panel_uses_specified_transforms_and_excludes_rate_columns(t
         "decision_date", "decision", "y", "inflation", "exports", "imports",
         "corporate_lending", "household_lending", "consumption",
     ]
-    assert len(panel) == 90
+    assert len(panel) == N_CALENDAR_DECISIONS
     assert set(panel["y"]) == {-1, 0, 1}
     assert not {"base_rate_before", "base_rate_after"}.intersection(panel.columns)
     rows = panel.dropna(subset=ingest.FEATURE_RULES.keys())
-    assert len(rows) == 88
+    assert len(rows) == N_CALENDAR_DECISIONS - 2  # the first two decisions lack 12-month growth
     first = rows.iloc[0]
     assert first["decision_date"] == "2016-03-15"
     raw = ingest.read_monthly_series(ROOT / "data/raw/export_history.csv", "exports_thousand_usd")
@@ -115,7 +116,7 @@ def test_build_panel_uses_raw_levels_for_all_six_factors_and_writes_file(tmp_pat
     panel = ingest.build_panel(decision_dates=dates, output_path=path)
     assert panel.columns.tolist() == ingest.OUTPUT_COLUMNS
     assert panel["decision_date"].iloc[0] == "2015-10-02"
-    assert len(panel) == 90
+    assert len(panel) == N_CALENDAR_DECISIONS
     assert path.is_file()
     for feature, (filename, source_column) in ingest.FEATURE_RULES.items():
         source = ingest.read_monthly_series(ROOT / "data" / "raw" / filename, source_column)
@@ -147,7 +148,9 @@ def test_main_writes_panel_and_rebuild_report_without_modifying_raw(tmp_path, mo
     monkeypatch.setattr(ingest, "CHECK_PATH", tmp_path / "outputs" / "rebuild_check.csv")
     monkeypatch.setenv("NBK_REBUILD_REFERENCE", str(reference))
     matching, differing = ingest.main()
-    assert matching + differing == 90 * (len(ingest.OUTPUT_COLUMNS) - 1)
+    n_rows = len(pd.read_csv(reference))
+    assert matching + differing == n_rows * (len(ingest.OUTPUT_COLUMNS) - 1)
+    assert differing == 0
     assert ingest.DECISIONS_PATH.is_file()
     assert ingest.CHECK_PATH.is_file()
     assert not (tmp_path / "data" / "processed" / "rebuilt_candidate.csv").exists()

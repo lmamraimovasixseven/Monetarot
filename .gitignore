@@ -5,3 +5,6 @@ __pycache__/
 .pytest_cache/
 .pytest-tmp/
 .pytest-temp/
+
+# Publisher downloads (large; the metadata sheet names a contact person)
+data/incoming/

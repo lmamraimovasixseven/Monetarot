@@ -37,14 +37,16 @@ def test_dashboard_shows_stored_model_outputs_and_honesty_text():
     source = (ROOT / "src" / "app.py").read_text(encoding="utf-8")
     assert "NBK Base-Rate Decision Forecast" in [element.value for element in at.title]
     assert any(element.label == "Policy pressure score" for element in at.metric)
-    assert any("does not beat Always Hold" in element.value for element in at.info)
+    assert any("Always Hold on the holdout" in element.value for element in at.info)
     assert "P(Increase) - P(Decrease)" in source
     assert [tab.label for tab in at.tabs] == ["Overview", "Drivers and scenario", "Evidence", "Data and provenance"]
     assert len(at.slider) == 1
 
 
 def test_all_periods_are_chronological_and_metrics_use_each_period_test_set():
+    from src.legacy_classifier import LEGACY_DATA_END
     data = app.load_data()
+    data = data.loc[data["decision_date"] <= LEGACY_DATA_END]  # archived backtest vintage (D26)
     reports, predictions = evaluate_periods(data)
     assert tuple(report["test_period_months"] for report in reports) == TEST_PERIOD_MONTHS
     assert len(reports) == 3

@@ -34,7 +34,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src import facts, ingest, model, readme, robust_eval
+from src import compare, data_screen, facts, forecast_log, ingest, model, readme, robust_eval
 from src import report as report_module
 
 
@@ -307,6 +307,8 @@ def run(workdir: Path, verbose: bool = False) -> Report:
 
     print("Re-running ingest ...", flush=True)
     ingest.build_panel(output_path=decisions)
+    data_screen.write(decisions_path=decisions, json_path=workdir / "data" / "processed" / "data_anomalies.json",
+                      md_path=outputs / "data_anomalies.md")
     print("Re-running model ...\n", flush=True)
     model.run_pipeline(
         output_dir=outputs, artifact_path=artifact_path,
@@ -316,9 +318,15 @@ def run(workdir: Path, verbose: bool = False) -> Report:
     print("Re-running exploratory robustness evaluation ...\n", flush=True)
     robust_eval.run(output_dir=outputs, artifact_path=workdir / "model" / "robust_eval.json",
                     model_panel_path=model_panel, decisions_path=decisions, main_artifact_path=artifact_path)
+    forecast_log.write_scores(decisions_path=decisions, json_path=workdir / "data" / "processed" / "forecast_scores.json",
+                              md_path=outputs / "forecast_scores.md")
+    print("Re-running OLD vs NEW comparison ...\n", flush=True)
+    compare.run(artifact_path=artifact_path, robust_path=workdir / "model" / "robust_eval.json",
+                json_path=workdir / "model" / "version_comparison.json", md_path=outputs / "version_comparison.md")
     print("Re-running report ...\n", flush=True)
-    report_module.run(output_dir=outputs, artifact_path=artifact_path,
-                      decisions_path=decisions, model_panel_path=model_panel)
+    report_module.run(output_dir=outputs, artifact_path=artifact_path, robust_path=workdir / "model" / "robust_eval.json",
+                      decisions_path=decisions, model_panel_path=model_panel,
+                      version_path=workdir / "model" / "version_comparison.json")
 
     report = Report()
     compare_panel(report, "data/processed/nbk_decisions_clean.csv", COMMITTED_DECISIONS, decisions, number_tol)
@@ -370,6 +378,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="directory for rebuilt files (default: a temporary directory removed afterwards)")
     parser.add_argument("--verbose", action="store_true", help="print every compared markdown number")
     args = parser.parse_args(argv)
+    # Generated sentences contain characters such as "−"; a Windows console (cp1251) cannot print them.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
     created = args.workdir is None
     workdir = Path(tempfile.mkdtemp(prefix="kz-check-")) if created else args.workdir

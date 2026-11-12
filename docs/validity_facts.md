@@ -17,23 +17,23 @@ Bullet facts for the student's validity section. Numbers come from `outputs/numb
 - Omitted variables: the omitted series above may drive both the factors and the decisions. [assumption]
 - Reverse causality: past base-rate decisions affect later lending, consumption and inflation, and these feed back into the factors. [assumption]
 - Release lag: assumed decision month minus 2, tolerating real lags up to 30 days; real lags known for 0 of 6 factor series. [assumption]
-- Release-lag limitation: Real release lags are UNKNOWN. The model assumes data for month M−2 are available at a decision in month M, which leaves about 45 days (median 44; 31 to 59 across decisions); `outputs/release_lag_check.md` uses the stricter shortest window minus one day (30 days). File update dates give only upper bounds on the release lag (true lag ≤ bound): inflation 1 day; exports 66 days; imports 66 days; corporate lending 24 days; household lending 24 days; consumption 37 days. Possible look-ahead cannot be ruled out for exports and imports at every decision (88 of 88); consumption at decisions early in the month (15 of 88). The nearest existing check is RB07 ("Ordered logit: release lag 3 months", which shifts all factors): benchmark winner Model beats Hold, survives No; a check that shifts only the trade series was not run. Revision status of all series is UNKNOWN. [assumption]
+- Release-lag limitation: Real release lags are UNKNOWN. The model assumes data for month M−2 are available at a decision in month M, which leaves about 45 days (median 44; 31 to 59 across decisions); `outputs/release_lag_check.md` uses the stricter shortest window minus one day (30 days). File update dates give only upper bounds on the release lag (true lag ≤ bound): inflation 1 day; exports 66 days; imports 66 days; corporate lending 24 days; household lending 24 days; consumption 37 days. For exports the update date belongs to the edition ending 2026-07; the later rows up to 2026-08 come from a newer edition whose publication date is UNKNOWN. For imports the update date belongs to the edition ending 2026-07; the later rows up to 2026-08 come from a newer edition whose publication date is UNKNOWN. Look-ahead cannot be excluded for 89 of 89 decisions for exports and imports (and for 15 of 89 decisions for consumption). The nearest existing check is RB07 ("Ordered logit: release lag 3 months", which shifts all factors): benchmark winner Model beats Hold, survives No; a check that shifts only the trade series was not run. Revision status of all series is UNKNOWN. [assumption]
 - Lag sensitivity: Ordered logit: release lag 1 month gives Always Hold; Ordered logit: release lag 3 months gives Model beats Hold. [estimate]
-- Regimes: slope-stability LR test p 0.019 (FAIL), 31 vs 39 estimation decisions. [estimate]
-- Household lending non-stationary: ADF p 0.152, KPSS p 0.010 (table bound). [estimate]
+- Regimes: slope-stability LR test p 0.013 (FAIL), 31 vs 40 estimation decisions. [estimate]
+- Household lending non-stationary: ADF p 0.133, KPSS p 0.010 (table bound). [estimate]
 
 ## External validity
 
-- One central bank; decisions 2016-03-15 to 2026-09-07 (88 usable). [source]
-- The holdout (2024-07-15 to 2026-09-07) overlaps earlier exploratory backtests; it is not untouched. [source]
+- One central bank; decisions 2016-03-15 to 2026-10-27 (89 usable). [source]
+- The holdout (2024-09-02 to 2026-10-27) overlaps earlier exploratory backtests; it is not untouched. [source]
 - No real-time vintages; revisions known for 0 of 7 series. [source]
 
 ## Statistical validity
 
 - Specifications run: 10 (main model plus 9 robustness checks). [source]
 - Multiple-testing families: slopes: Holm adjustment across the six slope-coefficient p-values only; joint test: single pre-specified primary test; no adjustment; diagnostics: raw p-values, no adjustment, flagged at 5%; robustness: report specification count; Holm-adjust coefficient p-values only within each specification. [source]
-- Household lending slope: raw p 0.005, Holm p 0.031; joint LR p 0.018. [estimate]
-- Power: 70 estimation decisions; holdout 18 with 3 increases and 4 decreases; no power calculation was run (`UNKNOWN`), so power is likely low. [assumption]
-- Out of sample: RMSE 0.625 vs Always Hold 0.624, ratio 1.002. [estimate]
-- Fragility of the negative result: the model beats Always Hold in 6 of 9 checks (RB03, RB04, RB05, RB07, RB08, RB09); only RB06 survives the strict rule. [estimate]
+- Household lending slope: raw p 0.008, Holm p 0.047; joint LR p 0.026. [estimate]
+- Power: 71 estimation decisions; holdout 18 with 3 increases and 4 decreases; no power calculation was run (`UNKNOWN`), so power is likely low. [assumption]
+- Out of sample: RMSE 0.620 vs Always Hold 0.624, ratio 0.995. [estimate]
+- Fragility of the main result: the RMSE ratio is below 1 in 6 of 8 comparable checks (RB01, RB04, RB05, RB07, RB08, RB09; RB03 is not comparable: binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is compared with a −1/0/+1 score); the benchmark conclusion differs from the main result in 2 (RB02, RB06); 1 (RB04) survive the strict rule. [estimate]
 - Economic size: factors meaningful by the stated rule: household lending (`outputs/economic_size.md`). [estimate]

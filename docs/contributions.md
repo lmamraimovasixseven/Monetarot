@@ -6,8 +6,8 @@ This statement lists what each team member actually did. Each person has read an
 
 | Name | Role | Main contributions (files, analyses, writing) | Approximate share | Signature | Date |
 |---|---|---|---|---|---|
-| Linara Mamraimova | Data, pipeline and product | Collected the data series and extracted the CSV files in `data/raw/`; recorded the sources, dates and units; prompted and reviewed the coding assistants for the data pipeline, the website, the tests and the checks; wrote the README run instructions; sections 1, 2, 5 and 6 of the note | SixSeven | 2026-10-18 |
-| Darina Baikazakova | Econometrics and literature | Literature review and references; model specification and the expected signs and mechanisms; reading the diagnostics, the out-of-sample comparison and the robustness checks; sections 3 and 4 of the note | SixSeven | 2026-10-18 |
+| Linara Mamraimova | Data, pipeline and product | Collected the data series and extracted the CSV files in `data/raw/`; recorded the sources, dates and units; prompted and reviewed the coding assistants for the data pipeline, the website, the tests and the checks; wrote the README run instructions; sections 1, 2, 5 and 6 of the note | UNKNOWN | SixSeven | 2026-10-18 |
+| Darina Baikazakova | Econometrics and literature | Literature review and references; model specification and the expected signs and mechanisms; reading the diagnostics, the out-of-sample comparison and the robustness checks; sections 3 and 4 of the note | UNKNOWN | SixSeven | 2026-10-18 |
 
 Every team member must be able to answer questions about any part of the system, including the parts she did not write.
 

@@ -47,7 +47,7 @@ def test_model_spec_signs_and_mechanism_p_values_match_the_results():
             assert holm == NUMBERS[f"p_holm_{name}"]["display"], name
     assert "MECHANISM_IN_STUDENT_WORDS" in section
     assert "\n\n## Cointegration: why no test was run" in text
-    holdout = f"ceil(20% × {NUMBERS['n_usable']['display']})"
+    holdout = f"ceil({NUMBERS['holdout_fraction']['display']} × {NUMBERS['n_usable']['display']})"
     assert holdout in text and f"**{NUMBERS['n_holdout']['display']} observations**" in text
 
 
@@ -99,21 +99,26 @@ def test_demo_script_has_six_steps_eighteen_questions_and_real_file_references()
     for path in set(re.findall(r"`((?:src|docs|data|outputs|tests|scripts|config|model)/[^`*]+?)`", text)):
         if not path.endswith("/"):
             assert (ROOT / path).exists(), path
+    # GitHub treats owner/repository names case-insensitively (.../monetarot.git and .../Monetarot.git are the
+    # same repository), so the remote is compared without regard to case.
     remote = "https://github.com/lmamraimovasixseven/monetarot.git"
-    assert remote in text
+    assert remote in text.lower()
     git_config = ROOT / ".git" / "config"
     if git_config.is_file():  # a "Download ZIP" copy has no .git folder; the remote is then checked in the text only
-        assert remote in git_config.read_text(encoding="utf-8")
+        assert remote in git_config.read_text(encoding="utf-8").lower()
 
 
 def test_demo_answers_that_state_results_match_the_numbers():
-    # Q7: household lending is the only meaningful one-SD move; Q8: most checks flip, one survives.
+    # Q7: household lending is the only meaningful one-SD move; Q8 ("Is the result robust? No"): the comparable
+    # checks disagree with each other and at most one survives. Counts exclude the non-comparable RB03 (D24).
     assert NUMBERS["econ_meaningful_factors"]["value"] == "household lending"
     assert NUMBERS["p_holm_household_lending"]["value"] < 0.05
     assert sum(NUMBERS[f"p_holm_{name}"]["value"] < 0.05 for name in ARTIFACT["model"]["feature_names"]) == 1
-    assert NUMBERS["robustness_flipped_benchmark_count"]["value"] * 2 > NUMBERS["robustness_check_count"]["value"]
+    assert NUMBERS["robustness_noncomparable_ids"]["value"] == "RB03"
+    assert NUMBERS["robustness_comparable_check_count"]["value"] == NUMBERS["robustness_check_count"]["value"] - 1
+    assert 0 < NUMBERS["robustness_beats_hold_count"]["value"] < NUMBERS["robustness_comparable_check_count"]["value"]
     assert NUMBERS["robustness_survivor_count"]["value"] == 1
-    assert NUMBERS["oos_winner"]["value"] == "Always Hold"
+    assert NUMBERS["oos_winner"]["value"] == ARTIFACT["benchmark_comparison"]["winner"]
 
 
 AI_USE_TOOLS = ("Codex", "GitHub Copilot", "Claude Code", "Claude, chat interface")
@@ -223,8 +228,8 @@ def test_demo_generated_answers_match_the_numbers_and_the_timing_adds_up():
     for previous, current in zip(rows, rows[1:]):
         assert previous[2:] == current[:2], "steps must be contiguous"
     robustness = text.split("<!-- generated:robustness-answer:start -->", 1)[1].split("<!--", 1)[0]
-    assert (f"in {NUMBERS['robustness_flipped_benchmark_count']['display']} of "
-            f"{NUMBERS['robustness_check_count']['display']} checks") in robustness
+    assert (f"in {NUMBERS['robustness_beats_hold_count']['display']} of "
+            f"{NUMBERS['robustness_comparable_check_count']['display']} comparable checks") in robustness
     assert f"only {NUMBERS['robustness_survivors']['display']} reproduces" in robustness
     lag = text.split("<!-- generated:lag-answer:start -->", 1)[1].split("<!--", 1)[0]
     assert "upper bounds" in lag and "RB07" in lag and NUMBERS["robustness_RB07_name"]["display"] in lag

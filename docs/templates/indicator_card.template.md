@@ -13,7 +13,7 @@ Draft for the student's Table 1. Facts come from the repository and the fact for
 | 5. Coverage | {{n.n_usable}} usable decisions, {{n.sample_usable_start}} to {{n.sample_usable_end}} ({{n.n_dropped}} dropped); estimation {{n.n_estimation}}, holdout {{n.n_holdout}}. |
 | 6. Source and vintage | {{r.raw_file_count}} CSVs derived by manual cleaning from downloaded files. Publishers: {{r.publisher_summary}}. Retrieval dates: {{r.retrieval_summary}}. Single vintage; revisions known for {{r.revised_known}} series. Table below. |
 | 7. Transformations | Levels for inflation and consumption (the consumption CSV already holds year-on-year % changes); 12-month log growth for exports, imports and both lending series; all aligned by `apply_release_lag` with an exact month lookup, {{r.fill_short}}. 12-month log growth removes the unit scale but not the currency effect (trade in USD, lending in KZT). Table below. |
-| 8. Known weaknesses | {{n.verdict_sentence}} Model beats Always Hold in {{n.robustness_flipped_benchmark_count}} of {{n.robustness_check_count}} robustness checks; stability test {{n.stability_lr_flag}}; household lending non-stationary; release lag unverified; no vintages. List below. |
+| 8. Known weaknesses | {{n.verdict_sentence}} {{n.verdict_inference_sentence}} RMSE ratio below 1 in {{n.robustness_beats_hold_count}} of {{n.robustness_comparable_check_count}} comparable robustness checks ({{n.robustness_noncomparable_ids}}, binary target, is not comparable); stability test {{n.stability_lr_flag}}; household lending non-stationary; release lag unverified ({{r.look_ahead_sentence}}); no vintages. List below. |
 
 ## 1. Concept
 
@@ -77,9 +77,10 @@ Estimated cutpoints: κ₁ = {{n.cutpoint_1}}, κ₂ = {{n.cutpoint_2}}; slopes 
 
 ## 8. Known weaknesses
 
-- {{n.verdict_sentence}}
-- The model beats Always Hold in {{n.robustness_flipped_benchmark_count}} of {{n.robustness_check_count}} robustness checks; only {{n.robustness_survivors}} survives the strict rule (`outputs/robustness_table_short.md`).
+- {{n.verdict_sentence}} {{n.verdict_inference_sentence}}
+- {{n.rps_supplementary_sentence}}
+- The RMSE ratio is below 1 in {{n.robustness_beats_hold_count}} of {{n.robustness_comparable_check_count}} comparable robustness checks ({{n.robustness_noncomparable_ids}}, binary target, is not comparable); {{n.robustness_survivor_count}} ({{n.robustness_survivors}}) survive the strict rule (`outputs/robustness_table_short.md`).
 - Parameter stability rejected: p {{n.stability_lr_p}} ({{n.stability_lr_flag}}).
 - Household lending fails both stationarity tests: ADF p {{n.unit_root_household_lending_adf_p}}, KPSS p {{n.unit_root_household_lending_kpss_p}} (table bound).
-- Release lag assumed, not verified; no vintages; unit conflicts with CSV column names: {{r.unit_conflicts}}.
+- Release lag assumed, not verified. {{r.look_ahead_sentence}} No vintages; unit conflicts with CSV column names: {{r.unit_conflicts}}.
 - Irregular decision-date sampling; small holdout ({{n.n_holdout}} decisions: {{n.holdout_actual_increase_count}} increases, {{n.holdout_actual_decrease_count}} decreases).

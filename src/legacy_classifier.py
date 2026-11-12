@@ -57,13 +57,20 @@ def get_class_probabilities(model, features):
     return [{"Direction": label, "Probability": float(mapped[label])} for label in ["Increase", "Hold", "Decrease"]]
 
 
+# The archived classifier backtests (prior exploration, disclosed in docs/model_spec.md) were run on the
+# decisions up to this date. Their windows are measured back from the latest decision, so newer decisions
+# would silently change an archived result; they are kept at their original data vintage (D26).
+LEGACY_DATA_END = pd.Timestamp("2026-09-07")
+
+
 def load_data():
-    """Load and order the processed data for archived classifier evaluation."""
+    """Load and order the processed data for archived classifier evaluation (decisions up to LEGACY_DATA_END)."""
     frame = pd.read_csv(DATA_PATH)
     frame["decision_date"] = pd.to_datetime(frame["decision_date"], errors="coerce")
     frame["decision"] = frame["decision"].astype("string").str.strip().str.title()
     for name in FEATURES:
         frame[name] = pd.to_numeric(frame[name], errors="coerce")
+    frame = frame.loc[frame["decision_date"] <= LEGACY_DATA_END]
     return frame.dropna(subset=["decision_date", "decision"]).loc[lambda x: x.decision.isin(CLASS_ORDER)].sort_values("decision_date").reset_index(drop=True)
 
 

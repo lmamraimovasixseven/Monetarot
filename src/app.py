@@ -586,24 +586,32 @@ def _metric_text(value: object) -> str:
     return f"{number:.3f}" if np.isfinite(number) else "undefined"
 
 
-def _holdout_comparison_frame(artifact: dict) -> pd.DataFrame:
-    """Build the requested holdout comparison using artifact values only."""
+def _holdout_comparison_frame(artifact: dict, robust: dict | None = None) -> pd.DataFrame:
+    """Build the requested holdout comparison using artifact values only.
+
+    With the exploratory evaluation (model/robust_eval.json) it adds the ranked probability score as a
+    supplementary column (same holdout, fixed origin); the pre-specified verdict stays RMSE-based.
+    """
     comparison = artifact.get("benchmark_comparison", {})
     rows = [
-        ("Ordered logit", comparison.get("model", {})),
-        ("Always Hold (pre-specified benchmark)", comparison.get("benchmark_always_hold", {})),
+        ("Ordered logit", comparison.get("model", {}), "M0"),
+        ("Always Hold (pre-specified benchmark)", comparison.get("benchmark_always_hold", {}), "B0"),
         ("Class-frequency comparator (secondary, added after the specification freeze)",
-         comparison.get("class_frequency_comparator_secondary", {})),
+         comparison.get("class_frequency_comparator_secondary", {}), "B1"),
     ]
-    return pd.DataFrame([
+    frame = pd.DataFrame([
         {
             "Model": label,
             "RMSE": _metric_text(values.get("rmse")),
             "MAE": _metric_text(values.get("mae")),
             "Log score": "undefined" if label.startswith("Always Hold") else _metric_text(values.get("log_score")),
         }
-        for label, values in rows
+        for label, values, _ in rows
     ])
+    if robust:
+        frame["RPS (supplementary)"] = [_metric_text((_robust_row(robust, "holdout_fixed_origin", spec) or {}).get("rps"))
+                                        for _, _, spec in rows]
+    return frame
 
 
 def _falsification_frame(artifact: dict) -> pd.DataFrame:
@@ -705,10 +713,11 @@ def _robustness_frame(artifact: dict) -> pd.DataFrame:
             "Factor signs match the main model": "Yes" if item.get("same_signs_as_primary") is True else "No" if item.get("same_signs_as_primary") is False else "UNKNOWN",
             "Survives": str(item.get("survives", "UNKNOWN")),
             "Converged": "Yes" if converged is True else "No — NOT CONVERGED" if converged is False else "UNKNOWN",
+            "Comparable with main score": "Yes" if robustness_check_is_comparable(item) else "No (binary target)",
         })
     return pd.DataFrame(rows, columns=[
         "Check", "Usable n", "RMSE ratio vs Always Hold", "Factor signs match the main model",
-        "Survives", "Converged",
+        "Survives", "Converged", "Comparable with main score",
     ])
 
 
@@ -800,7 +809,8 @@ def falsification_three_note(artifact: dict) -> str:
                 f"RMSE ratio is {ratio:.3f}, so the model does not forecast better than Always Hold; the difference "
                 f"from 1 is too small to say the model is worse; we can only say it is not better.")
     return (f"Falsification criterion 3 (holdout RMSE ratio ≥ 1) is not met: on the {holdout} holdout decisions the "
-            f"RMSE ratio is {ratio:.3f}.")
+            f"RMSE ratio is {ratio:.3f}, below 1; the difference from 1 is too small to say the model is better; we "
+            f"can only say it is not worse.")
 
 
 def specification_timing_note(provenance: dict) -> str:
@@ -890,8 +900,163 @@ def why_probabilities(artifact: dict, history: pd.DataFrame, data_month: str, la
         items.append(f"**Why the model does not beat Always Hold.** On the {holdout} holdout decisions the RMSE ratio "
                      f"is {ratio:.3f}, which is not below 1. {link} This is a limitation of the model, not a data error.")
     else:
-        items.append(f"**Holdout comparison.** On the {holdout} holdout decisions the RMSE ratio is {ratio:.3f}, below 1.")
+        link = (f"The factors have a detectable link with the decisions (joint likelihood-ratio test p = {joint:.3f})."
+                if joint < JOINT_TEST_LEVEL else
+                f"The joint likelihood-ratio test does not detect a link between the factors and the decisions "
+                f"(p = {joint:.3f}).")
+        items.append(f"**Holdout comparison.** On the {holdout} holdout decisions the RMSE ratio is {ratio:.3f}, below 1, "
+                     f"so the model meets the pre-specified criterion against Always Hold. {NOT_BETTER_NOTE} {link} The "
+                     "margin is small; see the Evidence tab for its uncertainty.")
     return items
+
+
+# ---------------------------------------------------------------------------
+# Generated wording shared with src.report (2026-11-10). Every number comes from
+# model/artifact.json or model/robust_eval.json; nothing here estimates anything.
+# ---------------------------------------------------------------------------
+
+INFERENCE_LEVEL = 0.05
+# Class frequencies count as doing "almost as well" when the model's RPS gain over them is
+# smaller than this share of its RPS gain over Always Hold (reporting rule, docs/deviations.md D25).
+FREQUENCY_CLOSE_SHARE = 0.25
+VERSION_COMPARISON_PATH = PROJECT_DIR / "model" / "version_comparison.json"
+NOT_BETTER_NOTE = "This does not show that the model forecasts better."
+
+
+def verdict_rule_sentence(ratio: float | None, winner: str | None = None, ratio_text: str | None = None) -> str:
+    """The pre-specified verdict (holdout RMSE ratio vs Always Hold), worded without claiming a better model."""
+    if not isinstance(ratio, (int, float)):
+        return "Holdout benchmark result: UNKNOWN."
+    shown = ratio_text or f"{float(ratio):.3f}"
+    if winner == "Always Hold" or float(ratio) >= 1.0:
+        return (f"Ordered logit does not beat Always Hold on the holdout (RMSE ratio {shown}, not below 1; "
+                "pre-specified rule).")
+    return (f"Ordered logit meets the pre-specified criterion against Always Hold on the holdout (RMSE ratio "
+            f"{shown}, below 1). {NOT_BETTER_NOTE}")
+
+
+def load_version_comparison(path_string: str = str(VERSION_COMPARISON_PATH)) -> dict:
+    """OLD vs NEW after the last data update, written by `python run.py compare`; {} if absent."""
+    path = Path(path_string)
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
+def version_change_sentence(comparison: dict) -> str:
+    return comparison.get("sentence") or "Effect of the data update: UNKNOWN (run `python run.py compare`)."
+
+
+NONCOMPARABLE_REASON = ("binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is "
+                        "compared with a −1/0/+1 score")
+
+
+def robustness_check_is_comparable(check: dict) -> bool:
+    """A robustness check is comparable with the main −1/0/+1 score unless it has a binary target."""
+    return not str(check.get("estimator", "")).lower().startswith("binary")
+
+
+def _robust_row(robust: dict, design: str, spec_id: str) -> dict | None:
+    rows = ((robust.get("designs") or {}).get(design) or {}).get("specifications") or []
+    return next((row for row in rows if row.get("id") == spec_id), None)
+
+
+def verdict_inference_sentence(robust: dict) -> str:
+    """Whether the bootstrap interval and the DM test can tell the model from Always Hold."""
+    main = _robust_row(robust, "holdout_fixed_origin", "M0")
+    boot = (main or {}).get("bootstrap_rmse_ratio_vs_hold") or {}
+    low, high = boot.get("ci_low"), boot.get("ci_high")
+    dm_p = ((main or {}).get("dm_squared_error_vs_hold") or {}).get("p_value")
+    n = ((robust.get("designs") or {}).get("holdout_fixed_origin") or {}).get("n")
+    if not all(isinstance(value, (int, float)) for value in (low, high, dm_p, n)):
+        return "Uncertainty of the RMSE ratio: UNKNOWN (run `python run.py robust`)."
+    contains_one = low <= 1.0 <= high
+    if contains_one and dm_p >= INFERENCE_LEVEL:
+        return (f"The 95% block-bootstrap interval for the RMSE ratio ({low:.3f} to {high:.3f}) contains 1, and the "
+                f"Diebold–Mariano test (HLN-corrected) gives p = {dm_p:.3f}, so on {n} holdout decisions the model "
+                "cannot be distinguished from Always Hold in either direction.")
+    return (f"The 95% block-bootstrap interval for the RMSE ratio is {low:.3f} to {high:.3f} "
+            f"({'contains' if contains_one else 'excludes'} 1); the Diebold–Mariano test (HLN-corrected) gives "
+            f"p = {dm_p:.3f} on {n} holdout decisions.")
+
+
+def rps_supplementary_sentence(robust: dict) -> str:
+    """RPS as a supplementary measure; the pre-specified verdict stays RMSE-based."""
+    main, hold, freq = (_robust_row(robust, "holdout_fixed_origin", key) for key in ("M0", "B0", "B1"))
+    values = [(row or {}).get("rps") for row in (main, hold, freq)]
+    if not all(isinstance(value, (int, float)) for value in values):
+        return "Ranked probability score: UNKNOWN (run `python run.py robust`)."
+    model_rps, hold_rps, freq_rps = values
+    text = ("Supplementary measure (exploratory, added after the holdout had been seen; the pre-specified verdict "
+            "stays RMSE-based): the ranked probability score on the same holdout (lower is better) is "
+            f"{model_rps:.3f} for the model, {hold_rps:.3f} for Always Hold and {freq_rps:.3f} for the class "
+            "frequencies of the estimation sample.")
+    gain_hold, gain_freq = hold_rps - model_rps, freq_rps - model_rps
+    if gain_freq <= 0:
+        return text + (" The class frequencies score at least as well as the model, so the six factors add nothing "
+                       "beyond the base rates of cuts, holds and hikes.")
+    if gain_hold > 0 and gain_freq < FREQUENCY_CLOSE_SHARE * gain_hold:
+        return text + (" Simple class frequencies do almost as well as the model, so the six factors add little "
+                       "beyond the base rates of cuts, holds and hikes; most of the gain over Always Hold comes from "
+                       "admitting that cuts and hikes happen.")
+    return text + f" The model's RPS is lower than that of the class frequencies by {gain_freq:.3f}."
+
+
+def policy_inertia_sentence(robust: dict) -> str:
+    """Policy-inertia specifications across designs, stated as exploratory and, where so, unstable."""
+    designs = [("rolling_origin_estimation_sample", "rolling origin inside the estimation sample"),
+               ("holdout_fixed_origin", "fixed-origin holdout"), ("holdout_recursive", "recursive holdout")]
+    parts, verdicts, wins = [], [], []
+    for spec_id in ("P0", "P1"):
+        pairs = []
+        for design, label in designs:
+            spec, main = _robust_row(robust, design, spec_id), _robust_row(robust, design, "M0")
+            if not spec or not main or spec.get("rps") is None or main.get("rps") is None:
+                return "Policy-inertia specifications: UNKNOWN (run `python run.py robust`)."
+            pairs.append((label, spec["rps"], main["rps"]))
+        better = [spec_rps < main_rps for _, spec_rps, main_rps in pairs]
+        parts.append(f"{spec_id}: " + "; ".join(f"{label} {spec_rps:.3f} vs {main_rps:.3f}"
+                                                for label, spec_rps, main_rps in pairs))
+        verdicts.append(f"{spec_id} has the lower RPS in {sum(better)} of {len(better)} designs")
+        wins.append(sum(better))
+    unstable = any(0 < count < len(designs) for count in wins)
+    return ("Policy-inertia specifications (exploratory only; P0 = inflation, its 3-month change, the ex-post real "
+            "rate and the previous decision; P1 = P0 plus the other five factors, ridge). RPS of the specification vs "
+            "the main model M0 — " + " | ".join(parts) + ". " + "; ".join(verdicts) + ". "
+            + ("The ranking depends on the evaluation design, which is instability, not an improvement; neither "
+               "specification replaces the pre-specified model." if unstable else
+               "They were examined after the holdout had been seen and are not presented as an improvement."))
+
+
+def holdout_update_sentence(artifact: dict, specification_date: str | None) -> str:
+    """How the data update changes the meaning of the holdout."""
+    sample = artifact.get("sample") or {}
+    rows = sample.get("holdout_rows") or []
+    if not rows:
+        return "Holdout after the data update: UNKNOWN (no holdout rows in the model artifact)."
+    text = (f"Interpretation of the data update: the holdout is the last {len(rows)} usable decisions "
+            f"({rows[0]} to {rows[-1]}); appending a decision moves the unchanged chronological split rule, so the "
+            "estimation and holdout windows shift with the data.")
+    if not specification_date or specification_date == "UNKNOWN":
+        return text + " The specification date is UNKNOWN, so it cannot be said which holdout decisions are new."
+    newer = [day for day in rows if day > specification_date]
+    return text + (f" {len(newer)} of these decisions ({', '.join(newer) or 'none'}) took place after the "
+                   f"specification was dated ({specification_date}); the other {len(rows) - len(newer)} had already "
+                   "been seen in earlier runs. The holdout is therefore partly newer data but still not an untouched "
+                   "confirmatory holdout.")
+
+
+def next_forecast_basis_sentence(artifact: dict, lag_months: int | None, next_date: date | None) -> str:
+    """D21: the next-decision forecast uses the latest decision's factors."""
+    latest = (artifact.get("latest_prediction") or {}).get("date")
+    if not latest or not isinstance(lag_months, int):
+        return "Basis of the next-decision forecast: UNKNOWN."
+    reference = (pd.Period(latest, freq="M") - lag_months).strftime("%Y-%m")
+    text = (f"The probabilities shown for the next NBK decision are the model's probabilities at the latest decision "
+            f"in the data ({latest}), computed from its factor month {reference} (decision month minus {lag_months}).")
+    if next_date is not None:
+        needed = (pd.Period(next_date, freq="M") - lag_months).strftime("%Y-%m")
+        text += (f" They are not recomputed for the meeting of {next_date.isoformat()} itself, which under the same "
+                 f"rule would need factor month {needed}.")
+    return text
 
 
 def _render_decision_rule(provenance: dict) -> None:
@@ -911,24 +1076,20 @@ def _render_evidence(artifact: dict, provenance: dict) -> None:
     checks = artifact.get("robustness_checks", {}).get("checks", [])
     survivals = {str(row.get("survives", "UNKNOWN")).lower() for row in checks}
     robustness_status = "mixed" if len(survivals) > 1 else "consistent"
-    if ratio is None:
-        result_sentence = "holdout benchmark outcome is UNKNOWN"
-    elif winner == "Always Hold" or float(ratio) >= 1.0:
-        result_sentence = f"Ordered logit does not beat Always Hold on the holdout (RMSE ratio {_metric_text(ratio)})"
-    else:
-        result_sentence = f"Ordered logit beats Always Hold on the holdout (RMSE ratio {_metric_text(ratio)})"
-    st.info(f"{result_sentence}; robustness results are {robustness_status}.")
+    result_sentence = verdict_rule_sentence(ratio, winner)
+    st.info(f"{result_sentence} Robustness results are {robustness_status}.")
+    robust = load_robust_eval()
+    st.markdown(verdict_inference_sentence(robust))
+    st.markdown(version_change_sentence(load_version_comparison()))
 
     st.subheader("Holdout comparison")
-    st.dataframe(_holdout_comparison_frame(artifact), hide_index=True, width="stretch")
+    st.dataframe(_holdout_comparison_frame(artifact, robust), hide_index=True, width="stretch")
+    st.caption("RPS = ranked probability score (lower is better), exploratory and supplementary; the pre-specified "
+               "verdict is the RMSE ratio.")
     st.caption("Always Hold assigns probability zero to Increase and Decrease, so the log score cannot be computed on a holdout that contains them.")
     st.caption(f"RMSE ratio (model / Always Hold): {_metric_text(ratio)} · Winner: {winner}")
-    st.caption(
-        "Model does not beat the Always Hold benchmark on the holdout."
-        if ratio is not None and (winner == "Always Hold" or float(ratio) >= 1.0)
-        else "Model beats the Always Hold benchmark on the holdout."
-        if ratio is not None else "Holdout benchmark result: UNKNOWN."
-    )
+    st.caption(verdict_rule_sentence(ratio, winner))
+    st.markdown(rps_supplementary_sentence(robust))
 
     st.subheader("Falsification")
     falsification = _falsification_frame(artifact)
@@ -957,7 +1118,9 @@ def _render_evidence(artifact: dict, provenance: dict) -> None:
             "Ratios in different rows use different holdouts and are not comparable with each other. "
             "The differenced non-stationary-factor check first-differences household and corporate "
             "12-month log growth and inflation; other factors retain their main-model transformations. "
-            f"Total specifications run: {total}."
+            f"Total specifications run: {total}. "
+            "Checks marked not comparable are left out of the count of checks with an RMSE ratio below 1 "
+            f"({NONCOMPARABLE_REASON})."
         )
     else:
         st.info("Robustness checks are not present in the model artifact.")
@@ -975,6 +1138,11 @@ def _render_evidence(artifact: dict, provenance: dict) -> None:
     st.markdown(rb09_household_note(artifact))
     st.markdown(falsification_three_note(artifact))
     st.markdown(specification_timing_note(provenance))
+    spec_date = (provenance.get("project") or {}).get("spec_date_allowed")
+    st.markdown(holdout_update_sentence(artifact, spec_date))
+    next_dates, _, _ = load_next_decisions()
+    st.markdown(next_forecast_basis_sentence(artifact, provenance.get("assumed_release_lag_months"),
+                                             next_dates[0] if next_dates else None))
     st.caption("Generated from config/release_lag.json, docs/facts_to_fill.csv and the raw files by `python run.py facts`.")
 
 
@@ -1031,8 +1199,43 @@ def freshness_warning(missing: list[date], latest_date: pd.Timestamp) -> str:
             "`python run.py all`.")
 
 
-def anomaly_warning(robust: dict) -> str:
-    flags = (robust.get("anomaly_screen") or {}).get("affecting_latest_score") or []
+def load_data_screen(path_string: str = str(PROJECT_DIR / "data" / "processed" / "data_anomalies.json")) -> dict:
+    """The raw-data jump screen written by `python run.py data` (src/data_screen.py); empty if missing."""
+    path = Path(path_string)
+    if not path.is_file():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_forecast_scores(path_string: str = str(PROJECT_DIR / "data" / "processed" / "forecast_scores.json")) -> dict:
+    """Logged forecasts and their scores, written by `python run.py forecast-log` / `forecast-score`; {} if absent."""
+    path = Path(path_string)
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
+def forecast_log_sentence(scores: dict) -> str:
+    """Prospective track record from docs/forecast_log.csv (forecasts stored before each decision)."""
+    if not scores:
+        return "Forecasts logged before a decision: none yet (`python run.py forecast-log`)."
+    text = f"Forecasts logged before the decision (docs/forecast_log.csv): {scores.get('n_logged', 0)}"
+    latest = scores.get("latest_logged")
+    if latest:
+        text += (f"; latest for {latest['target_decision_date']}, logged {latest['logged_at_utc']} (P(Decrease) "
+                 f"{float(latest['p_decrease']) * 100:.1f}%, P(Hold) {float(latest['p_hold']) * 100:.1f}%, "
+                 f"P(Increase) {float(latest['p_increase']) * 100:.1f}%)")
+    scored = scores.get("scored") or []
+    if not scored:
+        return text + ". None has been scored yet: the decision is not in the data."
+    last = scored[-1]
+    return (text + f". Scored: {len(scored)}; latest {last['target_decision_date']}: actual {last['actual']}, "
+            f"predicted {last['predicted_class']} ({'hit' if last['hit'] else 'miss'}), RPS {last['rps_model']:.3f} vs "
+            f"{last['rps_always_hold']:.3f} for Always Hold. Over all scored forecasts: RMSE {scores['rmse_model']:.3f} vs "
+            f"{scores['rmse_always_hold']:.3f}, mean RPS {scores['mean_rps_model']:.3f} vs {scores['mean_rps_always_hold']:.3f}.")
+
+
+def anomaly_warning(robust: dict, screen: dict | None = None) -> str:
+    source = screen if screen else (robust.get("anomaly_screen") or {})
+    flags = source.get("affecting_latest_score") or []
     if not flags:
         return ""
     parts = []
@@ -1040,7 +1243,8 @@ def anomaly_warning(robust: dict) -> str:
         ratio = flag["value"] / flag["previous_value"] if flag.get("previous_value") else None
         jump = f" ({(ratio - 1) * 100:+.0f}% month on month)" if ratio else ""
         parts.append(f"{flag['series_file']} {flag['month']}{jump}, modified z = {flag['modified_z']:.1f}")
-    return ("Check the source data: an unusually large monthly change enters the latest score — "
+    return ("Check the source data: an unusually large monthly change enters the latest score (for growth "
+            "factors, through the 12-month growth rate) — "
             + "; ".join(parts) + ". If the value is a data-entry or unit error, the latest score and its change are "
             "wrong. See Evidence → Stress tests → Raw-data anomaly screen.")
 
@@ -1157,19 +1361,9 @@ def robust_summary_sentences(robust: dict) -> list[str]:
     holdout = designs.get("holdout_fixed_origin", {})
     main = next((r for r in holdout.get("specifications", []) if r.get("id") == "M0"), None)
     if main:
-        boot = main.get("bootstrap_rmse_ratio_vs_hold") or {}
-        dm_p = (main.get("dm_squared_error_vs_hold") or {}).get("p_value")
-        sentences.append(
-            f"The headline RMSE ratio {_fmt3(main.get('rmse_ratio_to_hold'))} has a 95% block-bootstrap interval of "
-            f"{_fmt3(boot.get('ci_low'))} to {_fmt3(boot.get('ci_high'))} (Diebold–Mariano p = {_fmt3(dm_p)}): on 18 "
-            "decisions the model and Always Hold cannot be told apart in either direction.")
-        hold = next((r for r in holdout.get("specifications", []) if r.get("id") == "B0"), None)
-        freq = next((r for r in holdout.get("specifications", []) if r.get("id") == "B1"), None)
-        if hold and freq:
-            sentences.append(
-                f"Scored on its probabilities (RPS), the model beats Always Hold ({_fmt3(main.get('rps'))} vs "
-                f"{_fmt3(hold.get('rps'))}), but so do plain class frequencies ({_fmt3(freq.get('rps'))}); most of the "
-                "gain comes from admitting that cuts and hikes happen, not from the six factors.")
+        sentences.append(f"Headline RMSE ratio {_fmt3(main.get('rmse_ratio_to_hold'))}. "
+                         + verdict_inference_sentence(robust))
+        sentences.append(rps_supplementary_sentence(robust))
     rolling = designs.get("rolling_origin_estimation_sample", {})
     models = [r for r in rolling.get("specifications", []) if r.get("kind") == "model" and r.get("rps") is not None]
     if models:
@@ -1186,6 +1380,7 @@ def robust_summary_sentences(robust: dict) -> list[str]:
     if steady:
         sentences.append("Specifications with positive RPS skill in every design: " + ", ".join(sorted(steady)) +
                          ". Those whose skill turns negative in some design are not robust, whatever their best score.")
+    sentences.append(policy_inertia_sentence(robust))
     return sentences
 
 
@@ -1312,7 +1507,7 @@ def main() -> None:
     freshness = freshness_warning(missing_rounds, latest_date)
     if freshness:
         st.warning(freshness, icon="⚠️")
-    anomaly = anomaly_warning(robust)
+    anomaly = anomaly_warning(robust, load_data_screen())
     if anomaly:
         st.warning(anomaly)
 
@@ -1349,14 +1544,15 @@ def main() -> None:
         comparison = artifact.get("benchmark_comparison", {})
         ratio = comparison.get("rmse_ratio_model_to_hold")
         if isinstance(ratio, (int, float)):
-            if comparison.get("winner") == "Always Hold" or float(ratio) >= 1.0:
-                st.warning(f"Model does not beat the Always Hold benchmark on the holdout (RMSE ratio {float(ratio):.3f})")
-            else:
-                st.success(f"Model beats the Always Hold benchmark on the holdout (RMSE ratio {float(ratio):.3f})")
+            inference = verdict_inference_sentence(load_robust_eval())
+            # Neutral box in both cases: a ratio below 1 meets the pre-specified rule but is not a distinguishable gain.
+            st.warning(f"{verdict_rule_sentence(float(ratio), comparison.get('winner'))} {inference} "
+                       f"{version_change_sentence(load_version_comparison())}")
         else:
             st.warning("Holdout benchmark result: UNKNOWN.")
         _render_decision_rule(provenance)
         _render_track_record(artifact, model_panel)
+        st.caption(forecast_log_sentence(load_forecast_scores()))
         _render_history(history, provenance)
     with drivers_tab:
         _render_drivers(artifact)

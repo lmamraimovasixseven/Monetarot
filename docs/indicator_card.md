@@ -7,12 +7,12 @@ Draft for the student's Table 1. Facts come from the repository and the fact for
 |---|---|
 | 1. Concept | Pressure toward a hike or a cut at the next NBK base-rate decision, read from six macro factors. Indicator (student statement): NBK base-rate decisions (increase / hold / decrease); Week 2 status: instructor-suggested on 2026-10-07 at a lecture; formal approval record UNKNOWN. Named user: a bank treasury analyst who, before an NBK base-rate meeting, needs to know whether the model shows a distinguishable tilt in rate pressure. |
 | 2. Formula | Score = P(Increase) − P(Decrease) from an ordered logit with HC0 robust covariance; see the formula below. |
-| 3. Unit and scale | Probability difference; −1 (a cut is certain) to +1 (a hike is certain); 0 = balanced. Latest: -0.142 on 2026-09-07, 95% band -0.531 to +0.248. Input units (form): `base_rate_history.csv`: percent (source column header «Размер ставки, %»); `consumption_history_updated.csv`: year-on-year percent change; `export_history.csv`: thousand USD; `import_history.csv`: thousand USD; `inflation_history.csv`: year-on-year percent change; `loans_individuals_history.csv`: million KZT; `loans_legal_entities_history.csv`: million KZT. Conflicts with CSV column names: none. |
+| 3. Unit and scale | Probability difference; −1 (a cut is certain) to +1 (a hike is certain); 0 = balanced. Latest: -0.306 on 2026-10-27, 95% band -0.747 to +0.136. Input units (form): `base_rate_history.csv`: percent (source column header «Размер ставки, %»); `consumption_history_updated.csv`: year-on-year percent change; `export_history.csv`: thousand USD; `import_history.csv`: thousand USD; `inflation_history.csv`: year-on-year percent change; `loans_individuals_history.csv`: million KZT; `loans_legal_entities_history.csv`: million KZT. Conflicts with CSV column names: none. |
 | 4. Frequency and lag | One value per NBK decision date (irregular spacing). Raw files: 7 of 7 monthly with every calendar month present (`docs/data_audit.md`). Each decision uses the exact value for the month 2 months before the decision month (assumption, `config/release_lag.json`); no interpolation or fill. Real lags known for 0 of 6 factor series (`outputs/release_lag_check.md`). |
-| 5. Coverage | 88 usable decisions, 2016-03-15 to 2026-09-07 (2 dropped); estimation 70, holdout 18. |
+| 5. Coverage | 89 usable decisions, 2016-03-15 to 2026-10-27 (2 dropped); estimation 71, holdout 18. |
 | 6. Source and vintage | 7 CSVs derived by manual cleaning from downloaded files. Publishers: Bureau of National Statistics (4 files); National Bank of Kazakhstan (2 files); secondary: prg.kz (table); primary: National Bank of Kazakhstan, as cited in the table's own notes (NBK press releases) (1 file). Retrieval dates: 2026-10-08 (7 files). Single vintage; revisions known for 0 series. Table below. |
 | 7. Transformations | Levels for inflation and consumption (the consumption CSV already holds year-on-year % changes); 12-month log growth for exports, imports and both lending series; all aligned by `apply_release_lag` with an exact month lookup, no interpolation or fill. 12-month log growth removes the unit scale but not the currency effect (trade in USD, lending in KZT). Table below. |
-| 8. Known weaknesses | Ordered logit does not beat Always Hold on the holdout (RMSE ratio 1.002). Model beats Always Hold in 6 of 9 robustness checks; stability test FAIL; household lending non-stationary; release lag unverified; no vintages. List below. |
+| 8. Known weaknesses | Ordered logit meets the pre-specified criterion against Always Hold on the holdout (RMSE ratio 0.995, below 1). This does not show that the model forecasts better. The 95% block-bootstrap interval for the RMSE ratio (0.780 to 1.335) contains 1, and the Diebold–Mariano test (HLN-corrected) gives p = 0.961, so on 18 holdout decisions the model cannot be distinguished from Always Hold in either direction. RMSE ratio below 1 in 6 of 8 comparable robustness checks (RB03, binary target, is not comparable); stability test FAIL; household lending non-stationary; release lag unverified (Look-ahead cannot be excluded for 89 of 89 decisions for exports and imports (and for 15 of 89 decisions for consumption).); no vintages. List below. |
 
 ## 1. Concept
 
@@ -30,12 +30,12 @@ With factors x₁…x₆, slopes β and cutpoints κ₁ < κ₂ (stored in `mode
 - P(Decrease) = Λ(κ₁ − η), P(Increase) = 1 − Λ(κ₂ − η), P(Hold) = the remainder, with Λ the logistic function
 - **Score = P(Increase) − P(Decrease) = 1 − Λ(κ₂ − η) − Λ(κ₁ − η)**
 
-Estimated cutpoints: κ₁ = 0.3537, κ₂ = 3.3149; slopes in `outputs/results_table.md`. Code: estimation `_fit_ordered` in `src/model.py` (statsmodels `OrderedModel`); serving `ordered_probabilities` and `policy_pressure_score` in `src/app.py`; band `score_and_delta_band` (delta method, HC0 covariance).
+Estimated cutpoints: κ₁ = 0.4830, κ₂ = 3.3711; slopes in `outputs/results_table.md`. Code: estimation `_fit_ordered` in `src/model.py` (statsmodels `OrderedModel`); serving `ordered_probabilities` and `policy_pressure_score` in `src/app.py`; band `score_and_delta_band` (delta method, HC0 covariance).
 
 ## 3. Unit and scale
 
 - Probability difference, dimensionless, bounded by −1 and +1.
-- Latest value -0.142 (2026-09-07); 95% band -0.531 to +0.248 (width 0.778).
+- Latest value -0.306 (2026-10-27); 95% band -0.747 to +0.136 (width 0.883).
 - Input units (form, student statement), compared with the CSV column names:
 
 | Raw file | Unit (form) | Column name | Hint in column name | Check |
@@ -48,7 +48,7 @@ Estimated cutpoints: κ₁ = 0.3537, κ₂ = 3.3149; slopes in `outputs/results_
 | `loans_individuals_history.csv` | million KZT | `loans_individuals_mln_kzt` | million KZT | agrees |
 | `loans_legal_entities_history.csv` | million KZT | `loans_legal_entities_mln_kzt` | million KZT | agrees |
 
-- Next decision: Increase 12.5%, Hold 60.9%, Decrease 26.6%.
+- Next decision: Increase 8.1%, Hold 53.2%, Decrease 38.7%.
 
 ## 4. Frequency and lag
 
@@ -57,10 +57,10 @@ Estimated cutpoints: κ₁ = 0.3537, κ₂ = 3.3149; slopes in `outputs/results_
 
 | Raw file | Column | Rows | First month | Last month | Missing months | Frequency |
 |---|---|---|---|---|---|---|
-| `base_rate_history.csv` | `rate` | 133 | 2015-09 | 2026-09 | 0 | monthly, every calendar month present |
+| `base_rate_history.csv` | `rate` | 134 | 2015-09 | 2026-10 | 0 | monthly, every calendar month present |
 | `consumption_history_updated.csv` | `consumption_yoy` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
-| `export_history.csv` | `exports_thousand_usd` | 139 | 2015-01 | 2026-07 | 0 | monthly, every calendar month present |
-| `import_history.csv` | `imports_thousand_usd` | 139 | 2015-01 | 2026-07 | 0 | monthly, every calendar month present |
+| `export_history.csv` | `exports_thousand_usd` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
+| `import_history.csv` | `imports_thousand_usd` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
 | `inflation_history.csv` | `inflation` | 141 | 2015-01 | 2026-09 | 0 | monthly, every calendar month present |
 | `loans_individuals_history.csv` | `loans_individuals_mln_kzt` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
 | `loans_legal_entities_history.csv` | `loans_legal_entities_mln_kzt` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
@@ -71,15 +71,15 @@ Estimated cutpoints: κ₁ = 0.3537, κ₂ = 3.3149; slopes in `outputs/results_
 
 ## 5. Coverage
 
-- Decisions used: 88 (2016-03-15 to 2026-09-07); dropped for missing factors: 2.
-- Estimation sample 2016-03-15 to 2024-06-03 (70); holdout 2024-07-15 to 2026-09-07 (18).
+- Decisions used: 89 (2016-03-15 to 2026-10-27); dropped for missing factors: 2.
+- Estimation sample 2016-03-15 to 2024-07-15 (71); holdout 2024-09-02 to 2026-10-27 (18).
 
 | Raw file | First month | Last month |
 |---|---|---|
-| `base_rate_history.csv` | 2015-09 | 2026-09 |
+| `base_rate_history.csv` | 2015-09 | 2026-10 |
 | `consumption_history_updated.csv` | 2015-01 | 2026-08 |
-| `export_history.csv` | 2015-01 | 2026-07 |
-| `import_history.csv` | 2015-01 | 2026-07 |
+| `export_history.csv` | 2015-01 | 2026-08 |
+| `import_history.csv` | 2015-01 | 2026-08 |
 | `inflation_history.csv` | 2015-01 | 2026-09 |
 | `loans_individuals_history.csv` | 2015-01 | 2026-08 |
 | `loans_legal_entities_history.csv` | 2015-01 | 2026-08 |
@@ -100,15 +100,15 @@ Notes from the form:
 
 - `base_rate_history.csv`: The source is a table published on prg.kz, not an NBK publication. Its columns are «Дата установления ставки (с)», «Размер ставки, %», «Коридор базовой ставки, %» and «Примечание»; the notes column refers to NBK press releases (student statement). Upper bound from file update date: UNKNOWN; not applicable to the target.
 - `consumption_history_updated.csv`: Monthly series; the CSV holds the year-on-year percentage change, which the student checked against the source. Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 37 days; true release lag UNKNOWN. Observation only, not a lag rule: the retail-trade February 2025 issue was published 2025-03-12 (12 days after the month ended).
-- `export_history.csv`: Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 66 days; true release lag UNKNOWN.
-- `import_history.csv`: Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 66 days; true release lag UNKNOWN.
+- `export_history.csv`: Derived by manual cleaning from the downloaded Excel file (student statement). Publication date refers to the edition ending 2026-07. The publication and retrieval dates in this row describe the earlier download, whose last month was 2026-07. The 2026-08 row was appended from a newer edition (files in data/incoming/; sheet «Метаданные», «Дата последней актуализации» 2026-10-15); the stat.gov.kz page update date and the retrieval date of that newer edition are UNKNOWN (the student did not supply them; see TODO_HUMAN.md). Upper bound from file update date: 66 days; true release lag UNKNOWN.
+- `import_history.csv`: Derived by manual cleaning from the downloaded Excel file (student statement). Publication date refers to the edition ending 2026-07. The publication and retrieval dates in this row describe the earlier download, whose last month was 2026-07. The 2026-08 row was appended from a newer edition (files in data/incoming/; sheet «Метаданные», «Дата последней актуализации» 2026-10-15); the stat.gov.kz page update date and the retrieval date of that newer edition are UNKNOWN (the student did not supply them; see TODO_HUMAN.md). Upper bound from file update date: 66 days; true release lag UNKNOWN.
 - `inflation_history.csv`: Observation only, not a release-lag rule: the February 2026 issue was published 2026-03-02. Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 1 day; true release lag UNKNOWN.
 - `loans_individuals_history.csv`: Same Excel file as loans_legal_entities_history.csv. Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 24 days; true release lag UNKNOWN.
 - `loans_legal_entities_history.csv`: Same Excel file as loans_individuals_history.csv. Derived by manual cleaning from the downloaded Excel file (student statement). Upper bound from file update date: 24 days; true release lag UNKNOWN.
 
 - The CSVs were derived by manual cleaning from the downloaded files (student statement; `data/raw/SOURCES.md`, `docs/manual_steps_found.md`). Values not in the form are `UNKNOWN`.
 - Vintage: one current vintage per file; real-time vintages are not available.
-- Input data hash (processed panel, normalized line endings): `8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59`.
+- Input data hash (processed panel, normalized line endings): `80cb2129cb92d7c10cb9b897ca4eb44a9964a3c969aa4adee197f04f4c3dd500`.
 
 ## 7. Transformations
 
@@ -126,9 +126,10 @@ Notes from the form:
 
 ## 8. Known weaknesses
 
-- Ordered logit does not beat Always Hold on the holdout (RMSE ratio 1.002).
-- The model beats Always Hold in 6 of 9 robustness checks; only RB06 survives the strict rule (`outputs/robustness_table_short.md`).
-- Parameter stability rejected: p 0.019 (FAIL).
-- Household lending fails both stationarity tests: ADF p 0.152, KPSS p 0.010 (table bound).
-- Release lag assumed, not verified; no vintages; unit conflicts with CSV column names: none.
+- Ordered logit meets the pre-specified criterion against Always Hold on the holdout (RMSE ratio 0.995, below 1). This does not show that the model forecasts better. The 95% block-bootstrap interval for the RMSE ratio (0.780 to 1.335) contains 1, and the Diebold–Mariano test (HLN-corrected) gives p = 0.961, so on 18 holdout decisions the model cannot be distinguished from Always Hold in either direction.
+- Supplementary measure (exploratory, added after the holdout had been seen; the pre-specified verdict stays RMSE-based): the ranked probability score on the same holdout (lower is better) is 0.154 for the model, 0.194 for Always Hold and 0.159 for the class frequencies of the estimation sample. Simple class frequencies do almost as well as the model, so the six factors add little beyond the base rates of cuts, holds and hikes; most of the gain over Always Hold comes from admitting that cuts and hikes happen.
+- The RMSE ratio is below 1 in 6 of 8 comparable robustness checks (RB03, binary target, is not comparable); 1 (RB04) survive the strict rule (`outputs/robustness_table_short.md`).
+- Parameter stability rejected: p 0.013 (FAIL).
+- Household lending fails both stationarity tests: ADF p 0.133, KPSS p 0.010 (table bound).
+- Release lag assumed, not verified. Look-ahead cannot be excluded for 89 of 89 decisions for exports and imports (and for 15 of 89 decisions for consumption). No vintages; unit conflicts with CSV column names: none.
 - Irregular decision-date sampling; small holdout (18 decisions: 3 increases, 4 decreases).

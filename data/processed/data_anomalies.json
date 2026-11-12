@@ -1,0 +1,301 @@
+{
+  "generated_by": "python run.py data (src/data_screen.py)",
+  "method": "modified z-score of monthly changes (log change for levels, first difference for rates)",
+  "modified_z_threshold": 3.5,
+  "latest_decision": "2026-10-27",
+  "assumed_lag_months": 2,
+  "flags": [
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2015-10",
+      "value": 9.4,
+      "previous_value": 4.4,
+      "change": 5.0,
+      "change_definition": "first difference",
+      "modified_z": 11.241666666666674
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2015-11",
+      "value": 12.8,
+      "previous_value": 9.4,
+      "change": 3.4000000000000004,
+      "change_definition": "first difference",
+      "modified_z": 7.644333333333339
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2016-10",
+      "value": 11.5,
+      "previous_value": 16.6,
+      "change": -5.100000000000001,
+      "change_definition": "first difference",
+      "modified_z": -11.46650000000001
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2016-11",
+      "value": 8.7,
+      "previous_value": 11.5,
+      "change": -2.8000000000000007,
+      "change_definition": "first difference",
+      "modified_z": -6.295333333333339
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2022-03",
+      "value": 12.0,
+      "previous_value": 8.7,
+      "change": 3.3000000000000007,
+      "change_definition": "first difference",
+      "modified_z": 7.4195000000000055
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2022-09",
+      "value": 17.7,
+      "previous_value": 16.1,
+      "change": 1.5999999999999979,
+      "change_definition": "first difference",
+      "modified_z": 3.5973333333333306
+    },
+    {
+      "feature": "inflation",
+      "series_file": "inflation_history.csv",
+      "month": "2023-03",
+      "value": 18.1,
+      "previous_value": 21.3,
+      "change": -3.1999999999999993,
+      "change_definition": "first difference",
+      "modified_z": -7.194666666666669
+    },
+    {
+      "feature": "exports",
+      "series_file": "export_history.csv",
+      "month": "2019-04",
+      "value": 5201089.07,
+      "previous_value": 3433642.24,
+      "change": 0.4152464648613705,
+      "change_definition": "monthly log change",
+      "modified_z": 3.622592297771266
+    },
+    {
+      "feature": "exports",
+      "series_file": "export_history.csv",
+      "month": "2026-06",
+      "value": 9816470.38,
+      "previous_value": 6276443.18,
+      "change": 0.44725817856430794,
+      "change_definition": "monthly log change",
+      "modified_z": 3.9018571841261895
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2016-01",
+      "value": 1594493.32,
+      "previous_value": 2319829.46,
+      "change": -0.3749376562975044,
+      "change_definition": "monthly log change",
+      "modified_z": -4.502021259716936
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2020-01",
+      "value": 2553506.17,
+      "previous_value": 3525114.55,
+      "change": -0.32244554879612686,
+      "change_definition": "monthly log change",
+      "modified_z": -3.9017689890739953
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2021-01",
+      "value": 2182365.23,
+      "previous_value": 3582678.38,
+      "change": -0.49570141498664455,
+      "change_definition": "monthly log change",
+      "modified_z": -5.882966392518667
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2022-01",
+      "value": 2847284.44,
+      "previous_value": 4320583.01,
+      "change": -0.41702463718763383,
+      "change_definition": "monthly log change",
+      "modified_z": -4.983289912211852
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2026-01",
+      "value": 4689133.01,
+      "previous_value": 7115016.38,
+      "change": -0.4169598276231081,
+      "change_definition": "monthly log change",
+      "modified_z": -4.982548808641854
+    },
+    {
+      "feature": "corporate_lending",
+      "series_file": "loans_legal_entities_history.csv",
+      "month": "2015-06",
+      "value": 6713193.904,
+      "previous_value": 8094079.269,
+      "change": -0.18705801056674964,
+      "change_definition": "monthly log change",
+      "modified_z": -10.794953748381586
+    },
+    {
+      "feature": "corporate_lending",
+      "series_file": "loans_legal_entities_history.csv",
+      "month": "2015-08",
+      "value": 7258226.679,
+      "previous_value": 6634131.684,
+      "change": 0.08990774971749538,
+      "change_definition": "monthly log change",
+      "modified_z": 5.007490876221116
+    },
+    {
+      "feature": "corporate_lending",
+      "series_file": "loans_legal_entities_history.csv",
+      "month": "2019-01",
+      "value": 7150898.553,
+      "previous_value": 7789143.844,
+      "change": -0.0854929287916395,
+      "change_definition": "monthly log change",
+      "modified_z": -5.000098171658801
+    },
+    {
+      "feature": "corporate_lending",
+      "series_file": "loans_legal_entities_history.csv",
+      "month": "2023-12",
+      "value": 9685852.04158524,
+      "previous_value": 9034012.56194344,
+      "change": 0.06966964062257475,
+      "change_definition": "monthly log change",
+      "modified_z": 3.8527936387325012
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2020-04",
+      "value": -44.7,
+      "previous_value": -4.5,
+      "change": -40.2,
+      "change_definition": "first difference",
+      "modified_z": -11.297875
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2020-05",
+      "value": -30.8,
+      "previous_value": -44.7,
+      "change": 13.900000000000002,
+      "change_definition": "first difference",
+      "modified_z": 3.9064791666666663
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2020-06",
+      "value": 1.6,
+      "previous_value": -30.8,
+      "change": 32.4,
+      "change_definition": "first difference",
+      "modified_z": 9.105749999999999
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2021-04",
+      "value": 41.7,
+      "previous_value": 2.2,
+      "change": 39.5,
+      "change_definition": "first difference",
+      "modified_z": 11.101145833333332
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2021-05",
+      "value": 13.3,
+      "previous_value": 41.7,
+      "change": -28.400000000000002,
+      "change_definition": "first difference",
+      "modified_z": -7.981583333333333
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2022-01",
+      "value": -15.9,
+      "previous_value": 6.4,
+      "change": -22.3,
+      "change_definition": "first difference",
+      "modified_z": -6.267229166666666
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2022-02",
+      "value": 0.6,
+      "previous_value": -15.9,
+      "change": 16.5,
+      "change_definition": "first difference",
+      "modified_z": 4.637187499999999
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2023-01",
+      "value": 20.8,
+      "previous_value": 1.0,
+      "change": 19.8,
+      "change_definition": "first difference",
+      "modified_z": 5.5646249999999995
+    },
+    {
+      "feature": "consumption",
+      "series_file": "consumption_history_updated.csv",
+      "month": "2023-02",
+      "value": 6.5,
+      "previous_value": 20.8,
+      "change": -14.3,
+      "change_definition": "first difference",
+      "modified_z": -4.018895833333333
+    }
+  ],
+  "affecting_latest_score": [
+    {
+      "feature": "exports",
+      "series_file": "export_history.csv",
+      "month": "2026-06",
+      "value": 9816470.38,
+      "previous_value": 6276443.18,
+      "change": 0.44725817856430794,
+      "change_definition": "monthly log change",
+      "modified_z": 3.9018571841261895
+    },
+    {
+      "feature": "imports",
+      "series_file": "import_history.csv",
+      "month": "2026-01",
+      "value": 4689133.01,
+      "previous_value": 7115016.38,
+      "change": -0.4169598276231081,
+      "change_definition": "monthly log change",
+      "modified_z": -4.982548808641854
+    }
+  ]
+}

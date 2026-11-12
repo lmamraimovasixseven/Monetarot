@@ -1,7 +1,9 @@
 """Cross-platform entry point: `python run.py` starts the dashboard.
 
-Other tasks: `python run.py data|model|robust|report|facts|check|regression|test|all`. The Makefile only
-delegates here, so make is optional on every platform.
+Other tasks: `python run.py data|model|robust|report|facts|check|regression|test|all`, plus
+`needs [YYYY-MM-DD ...]` (factor months a decision needs), `compare` (OLD vs NEW after a data update),
+`forecast-log` (store the next-decision forecast before the decision) and `forecast-score` (score logged
+forecasts once decisions are in the data). The Makefile only delegates here, so make is optional.
 """
 
 from __future__ import annotations
@@ -24,11 +26,16 @@ TASKS = {
     "data": [[sys.executable, "-m", "src.ingest"]],
     "model": [[sys.executable, "-m", "src.model"]],
     "robust": [[sys.executable, "-m", "src.robust_eval"]],
-    "report": [[sys.executable, "-m", "src.report"], [sys.executable, "-m", "src.readme"]],
-    "facts": [[sys.executable, "-m", "src.facts"]],
+    "report": [[sys.executable, "-m", "src.compare"], [sys.executable, "-m", "src.report"],
+               [sys.executable, "-m", "src.readme"]],
+    "facts": [[sys.executable, "-m", "src.facts"], [sys.executable, "-m", "src.readme"]],
     "check": [[sys.executable, "-m", "src.check"]],
     "regression": [[sys.executable, "-m", "src.regression"]],
     "test": [[sys.executable, "-m", "pytest", "-q"]],
+    "needs": [[sys.executable, "-m", "src.data_needs"]],
+    "compare": [[sys.executable, "-m", "src.compare"]],
+    "forecast-log": [[sys.executable, "-m", "src.forecast_log", "log"]],
+    "forecast-score": [[sys.executable, "-m", "src.forecast_log", "score"]],
 }
 TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
 
@@ -120,8 +127,11 @@ def healthcheck(port: int | None) -> int:
     return 0 if page_ok else 1
 
 
-def run_task(name: str) -> int:
-    for command in TASKS[name]:
+def run_task(name: str, extra: list[str] | None = None) -> int:
+    commands = [list(command) for command in TASKS[name]]
+    if extra:
+        commands[-1] += extra  # e.g. `python run.py needs 2026-12-04`
+    for command in commands:
         print("+ " + " ".join(command[1:] if command[0] == sys.executable else command), flush=True)
         code = subprocess.call(command, cwd=ROOT)
         if code:
@@ -132,13 +142,14 @@ def run_task(name: str) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("task", nargs="?", default="app", choices=["app", *TASKS])
+    parser.add_argument("extra", nargs="*", help="arguments passed to the task (e.g. dates for `needs`)")
     parser.add_argument("--port", type=int, default=None, help=f"dashboard port (default {DEFAULT_PORT})")
     parser.add_argument("--no-browser", action="store_true", help="do not open a browser tab")
     parser.add_argument("--healthcheck", action="store_true",
                         help="start the server, verify it, render once, stop; exit code 0 on success")
     args = parser.parse_args(argv)
     if args.task != "app":
-        return run_task(args.task)
+        return run_task(args.task, args.extra)
     if args.healthcheck:
         return healthcheck(args.port)
     return serve(args.port or DEFAULT_PORT, open_browser=not args.no_browser)

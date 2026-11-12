@@ -2,16 +2,16 @@
 
 | Parameter | Estimate | Robust SE (HC0) | p (raw) | p (Holm, six slopes) |
 |---|---|---|---|---|
-| Inflation | 0.0220 | 0.0701 | 0.754 | 1.000 |
-| Exports | 0.0137 | 0.0105 | 0.189 | 0.945 |
-| Imports | -0.0078 | 0.0180 | 0.666 | 1.000 |
-| Corporate lending | -0.0421 | 0.0492 | 0.392 | 1.000 |
-| Household lending | 0.0751 | 0.0268 | 0.005 | 0.031 |
-| Consumption | -0.0015 | 0.0210 | 0.944 | 1.000 |
-| Cutpoint Decrease / Hold | 0.3537 | 0.7383 | 0.632 | not adjusted¹ |
-| Cutpoint Hold / Increase | 3.3149 | 0.7456 | 8.7e-06 | not adjusted¹ |
+| Inflation | 0.0385 | 0.0706 | 0.586 | 1.000 |
+| Exports | 0.0131 | 0.0104 | 0.207 | 1.000 |
+| Imports | -0.0044 | 0.0181 | 0.806 | 1.000 |
+| Corporate lending | -0.0522 | 0.0495 | 0.292 | 1.000 |
+| Household lending | 0.0696 | 0.0262 | 0.008 | 0.047 |
+| Consumption | -0.0051 | 0.0201 | 0.802 | 1.000 |
+| Cutpoint Decrease / Hold | 0.4830 | 0.7413 | 0.515 | not adjusted¹ |
+| Cutpoint Hold / Increase | 3.3711 | 0.7514 | 7.3e-06 | not adjusted¹ |
 
-N estimation: 70 · N holdout: 18 · estimation sample 2016-03-15 to 2024-06-03.
+N estimation: 71 · N holdout: 18 · estimation sample 2016-03-15 to 2024-07-15.
 
 Robust standard errors are HC0 score-based sandwich estimates. Holm adjustment is applied across the six slope p-values only.
 

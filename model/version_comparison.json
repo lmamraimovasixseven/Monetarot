@@ -1,0 +1,101 @@
+{
+  "generated_by": "python run.py compare",
+  "old_ref": "before-data-update-2026-09-07",
+  "old_source": "git",
+  "old": {
+    "usable_n": 88,
+    "dropped_n": 2,
+    "estimation_n": 70,
+    "estimation_start": "2016-03-15",
+    "estimation_end": "2024-06-03",
+    "holdout_n": 18,
+    "holdout_start": "2024-07-15",
+    "holdout_end": "2026-09-07",
+    "latest_decision": "2026-09-07",
+    "headline_score": -0.14151640940874505,
+    "headline_band_low": -0.5307389892279127,
+    "headline_band_high": 0.24770617041042264,
+    "next_probabilities": {
+      "Decrease": 0.26631074058261256,
+      "Hold": 0.6088949282435199,
+      "Increase": 0.12479433117386751
+    },
+    "rmse_model": 0.6246822051080606,
+    "rmse_hold": 0.6236095644623235,
+    "rmse_ratio": 1.0017200516266327,
+    "winner": "Always Hold",
+    "rmse_ratio_ci_low": 0.8277544806706899,
+    "rmse_ratio_ci_high": 1.229992952143026,
+    "dm_p": 0.9821607407450931,
+    "rps": {
+      "model": 0.15596552580304424,
+      "always_hold": 0.19444444444444445,
+      "class_frequency": 0.157891156462585,
+      "persistence": 0.2222222222222222
+    },
+    "joint_lr_p": 0.018466879346204394,
+    "holm_significant_slopes": [
+      "household_lending"
+    ],
+    "stability_p": 0.018630476839132673,
+    "stability_result": "FAIL",
+    "robustness_comparable": 8,
+    "robustness_ratio_below_one": 5,
+    "robustness_ratio_below_one_ids": [
+      "RB04",
+      "RB05",
+      "RB07",
+      "RB08",
+      "RB09"
+    ]
+  },
+  "new": {
+    "usable_n": 89,
+    "dropped_n": 2,
+    "estimation_n": 71,
+    "estimation_start": "2016-03-15",
+    "estimation_end": "2024-07-15",
+    "holdout_n": 18,
+    "holdout_start": "2024-09-02",
+    "holdout_end": "2026-10-27",
+    "latest_decision": "2026-10-27",
+    "headline_score": -0.3057221931927333,
+    "headline_band_low": -0.7473820914842324,
+    "headline_band_high": 0.13593770509876585,
+    "next_probabilities": {
+      "Decrease": 0.38682571693731294,
+      "Hold": 0.5320707593181074,
+      "Increase": 0.08110352374457963
+    },
+    "rmse_model": 0.6204310657863512,
+    "rmse_hold": 0.6236095644623235,
+    "rmse_ratio": 0.9949030629786558,
+    "winner": "Ordered Logit",
+    "rmse_ratio_ci_low": 0.7795741042833366,
+    "rmse_ratio_ci_high": 1.3346031687026227,
+    "dm_p": 0.9606947641423762,
+    "rps": {
+      "model": 0.1542006474867259,
+      "always_hold": 0.19444444444444445,
+      "class_frequency": 0.15857193237673303,
+      "persistence": 0.2222222222222222
+    },
+    "joint_lr_p": 0.02595204549055389,
+    "holm_significant_slopes": [
+      "household_lending"
+    ],
+    "stability_p": 0.013190507952658975,
+    "stability_result": "FAIL",
+    "robustness_comparable": 8,
+    "robustness_ratio_below_one": 6,
+    "robustness_ratio_below_one_ids": [
+      "RB01",
+      "RB04",
+      "RB05",
+      "RB07",
+      "RB08",
+      "RB09"
+    ]
+  },
+  "sentence": "Effect of the data update (OLD = git tag before-data-update-2026-09-07, NEW = current files): usable decisions 88 → 89; estimation sample 70 → 71 decisions (ending 2024-06-03 → 2024-07-15); holdout 18 → 18 decisions (2024-07-15–2026-09-07 → 2024-09-02–2026-10-27). The holdout RMSE ratio changed from 1.002 to 0.995, so the pre-specified rule's label changed from \"does not meet the pre-specified criterion (RMSE ratio not below 1)\" to \"meets the pre-specified criterion (RMSE ratio below 1)\". 95% bootstrap intervals: OLD 0.828 to 1.230, NEW 0.780 to 1.335; both ratios lie inside both intervals, so the change does not show that the model forecasts better or worse than before."
+}

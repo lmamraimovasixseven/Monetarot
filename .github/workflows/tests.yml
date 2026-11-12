@@ -1,0 +1,39 @@
+# Runs the test suite and the replication check on Linux and Windows on every push and pull request,
+# so platform differences are caught before they reach the note (docs/deviations.md, D14 and D29).
+# Platform-sensitive optimizer results are reported as WARN by `python run.py check` (D14), not FAIL.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # Keep committed line endings (generated files are compared byte for byte with fresh renders).
+      - name: Keep LF line endings on checkout
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history and tags: the append-only guard reads HEAD, `compare` reads the data-update tag
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Tests (without the slow clean-install test)
+        env:
+          PYTHONUTF8: "1"
+        run: python -m pytest -q -k "not check_01"
+      - name: Replication check
+        env:
+          PYTHONUTF8: "1"
+        run: python run.py check

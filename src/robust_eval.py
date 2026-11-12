@@ -2,8 +2,9 @@
 
 What this module adds, and what it does not change
 --------------------------------------------------
-The pre-specified ordered logit in ``src/model.py`` and its verdict (does not beat
-Always Hold on the 18-decision holdout) are left untouched. This module asks how
+The pre-specified ordered logit in ``src/model.py``, its holdout and its verdict
+rule (holdout RMSE ratio against Always Hold) are left untouched; the current
+verdict and holdout size are read from ``model/artifact.json``, never typed here. This module asks how
 much that verdict can be trusted and whether simple, theory-motivated changes
 make the forecasts more robust. Everything here was written after the holdout
 had been seen, so every holdout number it reports is labelled non-confirmatory.
@@ -25,6 +26,11 @@ Contents
   refit at every decision), a fixed-origin holdout evaluation that mirrors the
   main protocol, and a recursive holdout evaluation that refits at every
   holdout decision as a real user would.
+* ``announcement_month_sensitivity`` - re-aligns the six factors to the month of the
+  NBK announcement instead of the effective date where the announcement fell in the
+  previous calendar month (documented in ``docs/nbk_announcement_dates.csv``) and
+  re-evaluates the main specification. Non-confirmatory; the main model keeps the
+  effective-date convention.
 * ``anomaly_screen`` - modified z-scores (Iglewicz and Hoaglin, 1993) of monthly
   changes in every raw series, so that suspicious source values are flagged
   instead of silently driving the latest score.
@@ -46,11 +52,14 @@ from scipy.optimize import minimize
 from scipy.special import expit
 from scipy.stats import t as student_t
 
+from src.data_screen import MODIFIED_Z_THRESHOLD, RATE_SERIES, anomalies_in_latest_inputs, anomaly_screen  # noqa: F401
 from src.ingest import (
     FEATURE_RULES,
+    LOG_GROWTH_FEATURES,
     RAW_DIR,
     apply_release_lag,
     complete_month_calendar,
+    log_growth_12m,
     read_monthly_series,
 )
 
@@ -61,6 +70,8 @@ MODEL_PANEL_PATH = ROOT / "data" / "processed" / "model_panel.csv"
 OUTPUTS = ROOT / "outputs"
 ROBUST_ARTIFACT_PATH = ROOT / "model" / "robust_eval.json"
 MAIN_ARTIFACT_PATH = ROOT / "model" / "artifact.json"
+ANNOUNCEMENT_DATES_PATH = ROOT / "docs" / "nbk_announcement_dates.csv"
+EARLY_MONTH_DAY = 5           # an effective date on day 1-5 may follow an announcement in the previous month
 
 SEED = 42
 MAIN_FEATURES = list(FEATURE_RULES)
@@ -85,8 +96,6 @@ INNER_WINDOW = 12             # one-step forecasts used to pick the ridge penalt
 FIRST_ORIGIN = 40             # first rolling-origin forecast uses the first 40 usable decisions
 BLOCK_LENGTH = 3
 BOOTSTRAP_DRAWS = 10_000
-MODIFIED_Z_THRESHOLD = 3.5    # Iglewicz and Hoaglin (1993) outlier rule for the modified z-score
-RATE_SERIES = {"inflation", "consumption"}  # already rates: screen first differences, not log changes
 LABEL_NOTE = ("Exploratory: added on 2026-11-06 after the holdout had been seen. The pre-specified "
               "main model and its verdict are unchanged; holdout numbers here are non-confirmatory.")
 
@@ -433,49 +442,88 @@ def _metrics(probabilities: np.ndarray, actual: np.ndarray, hold_probabilities: 
 
 
 # ---------------------------------------------------------------------------
+# Announcement-date sensitivity (exploratory, non-confirmatory)
+# ---------------------------------------------------------------------------
+
+def load_announcement_dates(path: Path = ANNOUNCEMENT_DATES_PATH) -> pd.DataFrame:
+    """Documented NBK announcement dates keyed by effective date (sources in the file)."""
+    frame = pd.read_csv(path, parse_dates=["effective_date", "announcement_date"])
+    if frame.effective_date.duplicated().any():
+        raise RobustEvalError(f"{Path(path).name}: duplicate effective dates")
+    if (frame.announcement_date > frame.effective_date).any():
+        raise RobustEvalError(f"{Path(path).name}: an announcement date is after its effective date")
+    return frame
+
+
+def announcement_aligned_features(decision_dates: pd.Series, announcements: pd.DataFrame,
+                                  raw_dir: Path = RAW_DIR, lag_months: int = 2) -> pd.DataFrame:
+    """The six main factors aligned to (announcement month - lag) where an announcement date is documented.
+
+    Decisions without a documented announcement date keep their effective date. Same
+    transformations as ``src.ingest.build_model_panel``; nothing is imputed.
+    """
+    dates = pd.to_datetime(decision_dates).reset_index(drop=True)
+    lookup = dict(zip(announcements.effective_date, announcements.announcement_date))
+    alignment = pd.Series([lookup.get(date, date) for date in dates])
+    out = pd.DataFrame({"decision_date": dates})
+    for feature, (filename, column) in FEATURE_RULES.items():
+        source = read_monthly_series(Path(raw_dir) / filename, column)
+        transformed = log_growth_12m(source) if feature in LOG_GROWTH_FEATURES else source
+        out[feature] = apply_release_lag(transformed, alignment, lag_months=lag_months).to_numpy()
+    out["alignment_date"] = alignment
+    return out
+
+
+def announcement_month_sensitivity(usable: pd.DataFrame, estimation_n: int, raw_dir: Path = RAW_DIR,
+                                   lag_months: int = 2,
+                                   announcements_path: Path = ANNOUNCEMENT_DATES_PATH) -> dict[str, Any]:
+    """Re-evaluate the main specification (M0) with factors aligned to the announcement month."""
+    announcements = load_announcement_dates(announcements_path)
+    alt = announcement_aligned_features(usable.decision_date, announcements, raw_dir, lag_months)
+    moved = alt.decision_date.dt.to_period("M") != alt.alignment_date.dt.to_period("M")
+    shifted = [d.date().isoformat() for d in alt.loc[moved, "decision_date"]]
+    documented = set(announcements.effective_date)
+    undocumented_early = [d.date().isoformat() for d in usable.decision_date
+                          if d.day <= EARLY_MONTH_DAY and d not in documented]
+    base = {"label": ("Exploratory sensitivity check, non-confirmatory: the main model keeps the effective-date "
+                      "convention; this check is not used to choose or change any model."),
+            "decisions_realigned": shifted,
+            "early_month_decisions_without_documented_announcement": undocumented_early,
+            "announcement_dates_file": "docs/nbk_announcement_dates.csv"}
+    if alt[MAIN_FEATURES].isna().any().any():
+        return {**base, "status": "not run: a re-aligned factor month is missing"}
+    alt_usable = usable.copy()
+    alt_usable[MAIN_FEATURES] = alt[MAIN_FEATURES].to_numpy()
+    spec = next(item for item in SPECIFICATIONS if item["id"] == "M0")
+    hold = SPECIFICATIONS[0]
+    designs = {
+        "rolling_origin_estimation_sample": (list(range(FIRST_ORIGIN, estimation_n)), True, None),
+        "holdout_fixed_origin": (list(range(estimation_n, len(usable))), False, estimation_n),
+        "holdout_recursive": (list(range(estimation_n, len(usable))), True, None),
+    }
+    results = {}
+    for name, (positions, refit, origin) in designs.items():
+        actual = usable.y.to_numpy(dtype=int)[positions]
+        hold_probs, _ = _evaluate(hold, usable, positions, refit=refit, origin=origin)
+        effective_probs, _ = _evaluate(spec, usable, positions, refit=refit, origin=origin)
+        announced_probs, _ = _evaluate(spec, alt_usable, positions, refit=refit, origin=origin)
+        eff = _metrics(effective_probs, actual, hold_probs)
+        ann = _metrics(announced_probs, actual, hold_probs)
+        window = {usable.decision_date.iloc[i].date().isoformat() for i in positions}
+        results[name] = {
+            "n": len(positions),
+            "effective_date": {k: eff[k] for k in ("rmse", "rmse_ratio_to_hold", "rps")},
+            "announcement_month": {k: ann[k] for k in ("rmse", "rmse_ratio_to_hold", "rps")},
+            "realigned_in_window": sorted(set(shifted) & window),
+        }
+    return {**base, "status": "run", "designs": results}
+
+
+# ---------------------------------------------------------------------------
 # Data anomaly screen
 # ---------------------------------------------------------------------------
 
-def anomaly_screen(raw_dir: Path = RAW_DIR, threshold: float = MODIFIED_Z_THRESHOLD) -> list[dict[str, Any]]:
-    """Flag months whose change is extreme relative to the series' own history.
-
-    Level series (trade, lending) are screened on monthly log changes; rate series
-    (inflation, consumption growth) on first differences. modified z = 0.6745 *
-    (x - median) / MAD. A flag is a prompt to re-check the source, not proof of an error.
-    """
-    flags = []
-    for feature, (filename, column) in FEATURE_RULES.items():
-        series = complete_month_calendar(read_monthly_series(Path(raw_dir) / filename, column))
-        change = series.diff() if feature in RATE_SERIES else np.log(series.where(series > 0)).diff()
-        values = change.dropna()
-        median = float(values.median())
-        mad = float((values - median).abs().median())
-        if mad == 0:
-            continue
-        z = 0.6745 * (values - median) / mad
-        for month, score in z[z.abs() >= threshold].items():
-            flags.append({
-                "feature": feature, "series_file": filename, "month": str(month),
-                "value": float(series.loc[month]), "previous_value": float(series.shift(1).loc[month]),
-                "change": float(change.loc[month]),
-                "change_definition": "first difference" if feature in RATE_SERIES else "monthly log change",
-                "modified_z": float(score),
-            })
-    return flags
-
-
-def anomalies_in_latest_inputs(flags: list[dict[str, Any]], latest_date: pd.Timestamp, lag_months: int) -> list[dict[str, Any]]:
-    """Flags in a month that enters the latest score (reference month, and month-12 for growth factors)."""
-    reference = latest_date.to_period("M") - lag_months
-    growth = {"exports", "imports", "corporate_lending", "household_lending"}
-    relevant = []
-    for flag in flags:
-        months = {str(reference)} | ({str(reference - 12)} if flag["feature"] in growth else set())
-        # a month-to-month jump at the reference month or the month just before it moves the input
-        months |= {str(reference - 1)}
-        if flag["month"] in months:
-            relevant.append(flag)
-    return relevant
+# anomaly_screen and anomalies_in_latest_inputs live in src/data_screen.py (D28) and are imported above.
 
 
 # ---------------------------------------------------------------------------
@@ -510,7 +558,8 @@ def _fmt(value: Any, digits: int = 3) -> str:
 
 def run(output_dir: Path = OUTPUTS, artifact_path: Path = ROBUST_ARTIFACT_PATH,
         model_panel_path: Path = MODEL_PANEL_PATH, decisions_path: Path = DECISIONS_PATH,
-        raw_dir: Path = RAW_DIR, main_artifact_path: Path = MAIN_ARTIFACT_PATH) -> dict[str, Any]:
+        raw_dir: Path = RAW_DIR, main_artifact_path: Path = MAIN_ARTIFACT_PATH,
+        announcements_path: Path = ANNOUNCEMENT_DATES_PATH) -> dict[str, Any]:
     output_dir, artifact_path = Path(output_dir), Path(artifact_path)
     main_artifact = json.loads(Path(main_artifact_path).read_text(encoding="utf-8"))
     estimation_n = int(main_artifact["sample"]["estimation_n"])
@@ -537,8 +586,9 @@ def run(output_dir: Path = OUTPUTS, artifact_path: Path = ROBUST_ARTIFACT_PATH,
             "positions": rolling_positions, "refit": True, "origin": None, "actual": actual_rolling,
         },
         "holdout_fixed_origin": {
-            "description": ("Same protocol as the main model: fit once on the 70 estimation decisions, "
-                            "forecast the 18 holdout decisions. Non-confirmatory (holdout already seen)."),
+            "description": (f"Same protocol as the main model: fit once on the {estimation_n} estimation "
+                            f"decisions, forecast the {len(holdout_positions)} holdout decisions. "
+                            "Non-confirmatory (holdout already seen)."),
             "positions": holdout_positions, "refit": False, "origin": estimation_n, "actual": actual_holdout,
         },
         "holdout_recursive": {
@@ -600,6 +650,8 @@ def run(output_dir: Path = OUTPUTS, artifact_path: Path = ROBUST_ARTIFACT_PATH,
             item["coefficients_standardized"] = dict(zip(fit["features"], fit["beta_standardized"]))
         next_forecasts.append(item)
 
+    sensitivity = announcement_month_sensitivity(usable, estimation_n, raw_dir, lag_months, announcements_path)
+
     flags = anomaly_screen(raw_dir)
     latest_date = usable.decision_date.iloc[-1]
     relevant_flags = anomalies_in_latest_inputs(flags, latest_date, lag_months)
@@ -621,6 +673,7 @@ def run(output_dir: Path = OUTPUTS, artifact_path: Path = ROBUST_ARTIFACT_PATH,
             "base_rate_used": float(next_row["base_rate_after"].iloc[0]),
             "forecasts": next_forecasts,
         },
+        "announcement_month_sensitivity": sensitivity,
         "anomaly_screen": {"flags": flags, "affecting_latest_score": relevant_flags,
                            "latest_decision": latest_date.date().isoformat(), "assumed_lag_months": lag_months},
     }
@@ -669,6 +722,13 @@ def render_markdown(artifact: dict[str, Any]) -> str:
         f"({artifact['settings']['bootstrap_draws']} draws, seed {artifact['seed']}). Ridge penalties are chosen "
         f"at every forecast origin by one-step RPS over the previous {artifact['settings']['inner_window']} "
         "decisions only.", ""]
+    # Same generated wording as the dashboard and README (src.app, which estimates nothing).
+    from src.app import policy_inertia_sentence, rps_supplementary_sentence, verdict_inference_sentence
+    lines += ["## What the tables say (generated)", "",
+              f"- {verdict_inference_sentence(artifact)} The pre-specified verdict is the RMSE ratio rule of the main "
+              "model and is not changed by this evaluation.",
+              f"- {rps_supplementary_sentence(artifact)}",
+              f"- {policy_inertia_sentence(artifact)}", ""]
     nxt = artifact["next_decision_forecasts"]
     lines += ["## Next-meeting probabilities by specification", "",
               f"All specifications are fitted on every usable decision up to {nxt['based_on_decision']}. "
@@ -681,6 +741,7 @@ def render_markdown(artifact: dict[str, Any]) -> str:
         lines.append(f"| {item['id']} | {item['name']} | {_fmt(p['Decrease'])} | {_fmt(p['Hold'])} | "
                      f"{_fmt(p['Increase'])} | {_fmt(item['expected_score'])} |")
     lines.append("")
+    lines += render_announcement_sensitivity(artifact.get("announcement_month_sensitivity"))
     screen = artifact["anomaly_screen"]
     lines += ["## Raw-data anomaly screen", "",
               f"Modified z-score of monthly changes, flag at |z| ≥ {artifact['settings']['modified_z_threshold']} "
@@ -695,6 +756,31 @@ def render_markdown(artifact: dict[str, Any]) -> str:
                      f"| {'yes' if (flag['feature'], flag['month']) in affecting else 'no'} |")
     lines += ["", "Generated by `python run.py robust` (src/robust_eval.py).", ""]
     return "\n".join(lines)
+
+
+def render_announcement_sensitivity(sens: dict[str, Any] | None) -> list[str]:
+    if not sens:
+        return []
+    lines = ["## Announcement-date sensitivity (exploratory, non-confirmatory)", "", sens["label"], "",
+             "The main model aligns every factor to the decision's effective month minus the assumed lag. For the "
+             "decisions listed here the NBK announcement fell in the previous calendar month "
+             f"(`{sens['announcement_dates_file']}`), so this check aligns them to the announcement month instead: "
+             f"{', '.join(sens['decisions_realigned']) or 'none'}.", ""]
+    if sens["early_month_decisions_without_documented_announcement"]:
+        lines += ["Decisions effective on day 1-5 of a month whose announcement date is not documented (UNKNOWN; "
+                  "kept at the effective month): "
+                  f"{', '.join(sens['early_month_decisions_without_documented_announcement'])}.", ""]
+    if sens["status"] != "run":
+        return lines + [f"Status: {sens['status']}.", ""]
+    lines += ["| Design | n | Re-aligned decisions in window | RMSE ratio vs Hold (effective) "
+              "| RMSE ratio vs Hold (announcement) | RPS (effective) | RPS (announcement) |",
+              "|---|---|---|---|---|---|---|"]
+    for name, row in sens["designs"].items():
+        lines.append(f"| {name.replace('_', ' ')} | {row['n']} | {len(row['realigned_in_window'])} "
+                     f"| {_fmt(row['effective_date']['rmse_ratio_to_hold'])} "
+                     f"| {_fmt(row['announcement_month']['rmse_ratio_to_hold'])} "
+                     f"| {_fmt(row['effective_date']['rps'])} | {_fmt(row['announcement_month']['rps'])} |")
+    return lines + [""]
 
 
 def main() -> dict[str, Any]:

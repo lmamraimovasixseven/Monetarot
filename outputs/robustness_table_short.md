@@ -1,27 +1,27 @@
 # Robustness: the three required checks
 
-Main model: RMSE ratio 1.002, winner Always Hold. **Selection rule:** For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival.
+Main model: RMSE ratio 0.995, winner Ordered Logit. **Selection rule:** For each kind of check, the first specification in id order whose estimator converged and whose target is comparable with the main -1/0/+1 score. The rule does not look at RMSE ratios, signs or survival.
 
 | Kind | Check | Usable n | RMSE ratio vs Always Hold | Benchmark winner | Same signs | Survives (strict rule) | Effect on the main result |
 |---|---|---|---|---|---|---|---|
-| Alternative sample | RB01: Drop decision years 2020-2022 | 61 | 1.139 | Always Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
-| Alternative specification | RB03: Binary logit: Increase vs not Increase | 88 | 0.999 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative measure | RB04: Ordered logit: 3-month trailing inflation average | 88 | 0.984 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
+| Alternative sample | RB01: Drop decision years 2020-2022 | 62 | 0.899 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
+| Alternative specification | RB06: Ordered logit: release lag 1 month | 88 | 1.224 | Always Hold | yes | No | overturns the main result: Always Hold wins on this check's holdout. |
+| Alternative measure | RB04: Ordered logit: 3-month trailing inflation average | 89 | 0.969 | Model beats Hold | yes | Yes | confirms the main result: same slope signs and the same benchmark winner (Ordered Logit). |
 
-**Across all 9 checks:** the model beats Always Hold on the check's own holdout in 6 of 9 (RB03, RB04, RB05, RB07, RB08, RB09), while only RB06 survives the strict rule (all six slope signs match the main model and the benchmark winner is the same). The negative main result is therefore fragile. Each check uses its own chronological holdout, so the ratios are not directly comparable with each other.
+**Across the 8 comparable checks** (of 9; RB03 is not comparable: binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is compared with a −1/0/+1 score): the RMSE ratio is below 1 on the check's own holdout in 6 of 8 (RB01, RB04, RB05, RB07, RB08, RB09); the benchmark conclusion differs from the main result in 2 (RB02, RB06); 1 (RB04) survive the strict rule (all six slope signs match the main model and the benchmark winner is the same). Each check uses its own chronological holdout, so the ratios are not directly comparable with each other.
 
 ## All checks
 
 | Kind | Check | Usable n | RMSE ratio vs Always Hold | Benchmark winner | Same signs | Survives (strict rule) | Effect on the main result |
 |---|---|---|---|---|---|---|---|
-| Alternative sample | RB01: Drop decision years 2020-2022 | 61 | 1.139 | Always Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
-| Alternative sample | RB02: Last 60 calendar months | 42 | 1.426 | Always Hold | no | No | Estimator did not converge; same benchmark conclusion, but at least one slope changes sign. |
-| Alternative specification | RB03: Binary logit: Increase vs not Increase | 88 | 0.999 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative measure | RB04: Ordered logit: 3-month trailing inflation average | 88 | 0.984 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative measure | RB05: Ordered logit: 6-month trailing inflation average | 88 | 0.946 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative specification | RB06: Ordered logit: release lag 1 month | 87 | 1.211 | Always Hold | yes | Yes | confirms the main result: same slope signs and Always Hold still wins. |
-| Alternative specification | RB07: Ordered logit: release lag 3 months | 87 | 0.977 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative measure | RB08: Ordered logit: 3-month log growth for exports and lending | 88 | 0.859 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
-| Alternative measure | RB09: Differenced non-stationary factors | 87 | 0.976 | Model beats Hold | no | No | overturns the negative result: the model beats Always Hold on this check's holdout, and at least one slope changes sign. |
+| Alternative sample | RB01: Drop decision years 2020-2022 | 62 | 0.899 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
+| Alternative sample | RB02: Last 60 calendar months | 41 | 1.372 | Always Hold | no | No | overturns the main result: Always Hold wins on this check's holdout, and at least one slope changes sign. |
+| Alternative specification | RB03: Binary logit: Increase vs not Increase | 89 | 0.990 | Model beats Hold | no | No | not comparable (binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is compared with a −1/0/+1 score); left out of the counts. |
+| Alternative measure | RB04: Ordered logit: 3-month trailing inflation average | 89 | 0.969 | Model beats Hold | yes | Yes | confirms the main result: same slope signs and the same benchmark winner (Ordered Logit). |
+| Alternative measure | RB05: Ordered logit: 6-month trailing inflation average | 89 | 0.914 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
+| Alternative specification | RB06: Ordered logit: release lag 1 month | 88 | 1.224 | Always Hold | yes | No | overturns the main result: Always Hold wins on this check's holdout. |
+| Alternative specification | RB07: Ordered logit: release lag 3 months | 88 | 0.990 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
+| Alternative measure | RB08: Ordered logit: 3-month log growth for exports and lending | 89 | 0.817 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
+| Alternative measure | RB09: Differenced non-stationary factors | 88 | 0.980 | Model beats Hold | no | No | same benchmark conclusion, but at least one slope changes sign. |
 
 Generated by `python -m src.report` from model/artifact.json.

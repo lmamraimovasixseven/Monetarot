@@ -17,16 +17,16 @@ Real lags are filled in for 0 of 6 factor series. The assumption cannot be check
 
 The publication dates in the form are the last-update dates of the downloaded files, not first-release dates, so the lags below are only upper bounds (true release lag ≤ bound). They do not replace the real-lag check above.
 
-| Factor | Last month in CSV | File update date | Upper bound on release lag (days) | Decisions where the bound exceeds the window |
-|---|---|---|---|---|
-| Inflation | 2026-09 | 2026-10-01 | 1 | 0 of 88 |
-| Exports | 2026-07 | 2026-10-05 | 66 | 88 of 88 |
-| Imports | 2026-07 | 2026-10-05 | 66 | 88 of 88 |
-| Corporate lending | 2026-08 | 2026-09-24 | 24 | 0 of 88 |
-| Household lending | 2026-08 | 2026-09-24 | 24 | 0 of 88 |
-| Consumption | 2026-08 | 2026-10-07 | 37 | 15 of 88 |
+| Factor | Last month in CSV | Month dated by the update date | File update date | Upper bound on release lag (days) | Decisions where the bound exceeds the window |
+|---|---|---|---|---|---|
+| Inflation | 2026-09 | 2026-09 | 2026-10-01 | 1 | 0 of 89 |
+| Exports | 2026-08 | 2026-07 | 2026-10-05 | 66 | 89 of 89 |
+| Imports | 2026-08 | 2026-07 | 2026-10-05 | 66 | 89 of 89 |
+| Corporate lending | 2026-08 | 2026-08 | 2026-09-24 | 24 | 0 of 89 |
+| Household lending | 2026-08 | 2026-08 | 2026-09-24 | 24 | 0 of 89 |
+| Consumption | 2026-08 | 2026-08 | 2026-10-07 | 37 | 15 of 89 |
 
-Real release lags are UNKNOWN. The model assumes data for month M−2 are available at a decision in month M, which leaves about 45 days (median 44; 31 to 59 across decisions); `outputs/release_lag_check.md` uses the stricter shortest window minus one day (30 days). File update dates give only upper bounds on the release lag (true lag ≤ bound): inflation 1 day; exports 66 days; imports 66 days; corporate lending 24 days; household lending 24 days; consumption 37 days. Possible look-ahead cannot be ruled out for exports and imports at every decision (88 of 88); consumption at decisions early in the month (15 of 88). The nearest existing check is RB07 ("Ordered logit: release lag 3 months", which shifts all factors): benchmark winner Model beats Hold, survives No; a check that shifts only the trade series was not run. Revision status of all series is UNKNOWN.
+Real release lags are UNKNOWN. The model assumes data for month M−2 are available at a decision in month M, which leaves about 45 days (median 44; 31 to 59 across decisions); `outputs/release_lag_check.md` uses the stricter shortest window minus one day (30 days). File update dates give only upper bounds on the release lag (true lag ≤ bound): inflation 1 day; exports 66 days; imports 66 days; corporate lending 24 days; household lending 24 days; consumption 37 days. For exports the update date belongs to the edition ending 2026-07; the later rows up to 2026-08 come from a newer edition whose publication date is UNKNOWN. For imports the update date belongs to the edition ending 2026-07; the later rows up to 2026-08 come from a newer edition whose publication date is UNKNOWN. Look-ahead cannot be excluded for 89 of 89 decisions for exports and imports (and for 15 of 89 decisions for consumption). The nearest existing check is RB07 ("Ordered logit: release lag 3 months", which shifts all factors): benchmark winner Model beats Hold, survives No; a check that shifts only the trade series was not run. Revision status of all series is UNKNOWN.
 
 This check reports only. The estimation still uses the assumed offset; changing it requires an explicit decision and `python run.py model`.
 

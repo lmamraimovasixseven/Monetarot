@@ -7,10 +7,10 @@ Facts computed by `python run.py facts` from the raw files, the processed panel 
 
 | Raw file | Column | Rows | First month | Last month | Missing months | Frequency |
 |---|---|---|---|---|---|---|
-| `base_rate_history.csv` | `rate` | 133 | 2015-09 | 2026-09 | 0 | monthly, every calendar month present |
+| `base_rate_history.csv` | `rate` | 134 | 2015-09 | 2026-10 | 0 | monthly, every calendar month present |
 | `consumption_history_updated.csv` | `consumption_yoy` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
-| `export_history.csv` | `exports_thousand_usd` | 139 | 2015-01 | 2026-07 | 0 | monthly, every calendar month present |
-| `import_history.csv` | `imports_thousand_usd` | 139 | 2015-01 | 2026-07 | 0 | monthly, every calendar month present |
+| `export_history.csv` | `exports_thousand_usd` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
+| `import_history.csv` | `imports_thousand_usd` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
 | `inflation_history.csv` | `inflation` | 141 | 2015-01 | 2026-09 | 0 | monthly, every calendar month present |
 | `loans_individuals_history.csv` | `loans_individuals_mln_kzt` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
 | `loans_legal_entities_history.csv` | `loans_legal_entities_mln_kzt` | 140 | 2015-01 | 2026-08 | 0 | monthly, every calendar month present |
@@ -45,7 +45,7 @@ Units come from `docs/facts_to_fill.csv` (student statement) and are compared wi
 
 - `src/ingest.py` reads the file with `read_monthly_series`, keeps the values as levels (consumption is not in `LOG_GROWTH_FEATURES`), reindexes to calendar months with `complete_month_calendar` and selects one month per decision with `apply_release_lag` → `align_to_decision_months`.
 - `complete_month_calendar` leaves a missing month as missing; `align_to_decision_months` looks up exactly one reference month. Fill or interpolation calls found in `src/ingest.py`: none. **No interpolation and no forward or backward fill** is applied in the ingest path.
-- Check against the data: for all 88 usable decisions in `data/processed/model_panel.csv`, the consumption value equals the raw CSV value at the reference month (mismatches: 0).
+- Check against the data: for all 89 usable decisions in `data/processed/model_panel.csv`, the consumption value equals the raw CSV value at the reference month (mismatches: 0).
 - Reuse of one value: in 2 reference months, two or more decisions fall in the same calendar month and therefore use the same consumption value (4 decisions in total). This is a repeated lookup, not an interpolation.
 
 ### (c) Release-lag rule

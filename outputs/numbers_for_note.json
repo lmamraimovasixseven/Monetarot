@@ -3,26 +3,28 @@
   "generated_by": "python -m src.report",
   "inputs": [
     "model/artifact.json",
+    "model/robust_eval.json",
     "data/processed/nbk_decisions_clean.csv",
-    "data/processed/model_panel.csv"
+    "data/processed/model_panel.csv",
+    "data/processed/provenance.json"
   ],
-  "verdict_sentence": "Ordered logit does not beat Always Hold on the holdout (RMSE ratio 1.002).",
+  "verdict_sentence": "Ordered logit meets the pre-specified criterion against Always Hold on the holdout (RMSE ratio 0.995, below 1). This does not show that the model forecasts better.",
   "numbers": {
     "latest_decision_date": {
-      "value": "2026-09-07",
-      "display": "2026-09-07",
+      "value": "2026-10-27",
+      "display": "2026-10-27",
       "kind": "text",
       "source": "model/artifact.json#/latest_prediction/date"
     },
     "headline_score": {
-      "value": -0.14151640940874505,
-      "display": "-0.142",
+      "value": -0.3057221931927333,
+      "display": "-0.306",
       "kind": "score",
       "source": "model/artifact.json#/latest_prediction/expected_score"
     },
     "headline_score_band_low": {
-      "value": -0.5307389892279127,
-      "display": "-0.531",
+      "value": -0.7473820914842324,
+      "display": "-0.747",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -34,8 +36,8 @@
       }
     },
     "headline_score_band_high": {
-      "value": 0.24770617041042264,
-      "display": "+0.248",
+      "value": 0.13593770509876585,
+      "display": "+0.136",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -47,29 +49,29 @@
       }
     },
     "next_round_probability_increase": {
-      "value": 0.12479433117386751,
-      "display": "12.5%",
+      "value": 0.08110352374457963,
+      "display": "8.1%",
       "kind": "prob",
       "source": "model/artifact.json#/latest_prediction/class_probabilities/Increase",
       "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
     },
     "next_round_probability_hold": {
-      "value": 0.6088949282435199,
-      "display": "60.9%",
+      "value": 0.5320707593181074,
+      "display": "53.2%",
       "kind": "prob",
       "source": "model/artifact.json#/latest_prediction/class_probabilities/Hold",
       "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
     },
     "next_round_probability_decrease": {
-      "value": 0.26631074058261256,
-      "display": "26.6%",
+      "value": 0.38682571693731294,
+      "display": "38.7%",
       "kind": "prob",
       "source": "model/artifact.json#/latest_prediction/class_probabilities/Decrease",
       "note": "both upcoming rounds use the latest factor values, so their probabilities are identical"
     },
     "latest_score_change": {
-      "value": 0.2282994210491998,
-      "display": "+0.228",
+      "value": -0.11206189785754617,
+      "display": "-0.112",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -80,16 +82,16 @@
       }
     },
     "driver_1_factor": {
-      "value": "exports",
-      "display": "exports",
+      "value": "household_lending",
+      "display": "household lending",
       "kind": "factor",
-      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/feature"
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/feature"
     },
     "driver_1_contribution": {
-      "value": 0.21758745430380505,
-      "display": "+0.218",
+      "value": -0.04598199980801965,
+      "display": "-0.046",
       "kind": "score",
-      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/expected_score_contribution_to_latest_change"
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/expected_score_contribution_to_latest_change"
     },
     "driver_2_factor": {
       "value": "corporate_lending",
@@ -98,26 +100,26 @@
       "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/3/feature"
     },
     "driver_2_contribution": {
-      "value": 0.056428740192372706,
-      "display": "+0.056",
+      "value": -0.03729881897455378,
+      "display": "-0.037",
       "kind": "score",
       "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/3/expected_score_contribution_to_latest_change"
     },
     "driver_3_factor": {
-      "value": "household_lending",
-      "display": "household lending",
+      "value": "exports",
+      "display": "exports",
       "kind": "factor",
-      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/feature"
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/feature"
     },
     "driver_3_contribution": {
-      "value": -0.0363502496650534,
-      "display": "-0.036",
+      "value": -0.015891816610022702,
+      "display": "-0.016",
       "kind": "score",
-      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/4/expected_score_contribution_to_latest_change"
+      "source": "model/artifact.json#/per_factor_contribution_to_latest_score_change/1/expected_score_contribution_to_latest_change"
     },
     "n_usable": {
-      "value": 88,
-      "display": "88",
+      "value": 89,
+      "display": "89",
       "kind": "int",
       "source": "model/artifact.json#/sample/usable_n"
     },
@@ -128,8 +130,8 @@
       "source": "model/artifact.json#/sample/dropped_n"
     },
     "n_estimation": {
-      "value": 70,
-      "display": "70",
+      "value": 71,
+      "display": "71",
       "kind": "int",
       "source": "model/artifact.json#/sample/estimation_n"
     },
@@ -146,8 +148,8 @@
       "source": "model/artifact.json#/sample/usable_start"
     },
     "sample_usable_end": {
-      "value": "2026-09-07",
-      "display": "2026-09-07",
+      "value": "2026-10-27",
+      "display": "2026-10-27",
       "kind": "text",
       "source": "model/artifact.json#/sample/usable_end"
     },
@@ -158,20 +160,20 @@
       "source": "model/artifact.json#/sample/estimation_start"
     },
     "sample_estimation_end": {
-      "value": "2024-06-03",
-      "display": "2024-06-03",
+      "value": "2024-07-15",
+      "display": "2024-07-15",
       "kind": "text",
       "source": "model/artifact.json#/sample/estimation_end"
     },
     "sample_holdout_start": {
-      "value": "2024-07-15",
-      "display": "2024-07-15",
+      "value": "2024-09-02",
+      "display": "2024-09-02",
       "kind": "text",
       "source": "model/artifact.json#/sample/holdout_start"
     },
     "sample_holdout_end": {
-      "value": "2026-09-07",
-      "display": "2026-09-07",
+      "value": "2026-10-27",
+      "display": "2026-10-27",
       "kind": "text",
       "source": "model/artifact.json#/sample/holdout_end"
     },
@@ -200,20 +202,20 @@
       "source": "model/artifact.json#/benchmark_comparison/actual_score_distribution/1"
     },
     "coef_inflation": {
-      "value": 0.02199296137093244,
-      "display": "0.0220",
+      "value": 0.038487435321204876,
+      "display": "0.0385",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/inflation/coefficient_or_cutpoint"
     },
     "se_inflation": {
-      "value": 0.07013790331697874,
-      "display": "0.0701",
+      "value": 0.07058731384018462,
+      "display": "0.0706",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/inflation/hc0_standard_error"
     },
     "p_raw_inflation": {
-      "value": 0.7538496075980295,
-      "display": "0.754",
+      "value": 0.585584486141336,
+      "display": "0.586",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/inflation/p_value"
     },
@@ -224,44 +226,44 @@
       "source": "model/artifact.json#/model/coefficient_table/inflation/p_value_holm"
     },
     "coef_exports": {
-      "value": 0.013744691281439453,
-      "display": "0.0137",
+      "value": 0.013128283427931193,
+      "display": "0.0131",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/exports/coefficient_or_cutpoint"
     },
     "se_exports": {
-      "value": 0.010464238054485528,
-      "display": "0.0105",
+      "value": 0.01039426668090032,
+      "display": "0.0104",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/exports/hc0_standard_error"
     },
     "p_raw_exports": {
-      "value": 0.18901726923832896,
-      "display": "0.189",
+      "value": 0.2065779566137408,
+      "display": "0.207",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/exports/p_value"
     },
     "p_holm_exports": {
-      "value": 0.9450863461916448,
-      "display": "0.945",
+      "value": 1.0,
+      "display": "1.000",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/exports/p_value_holm"
     },
     "coef_imports": {
-      "value": -0.007792092949550429,
-      "display": "-0.0078",
+      "value": -0.004434765970455123,
+      "display": "-0.0044",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/imports/coefficient_or_cutpoint"
     },
     "se_imports": {
-      "value": 0.018044061392098232,
-      "display": "0.0180",
+      "value": 0.018068022427751563,
+      "display": "0.0181",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/imports/hc0_standard_error"
     },
     "p_raw_imports": {
-      "value": 0.6658599015103904,
-      "display": "0.666",
+      "value": 0.8061093096042594,
+      "display": "0.806",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/imports/p_value"
     },
@@ -272,20 +274,20 @@
       "source": "model/artifact.json#/model/coefficient_table/imports/p_value_holm"
     },
     "coef_corporate_lending": {
-      "value": -0.04211239603644495,
-      "display": "-0.0421",
+      "value": -0.05216821680238818,
+      "display": "-0.0522",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/corporate_lending/coefficient_or_cutpoint"
     },
     "se_corporate_lending": {
-      "value": 0.049201105448525705,
-      "display": "0.0492",
+      "value": 0.04949923173543685,
+      "display": "0.0495",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/corporate_lending/hc0_standard_error"
     },
     "p_raw_corporate_lending": {
-      "value": 0.39203994185091573,
-      "display": "0.392",
+      "value": 0.2919196703229595,
+      "display": "0.292",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/corporate_lending/p_value"
     },
@@ -296,44 +298,44 @@
       "source": "model/artifact.json#/model/coefficient_table/corporate_lending/p_value_holm"
     },
     "coef_household_lending": {
-      "value": 0.07512542007843497,
-      "display": "0.0751",
+      "value": 0.06959885184799125,
+      "display": "0.0696",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/household_lending/coefficient_or_cutpoint"
     },
     "se_household_lending": {
-      "value": 0.02683617183658186,
-      "display": "0.0268",
+      "value": 0.026203289406240345,
+      "display": "0.0262",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/household_lending/hc0_standard_error"
     },
     "p_raw_household_lending": {
-      "value": 0.005119624993344942,
-      "display": "0.005",
+      "value": 0.007904753144179258,
+      "display": "0.008",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/household_lending/p_value"
     },
     "p_holm_household_lending": {
-      "value": 0.03071774996006965,
-      "display": "0.031",
+      "value": 0.04742851886507554,
+      "display": "0.047",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/household_lending/p_value_holm"
     },
     "coef_consumption": {
-      "value": -0.0014785727707736366,
-      "display": "-0.0015",
+      "value": -0.005054063427178731,
+      "display": "-0.0051",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/consumption/coefficient_or_cutpoint"
     },
     "se_consumption": {
-      "value": 0.020968646439157686,
-      "display": "0.0210",
+      "value": 0.020117480966240633,
+      "display": "0.0201",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/consumption/hc0_standard_error"
     },
     "p_raw_consumption": {
-      "value": 0.9437849512923012,
-      "display": "0.944",
+      "value": 0.8016382635693907,
+      "display": "0.802",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/consumption/p_value"
     },
@@ -344,62 +346,62 @@
       "source": "model/artifact.json#/model/coefficient_table/consumption/p_value_holm"
     },
     "cutpoint_1": {
-      "value": 0.3537243712880859,
-      "display": "0.3537",
+      "value": 0.4830107577647011,
+      "display": "0.4830",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/coefficient_or_cutpoint"
     },
     "cutpoint_1_se": {
-      "value": 0.7383437429509783,
-      "display": "0.7383",
+      "value": 0.741266903329825,
+      "display": "0.7413",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/hc0_standard_error"
     },
     "cutpoint_1_p_raw": {
-      "value": 0.6318830170725244,
-      "display": "0.632",
+      "value": 0.514658165227772,
+      "display": "0.515",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Decrease|Hold]/p_value"
     },
     "cutpoint_2": {
-      "value": 3.3149380105299433,
-      "display": "3.3149",
+      "value": 3.371132775414891,
+      "display": "3.3711",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/coefficient_or_cutpoint"
     },
     "cutpoint_2_se": {
-      "value": 0.7455704247902439,
-      "display": "0.7456",
+      "value": 0.7514470728523868,
+      "display": "0.7514",
       "kind": "coef",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/hc0_standard_error"
     },
     "cutpoint_2_p_raw": {
-      "value": 8.741196969927691e-06,
-      "display": "8.7e-06",
+      "value": 7.25087970264118e-06,
+      "display": "7.3e-06",
       "kind": "p",
       "source": "model/artifact.json#/model/coefficient_table/cutpoint[Hold|Increase]/p_value"
     },
     "pseudo_r2_mcfadden": {
-      "value": 0.10974943047747465,
-      "display": "0.110",
+      "value": 0.10153781880341672,
+      "display": "0.102",
       "kind": "ratio",
       "source": "model/artifact.json#/model/pseudo_r2_mcfadden"
     },
     "oos_model_rmse": {
-      "value": 0.6246822051080606,
-      "display": "0.625",
+      "value": 0.6204310657863512,
+      "display": "0.620",
       "kind": "ratio",
       "source": "model/artifact.json#/benchmark_comparison/model/rmse"
     },
     "oos_model_mae": {
-      "value": 0.47892751242315573,
-      "display": "0.479",
+      "value": 0.498157553294745,
+      "display": "0.498",
       "kind": "ratio",
       "source": "model/artifact.json#/benchmark_comparison/model/mae"
     },
     "oos_model_log_score": {
-      "value": 0.939710389728996,
-      "display": "0.940",
+      "value": 0.9310477490115223,
+      "display": "0.931",
       "kind": "ratio",
       "source": "model/artifact.json#/benchmark_comparison/model/log_score"
     },
@@ -422,8 +424,8 @@
       "source": "model/artifact.json#/benchmark_comparison/benchmark_always_hold/log_score"
     },
     "oos_frequency_log_score": {
-      "value": 0.9456565309065696,
-      "display": "0.946",
+      "value": 0.9489989071942079,
+      "display": "0.949",
       "kind": "ratio",
       "source": "model/artifact.json#/benchmark_comparison/class_frequency_comparator_secondary/log_score"
     },
@@ -434,38 +436,38 @@
       "source": "model/artifact.json#/benchmark_comparison/class_frequency_comparator_secondary/label"
     },
     "rmse_ratio": {
-      "value": 1.0017200516266327,
-      "display": "1.002",
+      "value": 0.9949030629786558,
+      "display": "0.995",
       "kind": "ratio",
       "source": "model/artifact.json#/benchmark_comparison/rmse_ratio_model_to_hold"
     },
     "oos_winner": {
-      "value": "Always Hold",
-      "display": "Always Hold",
+      "value": "Ordered Logit",
+      "display": "Ordered Logit",
       "kind": "text",
       "source": "model/artifact.json#/benchmark_comparison/winner"
     },
     "joint_lr_statistic": {
-      "value": 15.240435352202809,
-      "display": "15.240",
+      "value": 14.35097885022735,
+      "display": "14.351",
       "kind": "stat",
       "source": "model/artifact.json#/diagnostics/joint_slope_lr/statistic"
     },
     "joint_lr_p": {
-      "value": 0.018466879346204394,
-      "display": "0.018",
+      "value": 0.02595204549055389,
+      "display": "0.026",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/joint_slope_lr/p_value"
     },
     "stability_lr_statistic": {
-      "value": 15.217553714524797,
-      "display": "15.218",
+      "value": 16.107101942515797,
+      "display": "16.107",
       "kind": "stat",
       "source": "model/artifact.json#/diagnostics/parameter_stability/statistic"
     },
     "stability_lr_p": {
-      "value": 0.018630476839132673,
-      "display": "0.019",
+      "value": 0.013190507952658975,
+      "display": "0.013",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/parameter_stability/p_value"
     },
@@ -482,26 +484,26 @@
       "source": "model/artifact.json#/diagnostics/parameter_stability/groups_n/2015-2019"
     },
     "stability_split_n_late": {
-      "value": 39,
-      "display": "39",
+      "value": 40,
+      "display": "40",
       "kind": "int",
       "source": "model/artifact.json#/diagnostics/parameter_stability/groups_n/2020+"
     },
     "proportional_odds_p": {
-      "value": 0.14195367940218653,
-      "display": "0.142",
+      "value": 0.09694542597226838,
+      "display": "0.097",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/proportional_odds/p_value"
     },
     "serial_correlation_p": {
-      "value": 0.1413149227265809,
-      "display": "0.141",
+      "value": 0.051728316506911586,
+      "display": "0.052",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/serial_correlation/p_value"
     },
     "unit_root_inflation_adf_p": {
-      "value": 0.17093453570326256,
-      "display": "0.171",
+      "value": 0.16492310538792365,
+      "display": "0.165",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/0/p_value"
     },
@@ -524,8 +526,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/1/pass_fail"
     },
     "unit_root_exports_adf_p": {
-      "value": 0.03488330229799153,
-      "display": "0.035",
+      "value": 0.032757596369413056,
+      "display": "0.033",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/4/p_value"
     },
@@ -548,8 +550,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/5/pass_fail"
     },
     "unit_root_imports_adf_p": {
-      "value": 0.0007547854032639911,
-      "display": "7.5e-04",
+      "value": 0.0008394653579540567,
+      "display": "8.4e-04",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/8/p_value"
     },
@@ -572,8 +574,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/9/pass_fail"
     },
     "unit_root_corporate_lending_adf_p": {
-      "value": 0.6660154127059807,
-      "display": "0.666",
+      "value": 0.6813455868899088,
+      "display": "0.681",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/12/p_value"
     },
@@ -584,8 +586,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/12/pass_fail"
     },
     "unit_root_corporate_lending_kpss_p": {
-      "value": 0.06784354583654921,
-      "display": "0.068",
+      "value": 0.06131212692864042,
+      "display": "0.061",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/13/p_value"
     },
@@ -596,8 +598,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/13/pass_fail"
     },
     "unit_root_household_lending_adf_p": {
-      "value": 0.151893332916596,
-      "display": "0.152",
+      "value": 0.1329206549966191,
+      "display": "0.133",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/16/p_value"
     },
@@ -620,8 +622,8 @@
       "source": "model/artifact.json#/diagnostics/unit_root_tests/17/pass_fail"
     },
     "unit_root_consumption_adf_p": {
-      "value": 3.322282400450816e-06,
-      "display": "3.3e-06",
+      "value": 2.716466965733839e-06,
+      "display": "2.7e-06",
       "kind": "p",
       "source": "model/artifact.json#/diagnostics/unit_root_tests/20/p_value"
     },
@@ -674,8 +676,8 @@
       "source": "model/artifact.json#/falsification_verdicts/2/rule"
     },
     "falsification_3_verdict": {
-      "value": "falsified",
-      "display": "falsified",
+      "value": "not falsified",
+      "display": "not falsified",
       "kind": "text",
       "source": "model/artifact.json#/falsification_verdicts/2/verdict"
     },
@@ -692,14 +694,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/0/survives"
     },
     "robustness_RB01_rmse_ratio": {
-      "value": 1.139120580440345,
-      "display": "1.139",
+      "value": 0.8985018620723201,
+      "display": "0.899",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/0/rmse_ratio_model_to_hold"
     },
     "robustness_RB01_n_usable": {
-      "value": 61,
-      "display": "61",
+      "value": 62,
+      "display": "62",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/0/n_usable"
     },
@@ -710,8 +712,8 @@
       "source": "model/artifact.json#/robustness_checks/checks/0/estimator_converged"
     },
     "robustness_RB01_benchmark_conclusion": {
-      "value": "Always Hold",
-      "display": "Always Hold",
+      "value": "Model beats Hold",
+      "display": "Model beats Hold",
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/0/benchmark_conclusion"
     },
@@ -734,20 +736,20 @@
       "source": "model/artifact.json#/robustness_checks/checks/1/survives"
     },
     "robustness_RB02_rmse_ratio": {
-      "value": 1.4260369540349196,
-      "display": "1.426",
+      "value": 1.3720872893519156,
+      "display": "1.372",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/1/rmse_ratio_model_to_hold"
     },
     "robustness_RB02_n_usable": {
-      "value": 42,
-      "display": "42",
+      "value": 41,
+      "display": "41",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/1/n_usable"
     },
     "robustness_RB02_converged": {
-      "value": false,
-      "display": "no",
+      "value": true,
+      "display": "yes",
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/1/estimator_converged"
     },
@@ -776,14 +778,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/2/survives"
     },
     "robustness_RB03_rmse_ratio": {
-      "value": 0.9988846432337574,
-      "display": "0.999",
+      "value": 0.9902778428546222,
+      "display": "0.990",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/2/rmse_ratio_model_to_hold"
     },
     "robustness_RB03_n_usable": {
-      "value": 88,
-      "display": "88",
+      "value": 89,
+      "display": "89",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/2/n_usable"
     },
@@ -812,20 +814,20 @@
       "source": "model/artifact.json#/robustness_checks/checks/3/name"
     },
     "robustness_RB04_survives": {
-      "value": "No",
-      "display": "No",
+      "value": "Yes",
+      "display": "Yes",
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/3/survives"
     },
     "robustness_RB04_rmse_ratio": {
-      "value": 0.9842084550724559,
-      "display": "0.984",
+      "value": 0.9690997112740187,
+      "display": "0.969",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/3/rmse_ratio_model_to_hold"
     },
     "robustness_RB04_n_usable": {
-      "value": 88,
-      "display": "88",
+      "value": 89,
+      "display": "89",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/3/n_usable"
     },
@@ -842,8 +844,8 @@
       "source": "model/artifact.json#/robustness_checks/checks/3/benchmark_conclusion"
     },
     "robustness_RB04_same_signs": {
-      "value": false,
-      "display": "no",
+      "value": true,
+      "display": "yes",
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/3/same_signs_as_primary"
     },
@@ -860,14 +862,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/4/survives"
     },
     "robustness_RB05_rmse_ratio": {
-      "value": 0.9459085034642147,
-      "display": "0.946",
+      "value": 0.9135167460729346,
+      "display": "0.914",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/4/rmse_ratio_model_to_hold"
     },
     "robustness_RB05_n_usable": {
-      "value": 88,
-      "display": "88",
+      "value": 89,
+      "display": "89",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/4/n_usable"
     },
@@ -896,20 +898,20 @@
       "source": "model/artifact.json#/robustness_checks/checks/5/name"
     },
     "robustness_RB06_survives": {
-      "value": "Yes",
-      "display": "Yes",
+      "value": "No",
+      "display": "No",
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/5/survives"
     },
     "robustness_RB06_rmse_ratio": {
-      "value": 1.2112769920915856,
-      "display": "1.211",
+      "value": 1.224196704123002,
+      "display": "1.224",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/5/rmse_ratio_model_to_hold"
     },
     "robustness_RB06_n_usable": {
-      "value": 87,
-      "display": "87",
+      "value": 88,
+      "display": "88",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/5/n_usable"
     },
@@ -944,14 +946,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/6/survives"
     },
     "robustness_RB07_rmse_ratio": {
-      "value": 0.9767241586710739,
-      "display": "0.977",
+      "value": 0.9901208813958555,
+      "display": "0.990",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/6/rmse_ratio_model_to_hold"
     },
     "robustness_RB07_n_usable": {
-      "value": 87,
-      "display": "87",
+      "value": 88,
+      "display": "88",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/6/n_usable"
     },
@@ -986,14 +988,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/7/survives"
     },
     "robustness_RB08_rmse_ratio": {
-      "value": 0.8589660379673328,
-      "display": "0.859",
+      "value": 0.8166009028631434,
+      "display": "0.817",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/7/rmse_ratio_model_to_hold"
     },
     "robustness_RB08_n_usable": {
-      "value": 88,
-      "display": "88",
+      "value": 89,
+      "display": "89",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/7/n_usable"
     },
@@ -1028,14 +1030,14 @@
       "source": "model/artifact.json#/robustness_checks/checks/8/survives"
     },
     "robustness_RB09_rmse_ratio": {
-      "value": 0.9755426069665947,
-      "display": "0.976",
+      "value": 0.9799188591497123,
+      "display": "0.980",
       "kind": "ratio",
       "source": "model/artifact.json#/robustness_checks/checks/8/rmse_ratio_model_to_hold"
     },
     "robustness_RB09_n_usable": {
-      "value": 87,
-      "display": "87",
+      "value": 88,
+      "display": "88",
       "kind": "int",
       "source": "model/artifact.json#/robustness_checks/checks/8/n_usable"
     },
@@ -1057,6 +1059,39 @@
       "kind": "text",
       "source": "model/artifact.json#/robustness_checks/checks/8/same_signs_as_primary"
     },
+    "robustness_comparable_check_count": {
+      "value": 8,
+      "display": "8",
+      "kind": "int",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/estimator"
+        ],
+        "method": "count of checks whose estimator is not binary (comparable with the -1/0/+1 score)"
+      }
+    },
+    "robustness_noncomparable_ids": {
+      "value": "RB03",
+      "display": "RB03",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/estimator"
+        ],
+        "method": "specification ids with a binary estimator (not comparable with the -1/0/+1 score)"
+      }
+    },
+    "robustness_noncomparable_reason": {
+      "value": "binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is compared with a −1/0/+1 score",
+      "display": "binary Increase-vs-not target: it cannot predict a decrease, and its P(Increase) is compared with a −1/0/+1 score",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/estimator"
+        ],
+        "method": "why a binary-target check is not comparable"
+      }
+    },
     "robustness_survivor_count": {
       "value": 1,
       "display": "1",
@@ -1065,42 +1100,64 @@
         "derived_from": [
           "model/artifact.json#/robustness_checks/checks/*/survives"
         ],
-        "method": "count of checks with survives == Yes"
+        "method": "count of comparable checks with survives == Yes"
       }
     },
     "robustness_survivors": {
-      "value": "RB06",
-      "display": "RB06",
+      "value": "RB04",
+      "display": "RB04",
       "kind": "text",
       "source": {
         "derived_from": [
           "model/artifact.json#/robustness_checks/checks/*/survives"
         ],
-        "method": "specification ids with survives == Yes"
+        "method": "comparable specification ids with survives == Yes"
       }
     },
     "robustness_flipped_benchmark_count": {
+      "value": 2,
+      "display": "2",
+      "kind": "int",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/same_benchmark_conclusion_as_primary",
+          "model/artifact.json#/benchmark_comparison/winner"
+        ],
+        "method": "count of comparable checks whose benchmark conclusion differs from the main model's winner"
+      }
+    },
+    "robustness_flipped_benchmark_ids": {
+      "value": "RB02, RB06",
+      "display": "RB02, RB06",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/robustness_checks/checks/*/same_benchmark_conclusion_as_primary",
+          "model/artifact.json#/benchmark_comparison/winner"
+        ],
+        "method": "comparable specification ids whose benchmark conclusion differs from the main model's winner"
+      }
+    },
+    "robustness_beats_hold_count": {
       "value": 6,
       "display": "6",
       "kind": "int",
       "source": {
         "derived_from": [
-          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion",
-          "model/artifact.json#/benchmark_comparison/winner"
+          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion"
         ],
-        "method": "count of checks whose benchmark conclusion differs from the main model's winner"
+        "method": "count of comparable checks in which the model beats Always Hold on the check's own holdout"
       }
     },
-    "robustness_flipped_benchmark_ids": {
-      "value": "RB03, RB04, RB05, RB07, RB08, RB09",
-      "display": "RB03, RB04, RB05, RB07, RB08, RB09",
+    "robustness_beats_hold_ids": {
+      "value": "RB01, RB04, RB05, RB07, RB08, RB09",
+      "display": "RB01, RB04, RB05, RB07, RB08, RB09",
       "kind": "text",
       "source": {
         "derived_from": [
-          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion",
-          "model/artifact.json#/benchmark_comparison/winner"
+          "model/artifact.json#/robustness_checks/checks/*/benchmark_conclusion"
         ],
-        "method": "specification ids whose benchmark conclusion differs from the main model's winner"
+        "method": "comparable specification ids in which the model beats Always Hold"
       }
     },
     "family_slope_coefficients": {
@@ -1170,14 +1227,14 @@
       "source": "model/artifact.json#/replication_tolerance/headline_score_name"
     },
     "data_sha256": {
-      "value": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59",
-      "display": "8bf4a1ae7f36eb61c021a7cf8a568f94a9e89271393e15d6c8a02b550cf75b59",
+      "value": "80cb2129cb92d7c10cb9b897ca4eb44a9964a3c969aa4adee197f04f4c3dd500",
+      "display": "80cb2129cb92d7c10cb9b897ca4eb44a9964a3c969aa4adee197f04f4c3dd500",
       "kind": "text",
       "source": "model/artifact.json#/data_sha256_normalized_crlf_to_lf"
     },
     "econ_typical_score_move": {
-      "value": 0.04308263385847183,
-      "display": "0.043",
+      "value": 0.03785729523903898,
+      "display": "0.038",
       "kind": "stat",
       "source": {
         "derived_from": [
@@ -1189,14 +1246,14 @@
       }
     },
     "econ_inflation_sd": {
-      "value": 4.57040710637602,
-      "display": "4.5704",
+      "value": 4.539846388523331,
+      "display": "4.5398",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/0/sd"
     },
     "econ_inflation_score_change": {
-      "value": 0.03046920660509142,
-      "display": "+0.030",
+      "value": 0.05413894334505137,
+      "display": "+0.054",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1210,8 +1267,8 @@
       }
     },
     "econ_inflation_band_low": {
-      "value": -0.16073201918890537,
-      "display": "-0.161",
+      "value": -0.14145574290503898,
+      "display": "-0.141",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1225,8 +1282,8 @@
       }
     },
     "econ_inflation_band_high": {
-      "value": 0.2216704323990882,
-      "display": "+0.222",
+      "value": 0.24973362959514173,
+      "display": "+0.250",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1256,14 +1313,14 @@
       }
     },
     "econ_exports_sd": {
-      "value": 27.869792071367907,
-      "display": "27.8698",
+      "value": 27.68347296467376,
+      "display": "27.6835",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/1/sd"
     },
     "econ_exports_score_change": {
-      "value": 0.11585626845789729,
-      "display": "+0.116",
+      "value": 0.11246994185509945,
+      "display": "+0.112",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1277,8 +1334,8 @@
       }
     },
     "econ_exports_band_low": {
-      "value": -0.057431435637746636,
-      "display": "-0.057",
+      "value": -0.06212196756803484,
+      "display": "-0.062",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1292,8 +1349,8 @@
       }
     },
     "econ_exports_band_high": {
-      "value": 0.2891439725535412,
-      "display": "+0.289",
+      "value": 0.28706185127823375,
+      "display": "+0.287",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1323,14 +1380,14 @@
       }
     },
     "econ_imports_sd": {
-      "value": 17.611687153104146,
-      "display": "17.6117",
+      "value": 17.547349141415744,
+      "display": "17.5473",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/2/sd"
     },
     "econ_imports_score_change": {
-      "value": -0.04173306697691653,
-      "display": "-0.042",
+      "value": -0.024172157625388435,
+      "display": "-0.024",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1344,8 +1401,8 @@
       }
     },
     "econ_imports_band_low": {
-      "value": -0.23022909115152498,
-      "display": "-0.230",
+      "value": -0.216749459997429,
+      "display": "-0.217",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1359,8 +1416,8 @@
       }
     },
     "econ_imports_band_high": {
-      "value": 0.14676295719769192,
-      "display": "+0.147",
+      "value": 0.16840514474665214,
+      "display": "+0.168",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1390,14 +1447,14 @@
       }
     },
     "econ_corporate_lending_sd": {
-      "value": 7.989157722989778,
-      "display": "7.9892",
+      "value": 7.97897353588117,
+      "display": "7.9790",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/3/sd"
     },
     "econ_corporate_lending_score_change": {
-      "value": -0.10262237067838798,
-      "display": "-0.103",
+      "value": -0.1297075015430998,
+      "display": "-0.130",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1411,8 +1468,8 @@
       }
     },
     "econ_corporate_lending_band_low": {
-      "value": -0.34132036598258086,
-      "display": "-0.341",
+      "value": -0.37328724095613,
+      "display": "-0.373",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1426,8 +1483,8 @@
       }
     },
     "econ_corporate_lending_band_high": {
-      "value": 0.13607562462580491,
-      "display": "+0.136",
+      "value": 0.11387223786993037,
+      "display": "+0.114",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1457,14 +1514,14 @@
       }
     },
     "econ_household_lending_sd": {
-      "value": 11.243824905461855,
-      "display": "11.2438",
+      "value": 11.205029770492034,
+      "display": "11.2050",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/4/sd"
     },
     "econ_household_lending_score_change": {
-      "value": 0.2557930449849343,
-      "display": "+0.256",
+      "value": 0.24133797530105736,
+      "display": "+0.241",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1478,8 +1535,8 @@
       }
     },
     "econ_household_lending_band_low": {
-      "value": 0.0792339483964882,
-      "display": "+0.079",
+      "value": 0.06414810677389773,
+      "display": "+0.064",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1493,8 +1550,8 @@
       }
     },
     "econ_household_lending_band_high": {
-      "value": 0.4323521415733804,
-      "display": "+0.432",
+      "value": 0.41852784382821695,
+      "display": "+0.419",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1524,14 +1581,14 @@
       }
     },
     "econ_consumption_sd": {
-      "value": 9.748772394864156,
-      "display": "9.7488",
+      "value": 9.68101427035291,
+      "display": "9.6810",
       "kind": "coef",
       "source": "model/artifact.json#/economic_size_plus_one_sd/5/sd"
     },
     "econ_consumption_score_change": {
-      "value": -0.004375702159523459,
-      "display": "-0.004",
+      "value": -0.015193588414566805,
+      "display": "-0.015",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1545,8 +1602,8 @@
       }
     },
     "econ_consumption_band_low": {
-      "value": -0.12611459123199398,
-      "display": "-0.126",
+      "value": -0.13396858540031314,
+      "display": "-0.134",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1560,8 +1617,8 @@
       }
     },
     "econ_consumption_band_high": {
-      "value": 0.11736318691294705,
-      "display": "+0.117",
+      "value": 0.10358140857117952,
+      "display": "+0.104",
       "kind": "score",
       "source": {
         "derived_from": [
@@ -1621,12 +1678,12 @@
           "model/artifact.json#/robustness_checks/checks/0/estimator_converged",
           "model/artifact.json#/robustness_checks/checks/1/estimator_converged"
         ],
-        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+        "method": "For each kind of check, the first specification in id order whose estimator converged and whose target is comparable with the main -1/0/+1 score. The rule does not look at RMSE ratios, signs or survival."
       }
     },
     "robustness_short_alternative_specification": {
-      "value": "RB03",
-      "display": "RB03",
+      "value": "RB06",
+      "display": "RB06",
       "kind": "text",
       "source": {
         "derived_from": [
@@ -1634,7 +1691,7 @@
           "model/artifact.json#/robustness_checks/checks/5/estimator_converged",
           "model/artifact.json#/robustness_checks/checks/6/estimator_converged"
         ],
-        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+        "method": "For each kind of check, the first specification in id order whose estimator converged and whose target is comparable with the main -1/0/+1 score. The rule does not look at RMSE ratios, signs or survival."
       }
     },
     "robustness_short_alternative_measure": {
@@ -1648,24 +1705,24 @@
           "model/artifact.json#/robustness_checks/checks/7/estimator_converged",
           "model/artifact.json#/robustness_checks/checks/8/estimator_converged"
         ],
-        "method": "For each kind of check, the first specification in id order whose estimator converged. The rule does not look at RMSE ratios, signs or survival."
+        "method": "For each kind of check, the first specification in id order whose estimator converged and whose target is comparable with the main -1/0/+1 score. The rule does not look at RMSE ratios, signs or survival."
       }
     },
     "robustness_RB09_household_lending_coef": {
-      "value": 0.31004857943976666,
-      "display": "0.3100",
+      "value": 0.3650746392621127,
+      "display": "0.3651",
       "kind": "coef",
       "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/estimate"
     },
     "robustness_RB09_household_lending_p_raw": {
-      "value": 0.28094410263690495,
-      "display": "0.281",
+      "value": 0.2006818171657191,
+      "display": "0.201",
       "kind": "p",
       "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/p_value"
     },
     "robustness_RB09_household_lending_p_holm": {
-      "value": 0.6508124804742613,
-      "display": "0.651",
+      "value": 0.45232824551244477,
+      "display": "0.452",
       "kind": "p",
       "source": "model/artifact.json#/robustness_checks/checks/8/coefficients/4/p_value_adjusted"
     },
@@ -1693,8 +1750,8 @@
       }
     },
     "power_inflation_mde": {
-      "value": 0.19638612928754046,
-      "display": "0.1964",
+      "value": 0.19764447875251692,
+      "display": "0.1976",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1705,8 +1762,8 @@
       }
     },
     "power_inflation_ratio": {
-      "value": 0.11198836420229687,
-      "display": "0.112",
+      "value": 0.19473063737539267,
+      "display": "0.195",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1717,8 +1774,8 @@
       }
     },
     "power_exports_mde": {
-      "value": 0.029299866552559475,
-      "display": "0.0293",
+      "value": 0.029103946706520892,
+      "display": "0.0291",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1729,8 +1786,8 @@
       }
     },
     "power_exports_ratio": {
-      "value": 0.46910422806136615,
-      "display": "0.469",
+      "value": 0.4510825820399723,
+      "display": "0.451",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1741,8 +1798,8 @@
       }
     },
     "power_imports_mde": {
-      "value": 0.05052337189787505,
-      "display": "0.0505",
+      "value": 0.05059046279770437,
+      "display": "0.0506",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1753,8 +1810,8 @@
       }
     },
     "power_imports_ratio": {
-      "value": -0.15422749228418295,
-      "display": "-0.154",
+      "value": -0.08766011863122071,
+      "display": "-0.088",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1765,8 +1822,8 @@
       }
     },
     "power_corporate_lending_mde": {
-      "value": 0.13776309525587196,
-      "display": "0.1378",
+      "value": 0.13859784885922316,
+      "display": "0.1386",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1777,8 +1834,8 @@
       }
     },
     "power_corporate_lending_ratio": {
-      "value": -0.3056870634202012,
-      "display": "-0.306",
+      "value": -0.3763999025365579,
+      "display": "-0.376",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1789,8 +1846,8 @@
       }
     },
     "power_household_lending_mde": {
-      "value": 0.0751412811424292,
-      "display": "0.0751",
+      "value": 0.07336921033747296,
+      "display": "0.0734",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1801,8 +1858,8 @@
       }
     },
     "power_household_lending_ratio": {
-      "value": 0.9997889167744669,
-      "display": "1.000",
+      "value": 0.948611161655695,
+      "display": "0.949",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1813,8 +1870,8 @@
       }
     },
     "power_consumption_mde": {
-      "value": 0.05871221002964152,
-      "display": "0.0587",
+      "value": 0.05632894670547377,
+      "display": "0.0563",
       "kind": "coef",
       "source": {
         "derived_from": [
@@ -1825,8 +1882,8 @@
       }
     },
     "power_consumption_ratio": {
-      "value": -0.025183394902477056,
-      "display": "-0.025",
+      "value": -0.08972408899468383,
+      "display": "-0.090",
       "kind": "ratio",
       "source": {
         "derived_from": [
@@ -1836,9 +1893,193 @@
         "method": "estimate / minimum detectable effect"
       }
     },
+    "rmse_ratio_ci_low": {
+      "value": 0.7795741042833366,
+      "display": "0.780",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/3/bootstrap_rmse_ratio_vs_hold/ci_low"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "rmse_ratio_ci_high": {
+      "value": 1.3346031687026227,
+      "display": "1.335",
+      "kind": "ratio",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/3/bootstrap_rmse_ratio_vs_hold/ci_high"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "dm_squared_error_p": {
+      "value": 0.9606947641423762,
+      "display": "0.961",
+      "kind": "p",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/3/dm_squared_error_vs_hold/p_value"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "rps_model": {
+      "value": 0.1542006474867259,
+      "display": "0.154",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/3/rps"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "rps_hold": {
+      "value": 0.19444444444444445,
+      "display": "0.194",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/0/rps"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "rps_class_frequency": {
+      "value": 0.15857193237673303,
+      "display": "0.159",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/1/rps"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "rps_persistence": {
+      "value": 0.2222222222222222,
+      "display": "0.222",
+      "kind": "stat",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/2/rps"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "dm_rps_p": {
+      "value": 0.2961766383695535,
+      "display": "0.296",
+      "kind": "p",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs/holdout_fixed_origin/specifications/3/dm_rps_vs_hold/p_value"
+        ],
+        "method": "read from the exploratory evaluation"
+      }
+    },
+    "verdict_inference_sentence": {
+      "value": "The 95% block-bootstrap interval for the RMSE ratio (0.780 to 1.335) contains 1, and the Diebold–Mariano test (HLN-corrected) gives p = 0.961, so on 18 holdout decisions the model cannot be distinguished from Always Hold in either direction.",
+      "display": "The 95% block-bootstrap interval for the RMSE ratio (0.780 to 1.335) contains 1, and the Diebold–Mariano test (HLN-corrected) gives p = 0.961, so on 18 holdout decisions the model cannot be distinguished from Always Hold in either direction.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs"
+        ],
+        "method": "src.app.verdict_inference_sentence"
+      }
+    },
+    "rps_supplementary_sentence": {
+      "value": "Supplementary measure (exploratory, added after the holdout had been seen; the pre-specified verdict stays RMSE-based): the ranked probability score on the same holdout (lower is better) is 0.154 for the model, 0.194 for Always Hold and 0.159 for the class frequencies of the estimation sample. Simple class frequencies do almost as well as the model, so the six factors add little beyond the base rates of cuts, holds and hikes; most of the gain over Always Hold comes from admitting that cuts and hikes happen.",
+      "display": "Supplementary measure (exploratory, added after the holdout had been seen; the pre-specified verdict stays RMSE-based): the ranked probability score on the same holdout (lower is better) is 0.154 for the model, 0.194 for Always Hold and 0.159 for the class frequencies of the estimation sample. Simple class frequencies do almost as well as the model, so the six factors add little beyond the base rates of cuts, holds and hikes; most of the gain over Always Hold comes from admitting that cuts and hikes happen.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs"
+        ],
+        "method": "src.app.rps_supplementary_sentence"
+      }
+    },
+    "policy_inertia_sentence": {
+      "value": "Policy-inertia specifications (exploratory only; P0 = inflation, its 3-month change, the ex-post real rate and the previous decision; P1 = P0 plus the other five factors, ridge). RPS of the specification vs the main model M0 — P0: rolling origin inside the estimation sample 0.165 vs 0.213; fixed-origin holdout 0.220 vs 0.154; recursive holdout 0.156 vs 0.148 | P1: rolling origin inside the estimation sample 0.173 vs 0.213; fixed-origin holdout 0.254 vs 0.154; recursive holdout 0.144 vs 0.148. P0 has the lower RPS in 1 of 3 designs; P1 has the lower RPS in 2 of 3 designs. The ranking depends on the evaluation design, which is instability, not an improvement; neither specification replaces the pre-specified model.",
+      "display": "Policy-inertia specifications (exploratory only; P0 = inflation, its 3-month change, the ex-post real rate and the previous decision; P1 = P0 plus the other five factors, ridge). RPS of the specification vs the main model M0 — P0: rolling origin inside the estimation sample 0.165 vs 0.213; fixed-origin holdout 0.220 vs 0.154; recursive holdout 0.156 vs 0.148 | P1: rolling origin inside the estimation sample 0.173 vs 0.213; fixed-origin holdout 0.254 vs 0.154; recursive holdout 0.144 vs 0.148. P0 has the lower RPS in 1 of 3 designs; P1 has the lower RPS in 2 of 3 designs. The ranking depends on the evaluation design, which is instability, not an improvement; neither specification replaces the pre-specified model.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/robust_eval.json#/designs"
+        ],
+        "method": "src.app.policy_inertia_sentence"
+      }
+    },
+    "holdout_update_sentence": {
+      "value": "Interpretation of the data update: the holdout is the last 18 usable decisions (2024-09-02 to 2026-10-27); appending a decision moves the unchanged chronological split rule, so the estimation and holdout windows shift with the data. 1 of these decisions (2026-10-27) took place after the specification was dated (2026-10-16); the other 17 had already been seen in earlier runs. The holdout is therefore partly newer data but still not an untouched confirmatory holdout.",
+      "display": "Interpretation of the data update: the holdout is the last 18 usable decisions (2024-09-02 to 2026-10-27); appending a decision moves the unchanged chronological split rule, so the estimation and holdout windows shift with the data. 1 of these decisions (2026-10-27) took place after the specification was dated (2026-10-16); the other 17 had already been seen in earlier runs. The holdout is therefore partly newer data but still not an untouched confirmatory holdout.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/sample/holdout_rows",
+          "data/processed/provenance.json#/project/spec_date_allowed"
+        ],
+        "method": "src.app.holdout_update_sentence"
+      }
+    },
+    "next_forecast_basis_sentence": {
+      "value": "The probabilities shown for the next NBK decision are the model's probabilities at the latest decision in the data (2026-10-27), computed from its factor month 2026-08 (decision month minus 2).",
+      "display": "The probabilities shown for the next NBK decision are the model's probabilities at the latest decision in the data (2026-10-27), computed from its factor month 2026-08 (decision month minus 2).",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/latest_prediction/date",
+          "config/release_lag.json"
+        ],
+        "method": "src.app.next_forecast_basis_sentence"
+      }
+    },
+    "main_result_label": {
+      "value": "Main result (ratio below 1, but not distinguishable from Always Hold)",
+      "display": "Main result (ratio below 1, but not distinguishable from Always Hold)",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/benchmark_comparison/winner",
+          "rmse_ratio_ci_low",
+          "rmse_ratio_ci_high",
+          "dm_squared_error_p"
+        ],
+        "method": "winner, and whether the bootstrap interval contains 1 and DM p >= 0.05"
+      }
+    },
+    "benchmark_limitation_sentence": {
+      "value": "**No distinguishable result against Always Hold.** The model meets the pre-specified criterion (RMSE ratio 0.995, below 1), but the difference cannot be told apart from zero, so this does not show that the model forecasts better.",
+      "display": "**No distinguishable result against Always Hold.** The model meets the pre-specified criterion (RMSE ratio 0.995, below 1), but the difference cannot be told apart from zero, so this does not show that the model forecasts better.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/artifact.json#/benchmark_comparison/winner",
+          "rmse_ratio_ci_low",
+          "rmse_ratio_ci_high",
+          "dm_squared_error_p"
+        ],
+        "method": "winner, and whether the bootstrap interval contains 1 and DM p >= 0.05"
+      }
+    },
+    "version_change_sentence": {
+      "value": "Effect of the data update (OLD = git tag before-data-update-2026-09-07, NEW = current files): usable decisions 88 → 89; estimation sample 70 → 71 decisions (ending 2024-06-03 → 2024-07-15); holdout 18 → 18 decisions (2024-07-15–2026-09-07 → 2024-09-02–2026-10-27). The holdout RMSE ratio changed from 1.002 to 0.995, so the pre-specified rule's label changed from \"does not meet the pre-specified criterion (RMSE ratio not below 1)\" to \"meets the pre-specified criterion (RMSE ratio below 1)\". 95% bootstrap intervals: OLD 0.828 to 1.230, NEW 0.780 to 1.335; both ratios lie inside both intervals, so the change does not show that the model forecasts better or worse than before.",
+      "display": "Effect of the data update (OLD = git tag before-data-update-2026-09-07, NEW = current files): usable decisions 88 → 89; estimation sample 70 → 71 decisions (ending 2024-06-03 → 2024-07-15); holdout 18 → 18 decisions (2024-07-15–2026-09-07 → 2024-09-02–2026-10-27). The holdout RMSE ratio changed from 1.002 to 0.995, so the pre-specified rule's label changed from \"does not meet the pre-specified criterion (RMSE ratio not below 1)\" to \"meets the pre-specified criterion (RMSE ratio below 1)\". 95% bootstrap intervals: OLD 0.828 to 1.230, NEW 0.780 to 1.335; both ratios lie inside both intervals, so the change does not show that the model forecasts better or worse than before.",
+      "kind": "text",
+      "source": {
+        "derived_from": [
+          "model/version_comparison.json#/sentence"
+        ],
+        "method": "src.compare.change_sentence (OLD artifact via git tag)"
+      }
+    },
     "headline_score_band_width": {
-      "value": 0.7784451596383354,
-      "display": "0.778",
+      "value": 0.8833197965829982,
+      "display": "0.883",
       "kind": "stat",
       "source": {
         "derived_from": [

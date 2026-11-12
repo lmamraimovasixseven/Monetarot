@@ -4,7 +4,7 @@
 
 > **These are options, not a decision.** The student chooses one (or none) and records the choice as `decision_rule_option` in `docs/facts_to_fill.md`. Current choice: **{{f.decision_rule_option}}**. Named user: **{{f.named_user}}**.
 >
-> Every option is a **monitoring** rule, not a forecast. {{n.verdict_sentence}} The model beats Always Hold in {{n.robustness_flipped_benchmark_count}} of {{n.robustness_check_count}} robustness checks, so the negative result is fragile too. No option claims predictive accuracy.
+> Every option is a **monitoring** rule, not a forecast. {{n.verdict_sentence}} {{n.verdict_inference_sentence}} The RMSE ratio is below 1 in {{n.robustness_beats_hold_count}} of {{n.robustness_comparable_check_count}} comparable robustness checks ({{n.robustness_noncomparable_ids}}, binary target, is not comparable); the benchmark conclusion differs from the main result in {{n.robustness_flipped_benchmark_count}} of them, so the main result is fragile. No option claims predictive accuracy.
 
 ## Facts the options use (all from `outputs/numbers_for_note.json`)
 

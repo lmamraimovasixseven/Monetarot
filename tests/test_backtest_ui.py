@@ -14,6 +14,13 @@ ROOT = Path(__file__).resolve().parents[1]
 APP_PATH = ROOT / "src" / "app.py"
 
 
+
+def _expected_benchmark_text() -> str:
+    """The verdict wording the app must show, from the stored winner and ratio (no typed result)."""
+    artifact = app.load_artifact()
+    comparison = artifact["benchmark_comparison"]
+    return app.verdict_rule_sentence(comparison["rmse_ratio_model_to_hold"], comparison["winner"])
+
 def test_app_is_read_only_and_renders_dashboard_sections_without_old_tabs():
     at = AppTest.from_file(str(APP_PATH)).run(timeout=30)
     assert not at.exception
@@ -25,7 +32,9 @@ def test_app_is_read_only_and_renders_dashboard_sections_without_old_tabs():
     assert all("probability-interval" in card and "95% CI" in card for card in cards)
     assert all("INCREASE</span>" not in card and "<strong>" not in card for card in cards)
     assert any("Both rounds use the latest available factor values" in item.value for item in at.caption)
-    assert any("Model does not beat the Always Hold benchmark" in item.value for item in at.warning)
+    assert any(_expected_benchmark_text() in item.value for item in at.warning)
+    # The verdict box always carries the generated inference sentence (D25).
+    assert any(app.verdict_inference_sentence(app.load_robust_eval()) in item.value for item in at.warning)
     assert any("Most likely at the next decision:" in item.value for item in at.caption)
     assert len(at.slider) == 1
 
@@ -140,11 +149,9 @@ def test_evidence_tables_use_artifact_metrics_and_defined_log_score_display():
     at = AppTest.from_file(str(APP_PATH)).run(timeout=30)
     assert not at.exception
     assert any("Always Hold assigns probability zero" in item.value for item in at.caption)
-    assert any("robustness results are mixed" in item.value for item in at.info)
-    assert any(
-        "Model does not beat the Always Hold benchmark on the holdout" in item.value
-        for item in at.caption
-    )
+    assert any("Robustness results are mixed" in item.value for item in at.info)
+    assert any(_expected_benchmark_text() in item.value for item in at.caption)
+    assert any("pre-specified verdict stays RMSE-based" in item.value for item in at.markdown)
     assert any(
         "first-differences household and corporate 12-month log growth and inflation" in item.value
         and "Total specifications run: 10" in item.value
@@ -176,9 +183,12 @@ def test_evidence_diagnostics_falsification_and_robustness_are_readable_tables()
 
     robustness = app._robustness_frame(artifact)
     assert len(robustness) == len(artifact["robustness_checks"]["checks"])
-    nonconverged = next(row for row in artifact["robustness_checks"]["checks"] if row["estimator_converged"] is False)
-    displayed = robustness.loc[robustness["Check"].str.startswith(nonconverged["specification_id"]), "Converged"].iloc[0]
-    assert displayed == "No — NOT CONVERGED"
+    for row in artifact["robustness_checks"]["checks"]:
+        shown = robustness.loc[robustness["Check"].str.startswith(row["specification_id"])].iloc[0]
+        assert shown["Converged"] == ("No — NOT CONVERGED" if row["estimator_converged"] is False else "Yes")
+        assert shown["Comparable with main score"] == (
+            "Yes" if app.robustness_check_is_comparable(row) else "No (binary target)")
+    assert robustness.loc[robustness["Check"].str.startswith("RB03"), "Comparable with main score"].iloc[0] != "Yes"
 
 
 def test_evidence_contains_no_raw_json_renderers_or_dict_writes():

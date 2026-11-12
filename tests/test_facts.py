@@ -28,6 +28,7 @@ TEMPLATE_LITERALS = {"0", "1", "2", "3", "12", "95", "100",  # 1-3 are also opti
 def root(tmp_path):
     """A temporary project tree holding copies of everything src.facts reads."""
     for relative in ("docs/facts_to_fill.csv", "docs/facts_to_fill.md", "config/release_lag.json", "docs/demo_script.md",
+                     "docs/model_spec.md", "docs/nbk_announcement_dates.csv", "config/nbk_decision_dates.csv",
                      "data/processed/model_panel.csv", "data/processed/nbk_decisions_clean.csv",
                      "outputs/numbers_for_note.json"):
         (tmp_path / relative).parent.mkdir(parents=True, exist_ok=True)
@@ -486,15 +487,41 @@ def test_indicator_origin_is_recorded_as_student_stated_and_never_as_approved():
 # ------------------------------------------------- release-lag upper bounds
 
 
+def _expected_bounds():
+    """Recompute the upper bounds independently from the form, the raw files and the model panel."""
+    import pandas as pd
+
+    raw_files = sorted(p.name for p in (ROOT / "data" / "raw").glob("*.csv"))
+    form = facts.load_series_facts(ROOT / "docs" / "facts_to_fill.csv", raw_files, date.today())
+    assumed = ingest.assumed_release_lag_months(ROOT / "config" / "release_lag.json")
+    panel = pd.read_csv(ROOT / "data" / "processed" / "model_panel.csv", parse_dates=["decision_date"])
+    usable = panel.dropna(subset=list(ingest.FEATURE_RULES) + ["y"])["decision_date"].reset_index(drop=True)
+    windows = (usable - (usable.dt.to_period("M") - assumed).dt.end_time.dt.normalize()).dt.days
+    expected = {}
+    for feature, (filename, _) in ingest.FEATURE_RULES.items():
+        row = form[filename]
+        csv_last = pd.read_csv(ROOT / "data" / "raw" / filename)["year_month"].astype(str).max()
+        match = re.search(r"Publication date refers to the edition ending (\d{4}-\d{2})\.", row["notes"])
+        last = match.group(1) if match else csv_last
+        if row["publication_date"] == "UNKNOWN":
+            expected[feature] = (None, None, last)
+        else:
+            bound = (date.fromisoformat(row["publication_date"]) - pd.Period(last, "M").end_time.date()).days
+            expected[feature] = (bound, int((windows < bound).sum()), last)
+    return form, expected, len(usable)
+
+
 def test_form_upper_bound_notes_match_the_computed_bounds():
     provenance = json.loads((ROOT / "data/processed/provenance.json").read_text(encoding="utf-8"))
     limitation = provenance["release_lag_limitation"]
-    raw_files = sorted(p.name for p in (ROOT / "data" / "raw").glob("*.csv"))
-    form = facts.load_series_facts(ROOT / "docs" / "facts_to_fill.csv", raw_files, date.today())
+    form, expected, total = _expected_bounds()
+    assert limitation["decisions"] == total
     for row in limitation["series"]:
         bound = row["upper_bound_days"]
+        assert (bound, row["decisions_where_bound_exceeds_window"], row["last_month"]) == expected[row["feature"]]
         note = form[row["series_file"]]["notes"]
-        assert f"Upper bound from file update date: {bound} day{'s' if bound != 1 else ''}; true release lag UNKNOWN." in note
+        shown = "UNKNOWN" if bound is None else f"{bound} day{'s' if bound != 1 else ''}"
+        assert f"Upper bound from file update date: {shown}" in note, row["series_file"]
         assert form[row["series_file"]]["release_lag_days"] == "UNKNOWN"
     assert "Upper bound from file update date: UNKNOWN; not applicable to the target." in form["base_rate_history.csv"]["notes"]
     consumption = form["consumption_history_updated.csv"]["notes"]
@@ -504,29 +531,47 @@ def test_form_upper_bound_notes_match_the_computed_bounds():
         assert row["revised_after_release"] == "UNKNOWN"
 
 
+def test_a_dated_edition_older_than_the_csv_is_used_for_the_bound():
+    """A publication date of an earlier edition is never paired with a month appended from a newer edition."""
+    form, expected, _ = _expected_bounds()
+    for feature, (filename, _) in ingest.FEATURE_RULES.items():
+        if "Publication date refers to the edition ending" in form[filename]["notes"]:
+            assert "UNKNOWN" in form[filename]["notes"], "the newer edition's own date must be stated as UNKNOWN"
+
+
 def test_limitation_text_is_consistent_with_the_strict_check_and_rb07():
     provenance = json.loads((ROOT / "data/processed/provenance.json").read_text(encoding="utf-8"))
     limitation = provenance["release_lag_limitation"]
     text = limitation["text"]
-    total = limitation["decisions"]
-    by_feature = {row["feature"]: row for row in limitation["series"]}
-    for feature in ("exports", "imports"):
-        assert by_feature[feature]["decisions_where_bound_exceeds_window"] == total
-    assert f"exports and imports at every decision ({total} of {total})" in text
-    consumption = by_feature["consumption"]["decisions_where_bound_exceeds_window"]
-    assert 0 < consumption < total and f"consumption at decisions early in the month ({consumption} of {total})" in text
-    for feature in ("inflation", "corporate_lending", "household_lending"):
-        assert by_feature[feature]["decisions_where_bound_exceeds_window"] == 0
+    _, expected, total = _expected_bounds()
+    # "Look-ahead cannot be excluded for N of M decisions for X (and for K of M decisions for Y)", recomputed.
+    groups: dict[int, list[str]] = {}
+    for feature, (_, count, _) in expected.items():
+        if count:
+            groups.setdefault(count, []).append(facts.FACTOR_LABELS[feature].lower())
+    for count, names in groups.items():
+        who = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+        assert f"{count} of {total} decisions for {who}" in text, (count, who)
+    if groups:
+        assert "Look-ahead cannot be excluded for " in text
+    for feature, (bound, count, _) in expected.items():
+        label = facts.FACTOR_LABELS[feature].lower()
+        assert (f"{label} UNKNOWN" if bound is None else f"{label} {bound} day") in text
+        if bound is None:
+            assert label in text.split("No upper bound is available for", 1)[1]
     window = limitation["window_days"]
     assert f"median {window['median']:g}; {window['min']} to {window['max']} across decisions" in text
-    check = (ROOT / "outputs" / "release_lag_check.md").read_text(encoding="utf-8")
+    check_md = (ROOT / "outputs" / "release_lag_check.md").read_text(encoding="utf-8")
     assert f"shortest window minus one day ({limitation['strict_tolerance_days']} days)" in text
-    assert f"| {limitation['strict_tolerance_days']} | UNKNOWN |" in check, "strict 30-day tolerance column unchanged"
-    assert "## Upper bounds from file update dates" in check
+    assert f"| {limitation['strict_tolerance_days']} | UNKNOWN |" in check_md, "strict tolerance column unchanged"
+    assert "## Upper bounds from file update dates" in check_md
     numbers = json.loads((ROOT / "outputs" / "numbers_for_note.json").read_text(encoding="utf-8"))["numbers"]
     assert numbers["robustness_RB07_name"]["display"] in text
     assert "a check that shifts only the trade series was not run" in text
-    assert text in (ROOT / "docs" / "validity_facts.md").read_text(encoding="utf-8")
+    for generated in ("docs/validity_facts.md", "outputs/release_lag_check.md"):
+        assert text in (ROOT / generated).read_text(encoding="utf-8"), generated
+    demo = (ROOT / "docs" / "demo_script.md").read_text(encoding="utf-8")
+    assert facts.look_ahead_sentence(limitation["series"], total) in demo
 
 
 def test_app_shows_the_limitation_and_the_chosen_decision_rule(tmp_path):
@@ -622,7 +667,9 @@ def test_limitations_add_falsification_and_specification_timing_or_unknown(tmp_p
     note = dashboard.falsification_three_note(artifact)
     comparison = artifact["benchmark_comparison"]
     assert f"on the {comparison['holdout_n']} holdout decisions the RMSE ratio is {comparison['rmse_ratio_model_to_hold']:.3f}" in note
-    assert "the difference from 1 is too small to say the model is worse; we can only say it is not better" in note
+    falsified = next(item for item in artifact["falsification_verdicts"] if "RMSE ratio" in item["rule"])["verdict"] == "falsified"
+    assert ("the difference from 1 is too small to say the model is worse; we can only say it is not better" if falsified
+            else "the difference from 1 is too small to say the model is better; we can only say it is not worse") in note
     assert dashboard.falsification_three_note({}).endswith("UNKNOWN (not in the model artifact).")
     timing = dashboard.specification_timing_note(provenance)
     project = provenance["project"]
@@ -690,16 +737,21 @@ def test_why_panel_explains_with_generated_numbers_and_unknown_fallbacks(tmp_pat
     history = dashboard.load_data()
     latest = {name: float(value) for name, value in artifact["latest_feature_vector"].items()}
     _, low, high = dashboard.score_and_delta_band(artifact, latest)
-    items = dashboard.why_probabilities(artifact, history, "2026-07", latest, max(-1.0, low), min(1.0, high))
+    month = (pd.Period(artifact["latest_prediction"]["date"], "M") - ingest.ASSUMED_LAG_MONTHS).strftime("%Y-%m")
+    items = dashboard.why_probabilities(artifact, history, month, latest, max(-1.0, low), min(1.0, high))
     assert len(items) == 4
-    assert "conditional estimate" in items[0] and "only the date differs" in items[0] and "2026-07" in items[0]
+    assert "conditional estimate" in items[0] and "only the date differs" in items[0] and month in items[0]
     counts = pd.read_csv(ROOT / "data/processed/nbk_decisions_clean.csv")["decision"].str.strip().str.title().value_counts()
     assert f"{int(counts['Hold'])} of {int(counts.sum())} decisions" in items[1]
     assert "overlap" in items[2] and "includes zero" in items[2]
     comparison = artifact["benchmark_comparison"]
     assert f"On the {comparison['holdout_n']} holdout decisions the RMSE ratio is {comparison['rmse_ratio_model_to_hold']:.3f}" in items[3]
     assert f"p = {artifact['diagnostics']['joint_slope_lr']['p_value']:.3f}" in items[3]
-    assert items[3].endswith("This is a limitation of the model, not a data error.")
+    if comparison["rmse_ratio_model_to_hold"] >= 1:
+        assert items[3].endswith("This is a limitation of the model, not a data error.")
+    else:
+        assert "so the model meets the pre-specified criterion against Always Hold" in items[3]
+        assert "This does not show that the model forecasts better." in items[3] and "beats" not in items[3]
     assert not any("forecasts the next decision" in item for item in items)
     empty = dashboard.why_probabilities({}, pd.DataFrame(), "", {}, -0.1, 0.1)
     assert "UNKNOWN" in empty[0] and all("UNKNOWN" in item for item in empty[1:])

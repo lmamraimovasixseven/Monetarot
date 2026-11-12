@@ -105,7 +105,9 @@ def test_oos_comparison_shows_undefined_hold_log_score_and_artifact_verdict(gene
     comparison = ARTIFACT["benchmark_comparison"]
     assert f"RMSE ratio (ordered logit / Always Hold): {comparison['rmse_ratio_model_to_hold']:.3f}" in text
     beats = comparison["winner"] != "Always Hold" and comparison["rmse_ratio_model_to_hold"] < 1
-    assert ("Ordered logit beats Always Hold" if beats else "Ordered logit does not beat Always Hold") in text
+    assert ("Ordered logit meets the pre-specified criterion against Always Hold" if beats
+            else "Ordered logit does not beat Always Hold") in text
+    assert "beats Always Hold" not in text  # a ratio below 1 is never worded as a better model
     for label in ("Ordered logit", "Always Hold", "Class-frequency comparator"):
         assert f"| {label}" in text
 
@@ -134,13 +136,21 @@ def test_short_robustness_table_uses_a_result_blind_rule_and_reports_fragility(g
     assert sorted(ids) == sorted(c["specification_id"] for c in ARTIFACT["robustness_checks"]["checks"])
     by_id = {c["specification_id"]: c for c in ARTIFACT["robustness_checks"]["checks"]}
     for category, group in report.ROBUSTNESS_CATEGORIES.items():
-        expected = next((spec for spec in group if by_id[spec]["estimator_converged"]), "none")
+        expected = next((spec for spec in group if by_id[spec]["estimator_converged"]
+                         and app.robustness_check_is_comparable(by_id[spec])), "none")
         assert numbers[f"robustness_short_{category.lower().replace(' ', '_')}"]["value"] == expected
-    flipped = [spec for spec, c in by_id.items() if c["benchmark_conclusion"] not in {ARTIFACT["benchmark_comparison"]["winner"], "UNDETERMINED"}]
+    comparable = {spec: c for spec, c in by_id.items() if app.robustness_check_is_comparable(c)}
+    assert "RB03" not in comparable  # binary target (D24)
+    flipped = [spec for spec, c in comparable.items()
+               if c["benchmark_conclusion"] != "UNDETERMINED" and c["same_benchmark_conclusion_as_primary"] is False]
+    beats = [spec for spec, c in comparable.items() if c["benchmark_conclusion"] == "Model beats Hold"]
     assert numbers["robustness_flipped_benchmark_count"]["value"] == len(flipped)
+    assert numbers["robustness_beats_hold_count"]["value"] == len(beats)
+    assert numbers["robustness_comparable_check_count"]["value"] == len(comparable)
     text = (out / "robustness_table_short.md").read_text(encoding="utf-8")
-    assert f"in {len(flipped)} of {len(by_id)}" in text
-    assert "overturns the negative result" in text
+    assert f"in {len(beats)} of {len(comparable)}" in text
+    assert "RB03 is not comparable" in text
+    assert ("overturns the main result" in text) == bool(flipped)
     chosen_table = text.split("## All checks")[0]
     assert sum(line.startswith("| Alternative ") for line in chosen_table.splitlines()) == 3
     assert all(f"| {spec}: " not in chosen_table or spec in {numbers[k]["value"] for k in numbers if k.startswith("robustness_short_")}
@@ -168,8 +178,9 @@ def test_report_reads_only_artifact_and_processed_data(tmp_path):
     inputs = tmp_path / "inputs"
     payload = report.run(tmp_path / "out", inputs / "model/artifact.json",
                          inputs / "data/processed/nbk_decisions_clean.csv", inputs / "data/processed/model_panel.csv")
-    assert payload["inputs"] == ["model/artifact.json", "data/processed/nbk_decisions_clean.csv",
-                                 "data/processed/model_panel.csv"]
+    assert payload["inputs"] == ["model/artifact.json", "model/robust_eval.json",
+                                 "data/processed/nbk_decisions_clean.csv", "data/processed/model_panel.csv",
+                                 "data/processed/provenance.json"]
 
 
 def test_report_refuses_an_artifact_inconsistent_with_processed_data(tmp_path):
@@ -293,7 +304,8 @@ def test_check_compares_numbers_and_figures(generated, tmp_path):
     out, payload = generated
     altered = json.loads(json.dumps(payload))
     altered["numbers"]["n_holdout"]["value"] += 1
-    altered["numbers"]["oos_winner"]["value"] = "Ordered Logit"
+    altered["numbers"]["oos_winner"]["value"] = (
+        "Always Hold" if payload["numbers"]["oos_winner"]["value"] != "Always Hold" else "Ordered Logit")
     altered_path = tmp_path / "numbers.json"
     altered_path.write_text(json.dumps(altered), encoding="utf-8")
     result = check.Report()
@@ -465,12 +477,13 @@ def test_main_results_still_fail_at_one_thousandth(tmp_path):
     results = (OUTPUTS / "results_table.md").read_text(encoding="utf-8")
     oos = (OUTPUTS / "oos_comparison.md").read_text(encoding="utf-8")
     household = next(line for line in results.splitlines() if line.startswith("| Household lending |"))
+    ratio = float(re.search(r"RMSE ratio \(ordered logit / Always Hold\): ([0-9]+\.[0-9]+)", oos).group(1))
     cells = [cell.strip() for cell in household.strip("|").split("|")]
     for name, text, old, new in [
         ("results_table.md", results, household, household.replace(cells[1], f"{float(cells[1]) + 1e-3:.4f}", 1)),
         ("results_table.md", results, household, household.replace(cells[4], f"{float(cells[4]) + 1e-3:.3f}", 1)),
-        ("oos_comparison.md", oos, "RMSE ratio (ordered logit / Always Hold): 1.002",
-         "RMSE ratio (ordered logit / Always Hold): 1.003"),
+        ("oos_comparison.md", oos, f"RMSE ratio (ordered logit / Always Hold): {ratio:.3f}",
+         f"RMSE ratio (ordered logit / Always Hold): {ratio + 1e-3:.3f}"),
     ]:
         assert old in text and old != new
         result = _compare(tmp_path, name, text, text.replace(old, new, 1))

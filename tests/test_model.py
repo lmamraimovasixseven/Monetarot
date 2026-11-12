@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -107,14 +108,14 @@ def test_falsification_rules_and_finite_class_frequency_comparator(fitted_artifa
     assert comparator["label"] == "added after the specification freeze, secondary"
     assert np.isclose(sum(comparator["probabilities"].values()), 1.0)
     assert np.isfinite(comparator["log_score"])
-    assert artifact["benchmark_comparison"]["winner"] == "Always Hold"
+    assert artifact["benchmark_comparison"]["winner"] == ("Always Hold" if ratio >= 1 else "Ordered Logit")
     report = (fitted_artifact["output_dir"] / "falsification_verdicts.md").read_text(encoding="utf-8")
     assert "p-value family" in report
     assert "transparency" in report
     annex = (fitted_artifact["output_dir"] / "annex_diagnostics.md").read_text(encoding="utf-8")
     assert "## Limitations of the unit-root tests" in annex
     assert "irregularly spaced" in annex
-    assert "88 usable observations" in annex
+    assert f"{fitted_artifact['artifact']['sample']['usable_n']} usable observations" in annex
     assert "all regressors are I(0)" in annex
     assert "not supported for household lending" in annex
     assert "ambiguous for inflation and corporate lending" in annex
@@ -234,9 +235,10 @@ def test_estimation_rows_are_chronologically_disjoint_from_holdout(fitted_artifa
     sample = fitted_artifact["artifact"]["sample"]
     estimation = set(sample["estimation_rows"])
     holdout = set(sample["holdout_rows"])
-    assert sample["usable_n"] == 88
-    assert sample["holdout_n"] == 18
-    assert sample["estimation_n"] == 70
+    calendar = pd.read_csv(Path(__file__).resolve().parents[1] / "config" / "nbk_decision_dates.csv")
+    assert sample["usable_n"] == len(calendar) - 2  # the first two decisions lack 12-month growth
+    assert sample["holdout_n"] == math.ceil(0.2 * sample["usable_n"])
+    assert sample["estimation_n"] == sample["usable_n"] - sample["holdout_n"]
     assert estimation.isdisjoint(holdout)
     assert max(estimation) < min(holdout)
     assert sample["estimation_end"] < sample["holdout_start"]

@@ -286,12 +286,33 @@ def main() -> tuple[int, int]:
     panel = build_panel()
     print(f"Decision rows: {len(panel)}")
     print(f"Panel: {DECISIONS_PATH.relative_to(ROOT)}")
+    from src import data_screen  # local import: data_screen imports this module
+
+    # Paths are read at call time so that a redirected panel (tests, src.check) gets its own screen files.
+    screen_md = CHECK_PATH.parent / data_screen.SCREEN_MD_PATH.name
+    screen = data_screen.write(raw_dir=RAW_DIR, decisions_path=DECISIONS_PATH,
+                               json_path=DECISIONS_PATH.parent / data_screen.SCREEN_JSON_PATH.name, md_path=screen_md)
+    print(f"Raw-data jump screen: {len(screen['flags'])} flagged months; entering the latest score: "
+          f"{len(screen['affecting_latest_score'])} ({screen_md.name}; values unchanged)")
     if original is None:
         print("No reference panel available; rebuild comparison was not generated.")
         return 0, 0
-    check, matching, differing = compare_cells(original, panel)
+    rebuilt = panel.copy()
+    rebuilt["decision_date"] = pd.to_datetime(rebuilt["decision_date"], errors="raise")
+    old_dates, new_dates = set(original["decision_date"]), set(rebuilt["decision_date"])
+    added = sorted(new_dates - old_dates)
+    removed = sorted(old_dates - new_dates)
+    # Decisions present in both panels must still match cell by cell; appended or
+    # dropped decision dates are listed separately instead of failing the comparison.
+    common_original = original[original["decision_date"].isin(new_dates)].reset_index(drop=True)
+    common_rebuilt = rebuilt[rebuilt["decision_date"].isin(old_dates)].reset_index(drop=True)
+    check, matching, differing = compare_cells(common_original, common_rebuilt)
     CHECK_PATH.parent.mkdir(parents=True, exist_ok=True)
     check.to_csv(CHECK_PATH, index=False)
+    print(f"Decision dates added since the reference panel: "
+          f"{', '.join(d.strftime('%Y-%m-%d') for d in added) or 'none'}")
+    print(f"Decision dates removed since the reference panel: "
+          f"{', '.join(d.strftime('%Y-%m-%d') for d in removed) or 'none'}")
     print(f"Compared cells (excluding the date key): {len(check)}")
     print(f"Matching cells: {matching}")
     print(f"Differing cells: {differing}")
