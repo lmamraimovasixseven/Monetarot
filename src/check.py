@@ -112,6 +112,19 @@ def _short(values: list[float], limit: int = 8) -> str:
     return f"[{shown}{more}]"
 
 
+# D32. Robust standard errors and p-values of the main model (numbers_for_note.json keys) are second-order
+# results of the optimizer's stopping point: a last-bit change of the inputs moves them by about 2e-6 while
+# the estimates move by about 3e-9. Beyond the coefficient tolerance they are accepted within
+# CROSS_PLATFORM_TOLERANCE (absolute and relative) and reported as WARN with both values.
+SE_OR_P_KEY = re.compile(r"^(se_|p_raw_|p_holm_)\w+$|^cutpoint_\d+_(se|p_raw)$")
+SE_OR_P_NOTE = "platform-sensitive (robust SE or p-value, optimizer stopping point)"
+
+
+def within_cross_platform(a: float, b: float) -> bool:
+    """Public alias used by src.regression (D32)."""
+    return _within_cross_platform(a, b)
+
+
 def _within_cross_platform(a: float, b: float) -> bool:
     difference = abs(a - b)
     scale = max(abs(a), abs(b))
@@ -215,6 +228,11 @@ def compare_numbers(report: Report, committed: Path, rebuilt: Path, tolerance: f
         if key in PLATFORM_SENSITIVE_KEYS and a != b:
             # Checked first: a convergence flag is a bool, which Python would otherwise treat as a number.
             report.add("WARN", item, f"{PLATFORM_NOTE}: committed={a!r} rebuilt={b!r}")
+        elif (_finite(a) and _finite(b) and abs(a - b) > tolerance and SE_OR_P_KEY.match(key)
+              and _within_cross_platform(a, b)):
+            # D32: robust SEs and p-values move by about 1e-6 when the optimizer stops at a slightly different
+            # point on another platform; estimates, the RMSE ratio and the headline keep the strict tolerance.
+            report.add("WARN", item, f"{SE_OR_P_NOTE}: committed={a!r} rebuilt={b!r} |diff|={abs(a - b):.3g}")
         elif _finite(a) and _finite(b):
             report.check(item, a, b, headline_tolerance if key in headline_keys else tolerance)
         else:

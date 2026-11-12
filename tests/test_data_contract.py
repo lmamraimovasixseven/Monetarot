@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from _tolerance import same_within_float_tolerance
 from src import data_screen, facts, ingest
 
 
@@ -120,9 +121,16 @@ def test_processed_panels_equal_a_fresh_rebuild(tmp_path):
 
 def test_data_screen_output_matches_a_fresh_screen():
     committed = json.loads((ROOT / "data" / "processed" / "data_anomalies.json").read_text(encoding="utf-8"))
-    fresh = data_screen.build_screen()
-    assert committed == json.loads(json.dumps(fresh))
+    fresh = json.loads(json.dumps(data_screen.build_screen()))
+    # Same flags, months and texts exactly; computed floats (logs, medians) within 1e-9 relative (D32).
+    assert same_within_float_tolerance(committed, fresh)
     assert committed["latest_decision"] == ARTIFACT["sample"]["usable_end"]
+
+
+def test_float_tolerance_helper_accepts_last_digit_noise_only():
+    assert same_within_float_tolerance({"z": [3.9000000000000004, "x"]}, {"z": [3.9, "x"]})
+    assert not same_within_float_tolerance({"z": [3.9001]}, {"z": [3.9]})
+    assert not same_within_float_tolerance({"month": "2026-06"}, {"month": "2026-07"})
 
 
 # ----------------------------------------------------------------- append-only guard

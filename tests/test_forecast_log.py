@@ -101,4 +101,6 @@ def test_committed_log_is_consistent_with_the_committed_scores():
     for row in rows:
         assert row["logged_at_utc"][:10] < row["target_decision_date"], "a forecast must be logged before its date"
     committed = json.loads((ROOT / "data" / "processed" / "forecast_scores.json").read_text(encoding="utf-8"))
-    assert committed == json.loads(json.dumps(fl.score_log(log)))
+    from _tolerance import same_within_float_tolerance
+
+    assert same_within_float_tolerance(committed, json.loads(json.dumps(fl.score_log(log))))  # floats: D32

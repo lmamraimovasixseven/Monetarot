@@ -100,12 +100,14 @@ def test_demo_script_has_six_steps_eighteen_questions_and_real_file_references()
         if not path.endswith("/"):
             assert (ROOT / path).exists(), path
     # GitHub treats owner/repository names case-insensitively (.../monetarot.git and .../Monetarot.git are the
-    # same repository), so the remote is compared without regard to case.
-    remote = "https://github.com/lmamraimovasixseven/monetarot.git"
-    assert remote in text.lower()
+    # same repository), and actions/checkout records the remote without the ".git" suffix, so the remote is
+    # compared without regard to case and with an optional ".git".
+    remote = "https://github.com/lmamraimovasixseven/monetarot"
+    assert remote + ".git" in text.lower()
     git_config = ROOT / ".git" / "config"
     if git_config.is_file():  # a "Download ZIP" copy has no .git folder; the remote is then checked in the text only
-        assert remote in git_config.read_text(encoding="utf-8").lower()
+        urls = re.findall(r"(?m)^\s*url\s*=\s*(\S+)\s*$", git_config.read_text(encoding="utf-8"))
+        assert any(url.lower().removesuffix("/").removesuffix(".git") == remote for url in urls), urls
 
 
 def test_demo_answers_that_state_results_match_the_numbers():

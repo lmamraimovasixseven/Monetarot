@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
+from src.check import CROSS_PLATFORM_TOLERANCE, within_cross_platform
 from src.ingest import DECISIONS_PATH, RAW_DIR, build_model_panel
 from src.model import FEATURES, SEED, _fit_ordered, _named_parameter_covariance
 
@@ -68,9 +69,15 @@ def compare(artifact: dict, rebuilt: dict, tolerance: float) -> list[tuple[str, 
     """Rows of (status, item, committed, rebuilt, |difference|)."""
     lines = []
 
-    def add(item: str, committed: float, value: float) -> None:
+    def add(item: str, committed: float, value: float, second_order: bool = False) -> None:
         difference = abs(value - committed)
-        lines.append(("PASS" if difference <= tolerance else "FAIL", item, committed, value, difference))
+        ok = difference <= tolerance
+        if not ok and second_order:
+            # D32: robust SEs and p-values depend on where the optimizer stops; a last-bit change of the inputs
+            # (another platform, BLAS or library version) moves them by about 2e-6 while the estimates move by
+            # about 3e-9. They pass within the cross-platform tolerance of src.check (absolute and relative 1e-4).
+            ok = within_cross_platform(committed, value)
+        lines.append(("PASS" if ok else "FAIL", item, committed, value, difference))
 
     table = artifact["model"]["coefficient_table"]
     for name, entry in table.items():
@@ -79,8 +86,8 @@ def compare(artifact: dict, rebuilt: dict, tolerance: float) -> list[tuple[str, 
             lines.append(("FAIL", f"{name}: missing from the re-estimate", math.nan, math.nan, math.nan))
             continue
         add(f"{name} estimate", float(entry["coefficient_or_cutpoint"]), new["estimate"])
-        add(f"{name} robust SE (HC0)", float(entry["hc0_standard_error"]), new["se"])
-        add(f"{name} p-value", float(entry["p_value"]), new["p_value"])
+        add(f"{name} robust SE (HC0)", float(entry["hc0_standard_error"]), new["se"], second_order=True)
+        add(f"{name} p-value", float(entry["p_value"]), new["p_value"], second_order=True)
     add("log-likelihood", float(artifact["model"]["log_likelihood"]), rebuilt["log_likelihood"])
     return lines
 
@@ -96,7 +103,9 @@ def main(argv: list[str] | None = None) -> int:
     tolerance = float(artifact["replication_tolerance"]["coefficients_absolute"])
     rebuilt = reestimate(artifact, args.panel)
     print(f"Main ordered logit re-estimated in memory on {rebuilt['n_rows']} estimation rows "
-          f"(seed {artifact.get('seed', SEED)}); nothing is written. Tolerance {tolerance:g} (model/artifact.json).")
+          f"(seed {artifact.get('seed', SEED)}); nothing is written. Tolerance {tolerance:g} (model/artifact.json) for "
+          f"estimates and the log-likelihood; robust SEs and p-values also pass within {CROSS_PLATFORM_TOLERANCE:g} "
+          f"absolute and relative (cross-platform, D32).")
     rows_ok = rebuilt["rows_match"]
     print(f"{'PASS' if rows_ok else 'FAIL'}  estimation rows match model/artifact.json "
           f"(sample.estimation_rows, n = {len(artifact['sample']['estimation_rows'])})")

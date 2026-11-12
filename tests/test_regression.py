@@ -61,3 +61,18 @@ def test_readme_and_demo_describe_the_regression_command():
     assert "Run `python run.py regression`" in demo
     makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
     assert "regression:\n\t$(PYTHON) run.py regression" in makefile
+
+
+def test_last_bit_input_noise_passes_but_a_real_change_in_a_standard_error_fails(tmp_path, capsys):
+    """D32: re-estimating from the CSV copy of the panel changes the inputs only in the last binary digit, as
+    another platform or library version does; that must pass. A 0.1% change of a robust SE must still fail."""
+    code = regression.main(["--panel", str(ROOT / "data" / "processed" / "model_panel.csv")])
+    output = capsys.readouterr().out
+    assert code == 0, output
+    artifact = json.loads((ROOT / "model/artifact.json").read_text(encoding="utf-8"))
+    artifact["model"]["coefficient_table"]["cutpoint[Decrease|Hold]"]["hc0_standard_error"] *= 1.001
+    path = tmp_path / "artifact.json"
+    path.write_text(json.dumps(artifact), encoding="utf-8")
+    code = regression.main(["--artifact", str(path)])
+    output = capsys.readouterr().out
+    assert code == 1 and "FAIL  cutpoint[Decrease|Hold] robust SE (HC0)" in output

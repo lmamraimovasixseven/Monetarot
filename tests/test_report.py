@@ -488,3 +488,25 @@ def test_main_results_still_fail_at_one_thousandth(tmp_path):
         assert old in text and old != new
         result = _compare(tmp_path, name, text, text.replace(old, new, 1))
         assert result.failed >= 1, (name, new)
+
+def test_check_accepts_platform_noise_in_standard_errors_but_not_in_estimates(tmp_path):
+    """D32: a robust SE or p-value may differ by about 1e-6 across platforms (WARN); estimates may not (FAIL)."""
+    import json as _json
+
+    def numbers(se: float, coef: float, ratio: float) -> dict:
+        return {"verdict_sentence": "v", "numbers": {
+            "cutpoint_1_se": {"value": se, "source": "s"}, "coef_inflation": {"value": coef, "source": "s"},
+            "rmse_ratio": {"value": ratio, "source": "s"}}}
+
+    committed, rebuilt = tmp_path / "a.json", tmp_path / "b.json"
+    committed.write_text(_json.dumps(numbers(0.741266903329825, 0.0384874, 0.9949)), encoding="utf-8")
+    rebuilt.write_text(_json.dumps(numbers(0.7412645972217374, 0.0384874 + 2e-6, 0.9949 + 2e-6)), encoding="utf-8")
+    result = check.Report()
+    check.compare_numbers(result, committed, rebuilt, 1e-6, 1e-6, {"rmse_ratio"})
+    status = {item.rsplit(" ", 1)[-1]: state for state, item, _ in result.rows}
+    assert status == {"cutpoint_1_se": "WARN", "coef_inflation": "FAIL", "rmse_ratio": "FAIL"}
+    big = tmp_path / "c.json"
+    big.write_text(_json.dumps(numbers(0.741266903329825 * 1.001, 0.0384874, 0.9949)), encoding="utf-8")
+    result = check.Report()
+    check.compare_numbers(result, committed, big, 1e-6, 1e-6, {"rmse_ratio"})
+    assert ("FAIL", "outputs/numbers_for_note.json cutpoint_1_se") in [(s, i) for s, i, _ in result.rows]
