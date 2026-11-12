@@ -176,13 +176,28 @@ def _assign_p_value_families(records: list[dict[str, Any]]) -> None:
         row["p_value_holm"] = row["p_value_adjusted"]
 
 
-def _fit_ordered(frame: pd.DataFrame, seed: int = SEED, feature_names: list[str] | None = None):
-    """Fit fixed ordered logit and calculate HC0 score-sandwich covariance."""
+NEWTON_FALLBACK_MAXITER = 200
+
+
+def _fit_ordered(frame: pd.DataFrame, seed: int = SEED, feature_names: list[str] | None = None,
+                 newton_fallback: bool = False):
+    """Fit fixed ordered logit and calculate HC0 score-sandwich covariance.
+
+    With ``newton_fallback`` (robustness checks only, D33): when BFGS reports non-convergence, the fit is
+    continued with Newton's method (analytic Hessian) from the BFGS end point. On a flat likelihood (RB02,
+    32 estimation decisions) BFGS stops at different points on different platforms; Newton reaches the same
+    optimum from any nearby start. When BFGS converges, the result is exactly the BFGS result.
+    """
     np.random.seed(seed)
     endog = pd.Categorical(frame.y.astype(int), categories=[-1, 0, 1], ordered=True)
     feature_names = feature_names or FEATURES
     model = OrderedModel(endog, frame[feature_names].astype(float), distr="logit")
     result = model.fit(method="bfgs", maxiter=2000, disp=False, gtol=1e-8)
+    if newton_fallback and not result.mle_retvals.get("converged", False):
+        refined = model.fit(start_params=np.asarray(result.params, dtype=float), method="newton",
+                            maxiter=NEWTON_FALLBACK_MAXITER, disp=False)
+        if refined.mle_retvals.get("converged", False):
+            result = refined
     params = np.asarray(result.params, dtype=float)
     score_rows = np.asarray(model.score_obs(params), dtype=float)
     hessian = np.asarray(model.hessian(params), dtype=float)
@@ -472,7 +487,7 @@ def _run_robustness_checks(usable: pd.DataFrame, raw_dir: Path,
                                          "p_value": p_value, "p_value_adjusted": None,
                                          "_record_index": None})
             else:
-                ordered_model, fitted, covariance = _fit_ordered(train, seed=SEED)
+                ordered_model, fitted, covariance = _fit_ordered(train, seed=SEED, newton_fallback=True)
                 converged = bool(fitted.mle_retvals.get("converged", False))
                 params = np.asarray(fitted.params, dtype=float)
                 p = len(FEATURES)

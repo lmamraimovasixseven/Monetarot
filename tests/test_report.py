@@ -510,3 +510,32 @@ def test_check_accepts_platform_noise_in_standard_errors_but_not_in_estimates(tm
     result = check.Report()
     check.compare_numbers(result, committed, big, 1e-6, 1e-6, {"rmse_ratio"})
     assert ("FAIL", "outputs/numbers_for_note.json cutpoint_1_se") in [(s, i) for s, i, _ in result.rows]
+
+
+def test_nonconverged_rb02_gives_warn_but_any_other_change_still_fails(tmp_path):
+    """D33: RB02 entries are WARN only when the rebuilt RB02 did not converge; other keys stay strict."""
+    import json as _json
+
+    def numbers(converged: bool, rb02: float, rb01: float, ratio: float) -> dict:
+        return {"verdict_sentence": "v", "numbers": {
+            "robustness_RB02_converged": {"value": converged, "source": "s"},
+            "robustness_RB02_rmse_ratio": {"value": rb02, "source": "s"},
+            "robustness_RB01_rmse_ratio": {"value": rb01, "source": "s"},
+            "rmse_ratio": {"value": ratio, "source": "s"}}}
+
+    def statuses(rebuilt: dict) -> dict:
+        committed, other = tmp_path / "a.json", tmp_path / "b.json"
+        committed.write_text(_json.dumps(numbers(True, 1.372, 0.899, 0.995)), encoding="utf-8")
+        other.write_text(_json.dumps(rebuilt), encoding="utf-8")
+        result = check.Report()
+        check.compare_numbers(result, committed, other, 1e-6, 1e-6, {"rmse_ratio"})
+        return {item.rsplit(" ", 1)[-1]: state for state, item, _ in result.rows}
+
+    nonconverged = statuses(numbers(False, 1.164, 0.899, 0.995))
+    assert nonconverged["robustness_RB02_rmse_ratio"] == "WARN"
+    assert nonconverged["robustness_RB02_converged"] == "WARN"
+    assert nonconverged["robustness_RB01_rmse_ratio"] == "PASS" and nonconverged["rmse_ratio"] == "PASS"
+    real_change = statuses(numbers(False, 1.164, 0.950, 0.996))
+    assert real_change["robustness_RB01_rmse_ratio"] == "FAIL" and real_change["rmse_ratio"] == "FAIL"
+    converged_but_different = statuses(numbers(True, 1.164, 0.899, 0.995))
+    assert converged_but_different["robustness_RB02_rmse_ratio"] == "FAIL"

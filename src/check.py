@@ -94,6 +94,8 @@ PLATFORM_SENSITIVE_LINE = re.compile(
     r"|\| Parameter stability LR \||LR stability unrestricted|parameter_stability"  # the stability LR test rows
     r"|^\| RB02 \||\| RB02: |\| Last 60 calendar months \|")  # robustness check RB02 rows
 PLATFORM_SENSITIVE_KEYS = {"robustness_RB02_converged"}
+RB02_KEY_PREFIX = "robustness_RB02_"
+RB02_NOTE = "platform-sensitive: RB02 did not converge on this platform (D33)"
 PLATFORM_NOTE = "platform-sensitive (optimizer did not converge)"
 # D14 update. (1) Spec-log rows of expanding-window fits record optimizer internals (fopt, gopt, ...).
 OPTIMIZER_INTERNALS_LINE = re.compile(r"\| expanding_window_fit \|")
@@ -220,12 +222,16 @@ def compare_numbers(report: Report, committed: Path, rebuilt: Path, tolerance: f
         report.add("FAIL", f"{label} keys",
                    f"only committed: {sorted(set(left['numbers']) - set(right['numbers']))}; "
                    f"only rebuilt: {sorted(set(right['numbers']) - set(left['numbers']))}")
+    # D33: when the rebuilt RB02 did not converge, every RB02 entry (but nothing else) is reported as WARN.
+    rb02_nonconverged = right["numbers"].get("robustness_RB02_converged", {}).get("value") is False
     for key, entry in left["numbers"].items():
         if key not in right["numbers"]:
             continue
         a, b = entry["value"], right["numbers"][key]["value"]
         item = f"{label} {key}"
-        if key in PLATFORM_SENSITIVE_KEYS and a != b:
+        if rb02_nonconverged and key.startswith(RB02_KEY_PREFIX) and a != b:
+            report.add("WARN", item, f"{RB02_NOTE}: committed={a!r} rebuilt={b!r}")
+        elif key in PLATFORM_SENSITIVE_KEYS and a != b:
             # Checked first: a convergence flag is a bool, which Python would otherwise treat as a number.
             report.add("WARN", item, f"{PLATFORM_NOTE}: committed={a!r} rebuilt={b!r}")
         elif (_finite(a) and _finite(b) and abs(a - b) > tolerance and SE_OR_P_KEY.match(key)

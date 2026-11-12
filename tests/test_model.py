@@ -250,3 +250,41 @@ def test_pipeline_does_not_import_legacy_classifier_runner():
     source = (ROOT / "src" / "model.py").read_text(encoding="utf-8")
     assert "outputs.legacy" not in source
     assert "src.app" not in source
+
+
+def test_newton_fallback_recovers_rb02_when_bfgs_stops_early(monkeypatch):
+    """D33: if BFGS stops before convergence (as on some platforms), the robustness fit continues with Newton
+    and reaches the committed RB02 estimates; without the fallback the same early stop is reported as such."""
+    import json as _json
+
+    import numpy as _np
+    import pandas as _pd
+    from statsmodels.miscmodels.ordinal_model import OrderedModel
+
+    from src import ingest as _ingest
+    from src import model as _model
+
+    root = Path(__file__).resolve().parents[1]
+    artifact = _json.loads((root / "model" / "artifact.json").read_text(encoding="utf-8"))
+    rb02 = next(c for c in artifact["robustness_checks"]["checks"] if c["specification_id"] == "RB02")
+    panel = _pd.read_csv(root / "data" / "processed" / "model_panel.csv", parse_dates=["decision_date"])
+    usable = panel.dropna(subset=_model.FEATURES + ["y"]).reset_index(drop=True)
+    definition = next(d for d in _model._robustness_definitions(usable, _ingest.RAW_DIR) if d["specification_id"] == "RB02")
+    frame = definition["base"].dropna(subset=_model.FEATURES + ["y"]).sort_values("decision_date").reset_index(drop=True)
+    train = frame.iloc[:-rb02["holdout_n"]].reset_index(drop=True)
+    original = OrderedModel.fit
+
+    def early_stop(self, *args, **kwargs):
+        if kwargs.get("method") == "bfgs":
+            kwargs["maxiter"] = 8
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(OrderedModel, "fit", early_stop)
+    _, plain, _ = _model._fit_ordered(train)
+    assert not plain.mle_retvals.get("converged", False)
+    _, fitted, covariance = _model._fit_ordered(train, newton_fallback=True)
+    assert fitted.mle_retvals.get("converged", False)
+    committed = _np.array([c["estimate"] for c in rb02["coefficients"]])
+    committed_se = _np.array([c["robust_se"] for c in rb02["coefficients"]])
+    assert _np.abs(_np.asarray(fitted.params)[:6] - committed).max() < 1e-6
+    assert _np.abs(_np.sqrt(_np.diag(covariance)[:6]) - committed_se).max() < 1e-4
