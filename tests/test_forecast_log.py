@@ -103,4 +103,6 @@ def test_committed_log_is_consistent_with_the_committed_scores():
     committed = json.loads((ROOT / "data" / "processed" / "forecast_scores.json").read_text(encoding="utf-8"))
     from _tolerance import same_within_float_tolerance
 
-    assert same_within_float_tolerance(committed, json.loads(json.dumps(fl.score_log(log))))  # floats: D32
+    fresh = fl.score_log(log)
+    fresh["reality_check_score"] = fl.reality_check_score(fresh)
+    assert same_within_float_tolerance(committed, json.loads(json.dumps(fresh)))  # floats: D32

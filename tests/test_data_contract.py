@@ -147,6 +147,7 @@ def _rows(text: str) -> list[str]:
 
 
 APPEND_ONLY = ([f"data/raw/{name}" for name in RAW_FILES]
+               + [f"data/raw/external/{p.name}" for p in sorted((RAW / "external").glob("*.csv"))]
                + ["config/nbk_decision_dates.csv", "docs/nbk_announcement_dates.csv", "docs/forecast_log.csv"])
 
 

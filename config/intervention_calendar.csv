@@ -1,0 +1,5 @@
+date,end_date,event,type,series_affected,source,note
+2026-01-01,,Повышение ставки НДС в Казахстане с 12% до 16%,level_shift,inflation_history.csv,UNKNOWN,Дата и ставки со слов владельца проекта (бриф); официальный документ и дата публикации UNKNOWN (TODO_HUMAN.md)
+2020-03-01,2020-06-30,Эпизод резкого падения и восстановления розничного товарооборота,temporary_episode,consumption_history_updated.csv,UNKNOWN,Найден экраном скачков (outputs/data_anomalies.md: 2020-04 -44.7 и 2020-06); причина в документах проекта не записана (UNKNOWN)
+2026-06-01,,Скачок экспорта на новый уровень,level_shift,export_history.csv,UNKNOWN,Найден экраном скачков; уровень держится в 2026-06...2026-08; проверка по источнику ждёт человека (TODO_HUMAN.md)
+2016-01-01,,Январское падение импорта (повторяется по годам),seasonal_break,import_history.csv,not applicable (data pattern),Флаги экрана скачков в 2016-01 2020-01 2021-01 2022-01 2026-01; трактуется как сезонный разрыв января а не ошибка

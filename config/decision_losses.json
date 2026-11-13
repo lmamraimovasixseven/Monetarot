@@ -1,0 +1,18 @@
+{
+  "status": "ДОПУЩЕНИЕ ПОЛЬЗОВАТЕЛЯ: значения потерь не подтверждены человеком (см. TODO_HUMAN.md)",
+  "decision": "Казначей или портфельный менеджер, держащий тенговые госбумаги, до заседания НБ РК 4 декабря 2026 решает, удлинять или сокращать дюрацию.",
+  "decision_status": "ждёт подтверждения человека",
+  "actions": ["lengthen", "keep", "shorten"],
+  "outcomes": ["Decrease", "Hold", "Increase"],
+  "loss_matrix_units": "условные единицы потерь (относительные, не тенге)",
+  "loss_matrix": {
+    "lengthen": [0.0, 1.0, 2.0],
+    "keep":     [1.0, 0.0, 1.0],
+    "shorten":  [2.0, 1.0, 0.0]
+  },
+  "binary_losses": {
+    "lengthen_but_no_cut": 1.0,
+    "not_lengthen_but_cut": 1.0
+  },
+  "sensitivity_ratios": [0.25, 0.5, 1.0, 2.0, 4.0]
+}

@@ -216,9 +216,25 @@ def render_markdown(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def reality_check_score(summary: dict[str, Any], decisions_path: Path = DECISIONS_PATH,
+                        artifact_path: Path = ARTIFACT_PATH) -> dict[str, Any] | None:
+    """Блок F: pinball, покрытие 80% и RPS для преререгистрированной цели, когда решение есть в данных."""
+    from src import prereg
+
+    artifact = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+    block = artifact.get("reality_check")
+    scored = [s for s in summary["scored"] if s["target_decision_date"] == prereg.TARGET_DATE]
+    if not block or not scored:
+        return None
+    decisions = pd.read_csv(decisions_path)
+    rate = decisions.loc[decisions["decision_date"] == scored[0]["effective_date"], "base_rate_after"]
+    return prereg.score_reality_check(block, float(rate.iloc[0]), scored[0]["actual"]) if len(rate) else None
+
+
 def write_scores(log_path: Path = LOG_PATH, decisions_path: Path = DECISIONS_PATH, json_path: Path = SCORES_JSON,
                  md_path: Path = SCORES_MD) -> dict[str, Any]:
     summary = score_log(log_path, decisions_path)
+    summary["reality_check_score"] = reality_check_score(summary, decisions_path)
     Path(json_path).parent.mkdir(parents=True, exist_ok=True)
     Path(json_path).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     Path(md_path).parent.mkdir(parents=True, exist_ok=True)

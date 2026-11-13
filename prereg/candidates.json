@@ -1,0 +1,22 @@
+{
+  "frozen_note": "Список заморожен 2026-11-13 до написания src/forecast_desk.py и до просмотра любых результатов прогноза рядов. Не редактировать: prereg-check сверяет хеш.",
+  "series": {
+    "inflation_yoy": {"file": "data/raw/inflation_history.csv", "column": "inflation", "seasonal": false, "note": "годовая инфляция y/y; m/m в проекте нет"},
+    "real_rate": {"definition": "базовая ставка НБ РК на конец месяца минус инфляция y/y того же месяца", "seasonal": false},
+    "imports_log": {"file": "data/raw/import_history.csv", "column": "imports_thousand_usd", "transform": "100*log", "seasonal": true, "note": "сезонный ряд для проверки сравнения с seasonal naive"},
+    "usd_kzt": {"file": "data/raw/external/usd_kzt_daily.csv", "transform": "среднее за месяц, 100*log", "seasonal": false, "note": "данных пока нет (шаблон)"}
+  },
+  "candidates": ["naive", "seasonal_naive", "mean12", "ses", "holt_damped", "holt_winters", "ar1", "arima_011", "arima_110", "arima_111", "arima_200"],
+  "benchmark": {"non_seasonal": "naive", "seasonal": "seasonal_naive"},
+  "horizons": [1, 2, 3],
+  "backtest": {
+    "design": "expanding window, all parameters re-estimated at every origin, data known at the origin only",
+    "first_origin_observations": 60,
+    "step": 1,
+    "label": "revised-data backtest"
+  },
+  "metrics": ["MAE", "RMSE", "pinball_q10", "pinball_q90", "coverage_80"],
+  "interval": {"nominal": 0.80, "methods": ["model formula", "empirical quantiles of past out-of-sample errors"]},
+  "selection_rule": "AICc сравнивается только между моделями с одинаковым d; модели в пределах 2 AICc — ничья, берётся более простая. Победитель бэктеста по MAE при h; разница с бенчмарком считается выигрышем только если тест Диболда–Мариано (HLN) даёт p < 0.05.",
+  "fallback_target_rule": "Запасная цель: инфляция y/y за ноябрь 2026 (БНС), горизонт 2 от последнего известного месяца 2026-09. Прогноз даёт модель с наименьшим MAE при h=2 в этом бэктесте; при ничьей (разница MAE < 1% или DM p >= 0.05 против naive) — naive."
+}

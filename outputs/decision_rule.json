@@ -1,0 +1,71 @@
+{
+  "decision": "Казначей или портфельный менеджер, держащий тенговые госбумаги, до заседания НБ РК 4 декабря 2026 решает, удлинять или сокращать дюрацию.",
+  "decision_status": "ждёт подтверждения человека",
+  "loss_status": "ДОПУЩЕНИЕ ПОЛЬЗОВАТЕЛЯ: значения потерь не подтверждены человеком (см. TODO_HUMAN.md)",
+  "loss_matrix": {
+    "lengthen": [
+      0.0,
+      1.0,
+      2.0
+    ],
+    "keep": [
+      1.0,
+      0.0,
+      1.0
+    ],
+    "shorten": [
+      2.0,
+      1.0,
+      0.0
+    ]
+  },
+  "binary_losses": {
+    "lengthen_but_no_cut": 1.0,
+    "not_lengthen_but_cut": 1.0
+  },
+  "probabilities": {
+    "Decrease": 0.38682571693731294,
+    "Hold": 0.5320707593181074,
+    "Increase": 0.08110352374457963
+  },
+  "probability_date": "2026-10-27",
+  "binary_threshold_p_cut": 0.5,
+  "p_cut": 0.38682571693731294,
+  "binary_action": "not_lengthen",
+  "expected_losses": {
+    "lengthen": 0.6942778068072667,
+    "keep": 0.46792924068189257,
+    "shorten": 1.3057221931927332
+  },
+  "best_action": "keep",
+  "sensitivity": [
+    {
+      "ratio_miss_to_false": 0.25,
+      "threshold": 0.8
+    },
+    {
+      "ratio_miss_to_false": 0.5,
+      "threshold": 0.6666666666666666
+    },
+    {
+      "ratio_miss_to_false": 1.0,
+      "threshold": 0.5
+    },
+    {
+      "ratio_miss_to_false": 2.0,
+      "threshold": 0.3333333333333333
+    },
+    {
+      "ratio_miss_to_false": 4.0,
+      "threshold": 0.2
+    }
+  ],
+  "holdout_loss_evaluation": {
+    "n": 18,
+    "first": "2024-09-02",
+    "last": "2026-10-27",
+    "model": 0.3888888888888889,
+    "always_hold": 0.3888888888888889,
+    "class_frequency": 0.3888888888888889
+  }
+}

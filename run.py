@@ -33,6 +33,15 @@ TASKS = {
     "regression": [[sys.executable, "-m", "src.regression"]],
     "test": [[sys.executable, "-m", "pytest", "-q"]],
     "needs": [[sys.executable, "-m", "src.data_needs"]],
+    "decision": [[sys.executable, "-m", "src.decision_rule"]],
+    "desk": [[sys.executable, "-m", "src.forecast_desk", "desk"]],
+    "corridor": [[sys.executable, "-m", "src.carry_corridor"]],
+    "traps": [[sys.executable, "-m", "src.traps"]],
+    "forecast": [[sys.executable, "-m", "src.forecast_desk", "forecast"]],
+    "model-card": [[sys.executable, "-m", "src.model_card"]],
+    "prereg": [[sys.executable, "-m", "src.prereg"]],
+    "prereg-check": [[sys.executable, "-m", "src.prereg", "check"]],
+    "ledger": [[sys.executable, "-m", "src.data_doc"], [sys.executable, "-m", "src.ledger"]],
     "compare": [[sys.executable, "-m", "src.compare"]],
     "forecast-log": [[sys.executable, "-m", "src.forecast_log", "log"]],
     "forecast-score": [[sys.executable, "-m", "src.forecast_log", "score"]],
@@ -140,9 +149,11 @@ def run_task(name: str, extra: list[str] | None = None) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     allow_abbrev=False)
     parser.add_argument("task", nargs="?", default="app", choices=["app", *TASKS])
-    parser.add_argument("extra", nargs="*", help="arguments passed to the task (e.g. dates for `needs`)")
+    parser.add_argument("extra", nargs=argparse.REMAINDER,
+                        help="arguments passed to the task in order (e.g. dates for `needs`, --series for `forecast`)")
     parser.add_argument("--port", type=int, default=None, help=f"dashboard port (default {DEFAULT_PORT})")
     parser.add_argument("--no-browser", action="store_true", help="do not open a browser tab")
     parser.add_argument("--healthcheck", action="store_true",

@@ -1,0 +1,8 @@
+{
+  "frozen_on": "2026-11-13",
+  "sha256": {
+    "prereg.md": "29cb3fc00b89f9b747367e9168e9a1e5b1074b7cb9c029bbd41ae30e8aba3d2c",
+    "candidates.json": "7fed4e3f96bd6bd9c3f6995a43995b12bcf711383202ed2325d043c43319c437"
+  },
+  "rule": "these files must not change after freezing; python run.py prereg-check fails otherwise"
+}

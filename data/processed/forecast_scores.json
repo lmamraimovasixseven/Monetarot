@@ -17,5 +17,6 @@
     "git_worktree": "uncommitted changes",
     "artifact_sha256": "8993051c88e81e1d7c1d98822c7efec100853e72ffe24a9a6a0cdf932f011633",
     "data_sha256": "81abaae0d987b7fce74bd7eb6ad80c684775d014666643e3b18dd0a47436a1a2"
-  }
+  },
+  "reality_check_score": null
 }

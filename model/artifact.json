@@ -3059,5 +3059,2870 @@
     "holdout_rule": "ceil(20 percent of usable n), last observations chronologically",
     "prior_exploration_disclosed": true,
     "not_preregistered": true
+  },
+  "decision": {
+    "decision": "Казначей или портфельный менеджер, держащий тенговые госбумаги, до заседания НБ РК 4 декабря 2026 решает, удлинять или сокращать дюрацию.",
+    "decision_status": "ждёт подтверждения человека",
+    "loss_status": "ДОПУЩЕНИЕ ПОЛЬЗОВАТЕЛЯ: значения потерь не подтверждены человеком (см. TODO_HUMAN.md)",
+    "loss_matrix": {
+      "lengthen": [
+        0.0,
+        1.0,
+        2.0
+      ],
+      "keep": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "shorten": [
+        2.0,
+        1.0,
+        0.0
+      ]
+    },
+    "binary_losses": {
+      "lengthen_but_no_cut": 1.0,
+      "not_lengthen_but_cut": 1.0
+    },
+    "probabilities": {
+      "Decrease": 0.38682571693731294,
+      "Hold": 0.5320707593181074,
+      "Increase": 0.08110352374457963
+    },
+    "probability_date": "2026-10-27",
+    "binary_threshold_p_cut": 0.5,
+    "p_cut": 0.38682571693731294,
+    "binary_action": "not_lengthen",
+    "expected_losses": {
+      "lengthen": 0.6942778068072667,
+      "keep": 0.46792924068189257,
+      "shorten": 1.3057221931927332
+    },
+    "best_action": "keep",
+    "sensitivity": [
+      {
+        "ratio_miss_to_false": 0.25,
+        "threshold": 0.8
+      },
+      {
+        "ratio_miss_to_false": 0.5,
+        "threshold": 0.6666666666666666
+      },
+      {
+        "ratio_miss_to_false": 1.0,
+        "threshold": 0.5
+      },
+      {
+        "ratio_miss_to_false": 2.0,
+        "threshold": 0.3333333333333333
+      },
+      {
+        "ratio_miss_to_false": 4.0,
+        "threshold": 0.2
+      }
+    ],
+    "holdout_loss_evaluation": {
+      "n": 18,
+      "first": "2024-09-02",
+      "last": "2026-10-27",
+      "model": 0.3888888888888889,
+      "always_hold": 0.3888888888888889,
+      "class_frequency": 0.3888888888888889
+    }
+  },
+  "evidence_ledger": {
+    "path": "ledger/evidence_ledger.csv",
+    "rows": 1891,
+    "sha256": "0c2b594bc2fa6acb13b71d9720f1e0849c661a09248905b59b05c765dc58755f"
+  },
+  "prereg": {
+    "frozen_on": "2026-11-13",
+    "sha256": {
+      "prereg.md": "29cb3fc00b89f9b747367e9168e9a1e5b1074b7cb9c029bbd41ae30e8aba3d2c",
+      "candidates.json": "7fed4e3f96bd6bd9c3f6995a43995b12bcf711383202ed2325d043c43319c437"
+    },
+    "unchanged": true
+  },
+  "reality_check": {
+    "target": "итог заседания НБ РК 2026-12-04 (ставка после решения)",
+    "current_rate": 15.75,
+    "current_rate_month": "2026-10",
+    "probabilities": {
+      "Decrease": 0.38682571693731294,
+      "Hold": 0.5320707593181074,
+      "Increase": 0.08110352374457963
+    },
+    "probability_date": "2026-10-27",
+    "step_distribution": {
+      "Decrease": {
+        "-2.5": 0.04,
+        "-2.0": 0.08,
+        "-1.0": 0.08,
+        "-0.5": 0.4,
+        "-0.25": 0.4
+      },
+      "Increase": {
+        "0.25": 0.29411764705882354,
+        "0.5": 0.17647058823529413,
+        "0.75": 0.058823529411764705,
+        "1.0": 0.11764705882352941,
+        "1.25": 0.058823529411764705,
+        "1.5": 0.11764705882352941,
+        "2.75": 0.058823529411764705,
+        "3.25": 0.058823529411764705,
+        "4.0": 0.058823529411764705
+      },
+      "Hold": {
+        "0.0": 1.0
+      }
+    },
+    "expected_rate": 15.596654752569263,
+    "interval_80": [
+      15.25,
+      15.75
+    ],
+    "median_rate": 15.75,
+    "benchmark_always_hold": 15.75,
+    "linked_forecast_log_row": {
+      "logged_at_utc": "2026-11-12T17:36:12+00:00",
+      "target_decision_date": "2026-12-04",
+      "based_on_decision": "2026-10-27",
+      "factor_month": "2026-08",
+      "model": "M0: pre-specified ordered logit (frozen; model/artifact.json)",
+      "p_decrease": 0.386826,
+      "p_hold": 0.532071,
+      "p_increase": 0.081104,
+      "expected_score": -0.305722,
+      "git_commit": "5425a175284d10c7f19a8a555f0cf0bc19af82f0",
+      "git_worktree": "uncommitted changes",
+      "artifact_sha256": "8993051c88e81e1d7c1d98822c7efec100853e72ffe24a9a6a0cdf932f011633",
+      "data_sha256": "81abaae0d987b7fce74bd7eb6ad80c684775d014666643e3b18dd0a47436a1a2"
+    },
+    "fallback_target": "инфляция y/y за ноябрь 2026 (БНС); m/m в данных нет; дата публикации UNKNOWN"
+  },
+  "forecast_desk": {
+    "label": "revised-data backtest",
+    "candidates_sha256": "7fed4e3f96bd6bd9c3f6995a43995b12bcf711383202ed2325d043c43319c437",
+    "nominal_coverage": 0.8,
+    "series": {
+      "inflation_yoy": {
+        "status": "ok",
+        "label": "revised-data backtest",
+        "n_observations": 141,
+        "first_month": "2015-01",
+        "last_month": "2026-09",
+        "first_origin_observations": 60,
+        "benchmark": "naive",
+        "n_origins": 81,
+        "n_models": 11,
+        "horizons": {
+          "1": {
+            "table": {
+              "naive": {
+                "n": 81,
+                "MAE": 0.4950617283950617,
+                "RMSE": 0.7487438039480643,
+                "pinball_q10": 0.16201356581631346,
+                "pinball_q90": 0.1574653276664562,
+                "coverage_formula": 0.9629629629629629,
+                "coverage_empirical": 0.7213114754098361,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 0.49743589743589733,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9571428571428572,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 81,
+                "MAE": 3.8580246913580245,
+                "RMSE": 5.1526931709136585,
+                "pinball_q10": 1.0219797054000963,
+                "pinball_q90": 0.963957831709249,
+                "coverage_formula": 0.8271604938271605,
+                "coverage_empirical": 0.6065573770491803,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 6.181838085009687e-14,
+                "MAE_without_event_windows": 3.921794871794872,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 81,
+                "MAE": 2.313683127572016,
+                "RMSE": 3.034017384317399,
+                "pinball_q10": 0.3823710231609129,
+                "pinball_q90": 0.5975405347141485,
+                "coverage_formula": 0.3950617283950617,
+                "coverage_empirical": 0.639344262295082,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 1.3283916340255983e-13,
+                "MAE_without_event_windows": 2.380448717948718,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.4142857142857143,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 0.0
+                }
+              },
+              "ses": {
+                "n": 81,
+                "MAE": 0.49506173453949126,
+                "RMSE": 0.7487438102600495,
+                "pinball_q10": 0.16136987028868316,
+                "pinball_q90": 0.1569217943872213,
+                "coverage_formula": 0.9629629629629629,
+                "coverage_empirical": 0.7213114754098361,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 7.512116013467166e-08,
+                "MAE_without_event_windows": 0.49743590368292284,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9571428571428572,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 81,
+                "MAE": 0.3221074029770289,
+                "RMSE": 0.6291052418925971,
+                "pinball_q10": 0.145627865880983,
+                "pinball_q90": 0.13619242411130647,
+                "coverage_formula": 0.9629629629629629,
+                "coverage_empirical": 0.7868852459016393,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 1.453836565433583e-06,
+                "MAE_without_event_windows": 0.32396757752935634,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9571428571428572,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 81,
+                "MAE": 0.5337983050183744,
+                "RMSE": 0.7955139282748876,
+                "pinball_q10": 0.16535207280306718,
+                "pinball_q90": 0.15856419013241857,
+                "coverage_formula": 0.9382716049382716,
+                "coverage_empirical": 0.7213114754098361,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 4.604486435190345e-07,
+                "MAE_without_event_windows": 0.538299170073909,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 81,
+                "MAE": 0.4883011893504861,
+                "RMSE": 0.7624426725857079,
+                "pinball_q10": 0.16372346123792417,
+                "pinball_q90": 0.1585477338479473,
+                "coverage_formula": 0.9629629629629629,
+                "coverage_empirical": 0.7049180327868853,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.4043325203119089,
+                "MAE_without_event_windows": 0.49170958580974966,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9571428571428572,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 81,
+                "MAE": 0.4115452332009647,
+                "RMSE": 0.6911075588805465,
+                "pinball_q10": 0.1423196338191021,
+                "pinball_q90": 0.13946589606704957,
+                "coverage_formula": 0.9382716049382716,
+                "coverage_empirical": 0.7704918032786885,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.001480280722665643,
+                "MAE_without_event_windows": 0.415552405830373,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 81,
+                "MAE": 0.3176865478699437,
+                "RMSE": 0.6185812547184018,
+                "pinball_q10": 0.14021817270601594,
+                "pinball_q90": 0.13337118055261138,
+                "coverage_formula": 0.9753086419753086,
+                "coverage_empirical": 0.7540983606557377,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 5.6413678543328174e-08,
+                "MAE_without_event_windows": 0.3184814249557398,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9714285714285714,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 81,
+                "MAE": 0.3566283666105375,
+                "RMSE": 0.6606591811495346,
+                "pinball_q10": 0.14303543558117351,
+                "pinball_q90": 0.1317780259109973,
+                "coverage_formula": 0.9629629629629629,
+                "coverage_empirical": 0.8032786885245902,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 2.7385663524830623e-06,
+                "MAE_without_event_windows": 0.3590210322308221,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9571428571428572,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 81,
+                "MAE": 0.35106692446879384,
+                "RMSE": 0.6338402338588925,
+                "pinball_q10": 0.14013296886329607,
+                "pinball_q90": 0.1290974120748587,
+                "coverage_formula": 0.9382716049382716,
+                "coverage_empirical": 0.7377049180327869,
+                "n_empirical": 61,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 7.366010009179043e-07,
+                "MAE_without_event_windows": 0.3555181745736506,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "arima_110",
+            "interval_choice": "покрытие 80% интервала у arima_110: формула 0.975, квантили прошлых ошибок 0.754; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "arima_110: MAE ниже бенчмарка naive, DM p = 0.000 < 0.05"
+          },
+          "2": {
+            "table": {
+              "naive": {
+                "n": 80,
+                "MAE": 0.94375,
+                "RMSE": 1.3318689875509526,
+                "pinball_q10": 0.25544229502067684,
+                "pinball_q90": 0.2560946192920261,
+                "coverage_formula": 0.85,
+                "coverage_empirical": 0.6949152542372882,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 0.9545454545454546,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 80,
+                "MAE": 3.90125,
+                "RMSE": 5.184604613661489,
+                "pinball_q10": 1.0326864623080425,
+                "pinball_q90": 0.97335765341974,
+                "coverage_formula": 0.825,
+                "coverage_empirical": 0.6101694915254238,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 7.212860702387682e-06,
+                "MAE_without_event_windows": 3.9675324675324677,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 80,
+                "MAE": 2.6221875000000003,
+                "RMSE": 3.418598158318049,
+                "pinball_q10": 0.4699736244943207,
+                "pinball_q90": 0.8187473496662034,
+                "coverage_formula": 0.35,
+                "coverage_empirical": 0.6271186440677966,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 1.31256859382378e-05,
+                "MAE_without_event_windows": 2.696753246753247,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.35714285714285715,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 0.0
+                }
+              },
+              "ses": {
+                "n": 80,
+                "MAE": 0.9437500058487058,
+                "RMSE": 1.3318689938400965,
+                "pinball_q10": 0.25513271518634645,
+                "pinball_q90": 0.2558553690102431,
+                "coverage_formula": 0.85,
+                "coverage_empirical": 0.6949152542372882,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 8.755637408406811e-05,
+                "MAE_without_event_windows": 0.9545454605446235,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 80,
+                "MAE": 0.6615399101666262,
+                "RMSE": 1.1256651381551932,
+                "pinball_q10": 0.23920934253298243,
+                "pinball_q90": 0.21860903535447213,
+                "coverage_formula": 0.925,
+                "coverage_empirical": 0.6949152542372882,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.004777631994910111,
+                "MAE_without_event_windows": 0.6672022401126287,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9142857142857143,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 80,
+                "MAE": 0.9955788271271231,
+                "RMSE": 1.406960297660478,
+                "pinball_q10": 0.2680090047562925,
+                "pinball_q90": 0.2665864553727271,
+                "coverage_formula": 0.8375,
+                "coverage_empirical": 0.6779661016949152,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.004570094819551476,
+                "MAE_without_event_windows": 1.009074318850602,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8142857142857143,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 80,
+                "MAE": 0.9362301900790001,
+                "RMSE": 1.370826492756579,
+                "pinball_q10": 0.2631870394647297,
+                "pinball_q90": 0.26305351646192354,
+                "coverage_formula": 0.8625,
+                "coverage_empirical": 0.711864406779661,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.7451518081423762,
+                "MAE_without_event_windows": 0.9496399676169087,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8428571428571429,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 80,
+                "MAE": 0.801145286167837,
+                "RMSE": 1.2224270535593136,
+                "pinball_q10": 0.2626465222692193,
+                "pinball_q90": 0.2542212495698478,
+                "coverage_formula": 0.9125,
+                "coverage_empirical": 0.7457627118644068,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 4.1521245981520605e-07,
+                "MAE_without_event_windows": 0.8068532259209558,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 80,
+                "MAE": 0.6587967557059418,
+                "RMSE": 1.1072377310733608,
+                "pinball_q10": 0.2574791431327193,
+                "pinball_q90": 0.2500905586876157,
+                "coverage_formula": 0.9375,
+                "coverage_empirical": 0.711864406779661,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.00027481447769368085,
+                "MAE_without_event_windows": 0.6632943357274256,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 80,
+                "MAE": 0.7184329835692325,
+                "RMSE": 1.1524751881184738,
+                "pinball_q10": 0.2628674415771027,
+                "pinball_q90": 0.25172929190013676,
+                "coverage_formula": 0.9375,
+                "coverage_empirical": 0.6949152542372882,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.00012536800003198087,
+                "MAE_without_event_windows": 0.7240444135549148,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 80,
+                "MAE": 0.710203070734593,
+                "RMSE": 1.1536393948352421,
+                "pinball_q10": 0.2449801206832886,
+                "pinball_q90": 0.25282272477883533,
+                "coverage_formula": 0.9125,
+                "coverage_empirical": 0.711864406779661,
+                "n_empirical": 59,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.006202847028664276,
+                "MAE_without_event_windows": 0.7207750455108242,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.9,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "arima_110",
+            "interval_choice": "покрытие 80% интервала у arima_110: формула 0.938, квантили прошлых ошибок 0.712; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "arima_110: MAE ниже бенчмарка naive, DM p = 0.000 < 0.05"
+          },
+          "3": {
+            "table": {
+              "naive": {
+                "n": 79,
+                "MAE": 1.3632911392405063,
+                "RMSE": 1.8707948625441324,
+                "pinball_q10": 0.35267055583793555,
+                "pinball_q90": 0.35575646331395705,
+                "coverage_formula": 0.7974683544303798,
+                "coverage_empirical": 0.6842105263157895,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 1.3855263157894737,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7714285714285715,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 79,
+                "MAE": 3.935443037974683,
+                "RMSE": 5.2155682239554855,
+                "pinball_q10": 1.0416676268358396,
+                "pinball_q90": 0.982662244789073,
+                "coverage_formula": 0.8227848101265823,
+                "coverage_empirical": 0.5789473684210527,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.0008973836496291604,
+                "MAE_without_event_windows": 4.003947368421053,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 79,
+                "MAE": 2.9190928270042193,
+                "RMSE": 3.776857061314789,
+                "pinball_q10": 0.5593255357301709,
+                "pinball_q90": 1.0296047245078659,
+                "coverage_formula": 0.3037974683544304,
+                "coverage_empirical": 0.5964912280701754,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.0010494468721449586,
+                "MAE_without_event_windows": 3.0015350877192986,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.2857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 0.0
+                }
+              },
+              "ses": {
+                "n": 79,
+                "MAE": 1.3632911450689356,
+                "RMSE": 1.8707948685865556,
+                "pinball_q10": 0.35259764484701844,
+                "pinball_q90": 0.3558044715161383,
+                "coverage_formula": 0.7974683544303798,
+                "coverage_empirical": 0.6842105263157895,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.0004047717199144163,
+                "MAE_without_event_windows": 1.3855263217303317,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7714285714285715,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 79,
+                "MAE": 1.0022341131766317,
+                "RMSE": 1.6199349125687734,
+                "pinball_q10": 0.3343245219908195,
+                "pinball_q90": 0.3073316304115816,
+                "coverage_formula": 0.8860759493670886,
+                "coverage_empirical": 0.7543859649122807,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.03278733106549703,
+                "MAE_without_event_windows": 1.0200405198631999,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8714285714285714,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 79,
+                "MAE": 1.4320097863162182,
+                "RMSE": 1.9634985121542705,
+                "pinball_q10": 0.37349634797996856,
+                "pinball_q90": 0.373313934188053,
+                "coverage_formula": 0.7974683544303798,
+                "coverage_empirical": 0.6842105263157895,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.006203879405175038,
+                "MAE_without_event_windows": 1.4575186437545866,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7714285714285715,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 79,
+                "MAE": 1.3787862560051125,
+                "RMSE": 1.945740143271329,
+                "pinball_q10": 0.3699485977432329,
+                "pinball_q90": 0.37128448927365565,
+                "coverage_formula": 0.7721518987341772,
+                "coverage_empirical": 0.6842105263157895,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.6914552265231944,
+                "MAE_without_event_windows": 1.4062742295291246,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7428571428571429,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 79,
+                "MAE": 1.231323365763544,
+                "RMSE": 1.7453582376309114,
+                "pinball_q10": 0.3479076669678238,
+                "pinball_q90": 0.35409694208247183,
+                "coverage_formula": 0.8734177215189873,
+                "coverage_empirical": 0.7017543859649122,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.008476065909835405,
+                "MAE_without_event_windows": 1.252778649346943,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8571428571428571,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 79,
+                "MAE": 1.0252251615479815,
+                "RMSE": 1.5944203665226087,
+                "pinball_q10": 0.3602088807757056,
+                "pinball_q90": 0.35516648160749414,
+                "coverage_formula": 0.9113924050632911,
+                "coverage_empirical": 0.7017543859649122,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.00471897402835881,
+                "MAE_without_event_windows": 1.0429865610767703,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 79,
+                "MAE": 1.1014743397704503,
+                "RMSE": 1.6437137872537895,
+                "pinball_q10": 0.3620367628524201,
+                "pinball_q90": 0.35308099873515825,
+                "coverage_formula": 0.9240506329113924,
+                "coverage_empirical": 0.7017543859649122,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.0037619114407815837,
+                "MAE_without_event_windows": 1.1210172952825843,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9142857142857143,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 79,
+                "MAE": 1.0468588136662036,
+                "RMSE": 1.6773710350078976,
+                "pinball_q10": 0.33549671851444873,
+                "pinball_q90": 0.38041251120439695,
+                "coverage_formula": 0.8987341772151899,
+                "coverage_empirical": 0.7192982456140351,
+                "n_empirical": 57,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.05813708146284311,
+                "MAE_without_event_windows": 1.0713306545676426,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8857142857142857,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "holt_damped",
+            "interval_choice": "покрытие 80% интервала у holt_damped: формула 0.886, квантили прошлых ошибок 0.754; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "holt_damped: MAE ниже бенчмарка naive, DM p = 0.033 < 0.05"
+          }
+        },
+        "differencing": {
+          "tests": {
+            "level": {
+              "adf_p": 0.26848852203267726,
+              "kpss_p": 0.1
+            },
+            "first_difference": {
+              "adf_p": 0.003658738956882588,
+              "kpss_p": 0.1
+            }
+          },
+          "models": {
+            "ar1": {
+              "d": 0,
+              "aicc": 392.00443136875276,
+              "ljung_box_p_lag12": 1.8029283656792388e-22,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 62.31438442526286,
+              "chosen_within_d": false
+            },
+            "arima_011": {
+              "d": 1,
+              "aicc": 335.5695292483672,
+              "ljung_box_p_lag12": 6.146936690693685e-08,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 6.911270520814469,
+              "chosen_within_d": false
+            },
+            "arima_110": {
+              "d": 1,
+              "aicc": 328.6582587275527,
+              "ljung_box_p_lag12": 6.919097203104844e-06,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            },
+            "arima_111": {
+              "d": 1,
+              "aicc": 329.7487468174525,
+              "ljung_box_p_lag12": 1.253369922892023e-05,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 1.090488089899793,
+              "chosen_within_d": false
+            },
+            "arima_200": {
+              "d": 0,
+              "aicc": 329.6900469434899,
+              "ljung_box_p_lag12": 5.708496067951979e-05,
+              "status": "ok (statespace)",
+              "n_params": 4,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            }
+          }
+        },
+        "ar1": [
+          {
+            "period": "весь ряд",
+            "n": 141,
+            "c": 0.2825246672234522,
+            "phi": 0.971825781036356,
+            "mean": 10.027772822665346,
+            "half_life_months": 24.253954746408322
+          },
+          {
+            "period": "начало – 2020-03",
+            "n": 62,
+            "c": 0.2954155550577374,
+            "phi": 0.959818137384681,
+            "mean": 7.35196269734676,
+            "half_life_months": 16.90130768566076
+          },
+          {
+            "period": "2020-03 – 2026-01",
+            "n": 70,
+            "c": 0.40580286812988703,
+            "phi": 0.9705210112031983,
+            "mean": 13.76583406327407,
+            "half_life_months": 23.164959838937833
+          },
+          {
+            "period": "2026-01 – 2026-06",
+            "n": 5,
+            "status": "слишком короткий (< 24 наблюдений)"
+          },
+          {
+            "period": "2026-06 – конец",
+            "n": 4,
+            "status": "слишком короткий (< 24 наблюдений)"
+          }
+        ],
+        "ar1_words": "отклонение от среднего 10.03 уменьшается вдвое примерно за 24.3 мес. (phi = 0.972)",
+        "current_forecasts": {
+          "naive": {
+            "series": "inflation_yoy",
+            "cutoff": "2026-09",
+            "method": "naive",
+            "n_used": 141,
+            "target_months": [
+              "2026-10",
+              "2026-11",
+              "2026-12"
+            ],
+            "point": [
+              9.3,
+              9.3,
+              9.3
+            ],
+            "lower_80": [
+              8.07763789587159,
+              7.571318934210688,
+              7.182806730402794
+            ],
+            "upper_80": [
+              10.522362104128412,
+              11.028681065789314,
+              11.417193269597208
+            ],
+            "status": "ok"
+          },
+          "arima_110": {
+            "series": "inflation_yoy",
+            "cutoff": "2026-09",
+            "method": "arima_110",
+            "n_used": 141,
+            "target_months": [
+              "2026-10",
+              "2026-11",
+              "2026-12"
+            ],
+            "point": [
+              9.006449907660553,
+              8.834106594235555,
+              8.732923803095566
+            ],
+            "lower_80": [
+              8.019565529144156,
+              6.982840126726686,
+              6.075530343052581
+            ],
+            "upper_80": [
+              9.99333428617695,
+              10.685373061744425,
+              11.390317263138552
+            ],
+            "status": "ok (statespace)"
+          }
+        }
+      },
+      "real_rate": {
+        "status": "ok",
+        "label": "revised-data backtest",
+        "n_observations": 133,
+        "first_month": "2015-09",
+        "last_month": "2026-09",
+        "first_origin_observations": 60,
+        "benchmark": "naive",
+        "n_origins": 73,
+        "n_models": 11,
+        "horizons": {
+          "1": {
+            "table": {
+              "naive": {
+                "n": 73,
+                "MAE": 0.5554794520547944,
+                "RMSE": 0.8641053652140929,
+                "pinball_q10": 0.1719288847215846,
+                "pinball_q90": 0.18507219171450742,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7735849056603774,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 0.5607142857142856,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 73,
+                "MAE": 2.6719178082191783,
+                "RMSE": 3.713456647649546,
+                "pinball_q10": 0.6153898614899295,
+                "pinball_q90": 0.8266694553261946,
+                "coverage_formula": 0.7808219178082192,
+                "coverage_empirical": 0.6792452830188679,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 3.737852159666082e-09,
+                "MAE_without_event_windows": 2.765,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.75,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 73,
+                "MAE": 1.6820776255707763,
+                "RMSE": 2.2851635625509066,
+                "pinball_q10": 0.3354011211581583,
+                "pinball_q90": 0.35044927165910356,
+                "coverage_formula": 0.5753424657534246,
+                "coverage_empirical": 0.6226415094339622,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 7.383621395357302e-08,
+                "MAE_without_event_windows": 1.7080357142857145,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.5625,
+                  "2026-01 – 2026-06": 0.4,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ses": {
+                "n": 73,
+                "MAE": 0.5554794555555468,
+                "RMSE": 0.8641053660503386,
+                "pinball_q10": 0.17140999063929063,
+                "pinball_q90": 0.18461174404803307,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7924528301886793,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.01912573733696644,
+                "MAE_without_event_windows": 0.5607142892160586,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 73,
+                "MAE": 0.5470126707214614,
+                "RMSE": 0.8625136740121424,
+                "pinball_q10": 0.16458215685305255,
+                "pinball_q90": 0.1837679919285201,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7735849056603774,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.205884906805511,
+                "MAE_without_event_windows": 0.5535240399092409,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 73,
+                "MAE": 0.6127168568663255,
+                "RMSE": 0.928918168392157,
+                "pinball_q10": 0.177583393678275,
+                "pinball_q90": 0.18414366334832638,
+                "coverage_formula": 0.9041095890410958,
+                "coverage_empirical": 0.8301886792452831,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.07157700473411509,
+                "MAE_without_event_windows": 0.6256761567551729,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.890625,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 73,
+                "MAE": 0.6544638331466635,
+                "RMSE": 0.9134516526996166,
+                "pinball_q10": 0.1792795071568676,
+                "pinball_q90": 0.17258752733167113,
+                "coverage_formula": 0.8904109589041096,
+                "coverage_empirical": 0.7547169811320755,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.0018428324188910995,
+                "MAE_without_event_windows": 0.6525022610683937,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 73,
+                "MAE": 0.5410552132351091,
+                "RMSE": 0.8770277490777513,
+                "pinball_q10": 0.17517837929535024,
+                "pinball_q90": 0.1859387871221088,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7735849056603774,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.23532483708116037,
+                "MAE_without_event_windows": 0.5468902999876487,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 73,
+                "MAE": 0.5368687333167714,
+                "RMSE": 0.8867275891110011,
+                "pinball_q10": 0.1773028330575956,
+                "pinball_q90": 0.18645808638327047,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7547169811320755,
+                "n_empirical": 53,
+                "statuses": [
+                  "fallback naive (failed (innovations_mle: AttributeError))",
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.2704202123296121,
+                "MAE_without_event_windows": 0.5429489621440226,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 73,
+                "MAE": 0.5230176086921285,
+                "RMSE": 0.8807582870412015,
+                "pinball_q10": 0.175755004162858,
+                "pinball_q90": 0.18753982960006452,
+                "coverage_formula": 0.9315068493150684,
+                "coverage_empirical": 0.7735849056603774,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.10041715244540206,
+                "MAE_without_event_windows": 0.5299105578585588,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.921875,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 73,
+                "MAE": 0.5945043150899372,
+                "RMSE": 0.9156578137015695,
+                "pinball_q10": 0.18376390466299203,
+                "pinball_q90": 0.1783568789873122,
+                "coverage_formula": 0.9041095890410958,
+                "coverage_empirical": 0.7169811320754716,
+                "n_empirical": 53,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.2670892063945938,
+                "MAE_without_event_windows": 0.5946302163748248,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.890625,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "arima_111",
+            "interval_choice": "покрытие 80% интервала у arima_111: формула 0.932, квантили прошлых ошибок 0.774; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "нет выигрыша у naive: наименьший MAE у arima_111, но DM p = 0.100"
+          },
+          "2": {
+            "table": {
+              "naive": {
+                "n": 72,
+                "MAE": 0.8999999999999999,
+                "RMSE": 1.2698151659023276,
+                "pinball_q10": 0.24484102318891765,
+                "pinball_q90": 0.25305333734700164,
+                "coverage_formula": 0.8888888888888888,
+                "coverage_empirical": 0.8431372549019608,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 0.9101449275362319,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.873015873015873,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 72,
+                "MAE": 2.681944444444445,
+                "RMSE": 3.7320868454823266,
+                "pinball_q10": 0.6230795144343122,
+                "pinball_q90": 0.8445072320902782,
+                "coverage_formula": 0.7777777777777778,
+                "coverage_empirical": 0.6666666666666666,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.001388684614166099,
+                "MAE_without_event_windows": 2.776811594202899,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.746031746031746,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 72,
+                "MAE": 1.8747685185185188,
+                "RMSE": 2.528687164717331,
+                "pinball_q10": 0.4273798863602222,
+                "pinball_q90": 0.4342575143282095,
+                "coverage_formula": 0.4722222222222222,
+                "coverage_empirical": 0.6666666666666666,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.003636249462858213,
+                "MAE_without_event_windows": 1.9107487922705317,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.4444444444444444,
+                  "2026-01 – 2026-06": 0.4,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ses": {
+                "n": 72,
+                "MAE": 0.9000000032182369,
+                "RMSE": 1.2698151674918368,
+                "pinball_q10": 0.24410904058281607,
+                "pinball_q90": 0.25286502496411717,
+                "coverage_formula": 0.8888888888888888,
+                "coverage_empirical": 0.8431372549019608,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.033251504859751646,
+                "MAE_without_event_windows": 0.9101449308080085,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.873015873015873,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 72,
+                "MAE": 0.8885040647340793,
+                "RMSE": 1.2686549585826088,
+                "pinball_q10": 0.23377361647933823,
+                "pinball_q90": 0.25674422707850764,
+                "coverage_formula": 0.875,
+                "coverage_empirical": 0.8235294117647058,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.49233146625232416,
+                "MAE_without_event_windows": 0.9007944193872016,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8571428571428571,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 72,
+                "MAE": 0.9646863136886838,
+                "RMSE": 1.363053019366125,
+                "pinball_q10": 0.2466335424205814,
+                "pinball_q90": 0.2796421172166046,
+                "coverage_formula": 0.8611111111111112,
+                "coverage_empirical": 0.8431372549019608,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.3815454282449918,
+                "MAE_without_event_windows": 0.9859885108392902,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8412698412698413,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 72,
+                "MAE": 1.0956715781494313,
+                "RMSE": 1.382394195843365,
+                "pinball_q10": 0.25560528341414257,
+                "pinball_q90": 0.2170659650815755,
+                "coverage_formula": 0.8333333333333334,
+                "coverage_empirical": 0.7647058823529411,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.029505671330028398,
+                "MAE_without_event_windows": 1.0928083673838704,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8095238095238095,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 72,
+                "MAE": 0.8830639873856061,
+                "RMSE": 1.2756064873482618,
+                "pinball_q10": 0.25849940709962893,
+                "pinball_q90": 0.25564085320271973,
+                "coverage_formula": 0.9166666666666666,
+                "coverage_empirical": 0.803921568627451,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.13540203072133128,
+                "MAE_without_event_windows": 0.8927547950267272,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9047619047619048,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 72,
+                "MAE": 0.8764883579130102,
+                "RMSE": 1.2885976631359994,
+                "pinball_q10": 0.2664530023379636,
+                "pinball_q90": 0.2591123179523689,
+                "coverage_formula": 0.9166666666666666,
+                "coverage_empirical": 0.803921568627451,
+                "n_empirical": 51,
+                "statuses": [
+                  "fallback naive (failed (innovations_mle: AttributeError))",
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.26289936479833476,
+                "MAE_without_event_windows": 0.8867170422897447,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9047619047619048,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 72,
+                "MAE": 0.8445215924995426,
+                "RMSE": 1.2788166743904321,
+                "pinball_q10": 0.2665997773289532,
+                "pinball_q90": 0.26356857449442905,
+                "coverage_formula": 0.9166666666666666,
+                "coverage_empirical": 0.7843137254901961,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.13637439697849577,
+                "MAE_without_event_windows": 0.8576280393633006,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9047619047619048,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 72,
+                "MAE": 1.0611650873597525,
+                "RMSE": 1.373158709810597,
+                "pinball_q10": 0.2686376545974083,
+                "pinball_q90": 0.2299659069688592,
+                "coverage_formula": 0.8888888888888888,
+                "coverage_empirical": 0.6862745098039216,
+                "n_empirical": 51,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.09678177578808335,
+                "MAE_without_event_windows": 1.061679542090756,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.873015873015873,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "arima_111",
+            "interval_choice": "покрытие 80% интервала у arima_111: формула 0.917, квантили прошлых ошибок 0.784; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "нет выигрыша у naive: наименьший MAE у arima_111, но DM p = 0.136"
+          },
+          "3": {
+            "table": {
+              "naive": {
+                "n": 71,
+                "MAE": 1.1739436619718309,
+                "RMSE": 1.6356826545754142,
+                "pinball_q10": 0.2942518684682613,
+                "pinball_q90": 0.32142369273234284,
+                "coverage_formula": 0.8732394366197183,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 1.1904411764705882,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8548387096774194,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 71,
+                "MAE": 2.693661971830986,
+                "RMSE": 3.751858694296979,
+                "pinball_q10": 0.6296504121449266,
+                "pinball_q90": 0.862531591379706,
+                "coverage_formula": 0.7746478873239436,
+                "coverage_empirical": 0.6530612244897959,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.02605548122546049,
+                "MAE_without_event_windows": 2.7904411764705883,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7419354838709677,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 71,
+                "MAE": 2.0488849765258212,
+                "RMSE": 2.7490233807885422,
+                "pinball_q10": 0.515543069410539,
+                "pinball_q90": 0.5052023376100812,
+                "coverage_formula": 0.4647887323943662,
+                "coverage_empirical": 0.673469387755102,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.03872459637867795,
+                "MAE_without_event_windows": 2.0952205882352937,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.45161290322580644,
+                  "2026-01 – 2026-06": 0.4,
+                  "2026-06 – конец": 0.75
+                }
+              },
+              "ses": {
+                "n": 71,
+                "MAE": 1.1739436649940385,
+                "RMSE": 1.6356826570187697,
+                "pinball_q10": 0.2933585209482374,
+                "pinball_q90": 0.3214506150864308,
+                "coverage_formula": 0.8732394366197183,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.05502052898364697,
+                "MAE_without_event_windows": 1.1904411791659455,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8548387096774194,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 71,
+                "MAE": 1.1741886044082517,
+                "RMSE": 1.633874619890924,
+                "pinball_q10": 0.2806013029444955,
+                "pinball_q90": 0.3291135238183116,
+                "coverage_formula": 0.8309859154929577,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.9884455544143544,
+                "MAE_without_event_windows": 1.194509506980227,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8064516129032258,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 71,
+                "MAE": 1.1945774847552157,
+                "RMSE": 1.7382461436957997,
+                "pinball_q10": 0.3065757539263012,
+                "pinball_q90": 0.37794538932357774,
+                "coverage_formula": 0.8450704225352113,
+                "coverage_empirical": 0.8163265306122449,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.8403217196733981,
+                "MAE_without_event_windows": 1.2201999222592013,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8225806451612904,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 71,
+                "MAE": 1.4421447306622315,
+                "RMSE": 1.7840197920780139,
+                "pinball_q10": 0.3537786997309095,
+                "pinball_q90": 0.2808766413473421,
+                "coverage_formula": 0.704225352112676,
+                "coverage_empirical": 0.7551020408163265,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.09514298905519597,
+                "MAE_without_event_windows": 1.439547484127935,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.6935483870967742,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 71,
+                "MAE": 1.1606484113326747,
+                "RMSE": 1.6345888386015517,
+                "pinball_q10": 0.31251827427297296,
+                "pinball_q90": 0.3221764083499387,
+                "coverage_formula": 0.9014084507042254,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.24193994066922136,
+                "MAE_without_event_windows": 1.180164503304244,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8870967741935484,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 71,
+                "MAE": 1.1551737956832124,
+                "RMSE": 1.6456954423932848,
+                "pinball_q10": 0.32419484868644466,
+                "pinball_q90": 0.325239138943638,
+                "coverage_formula": 0.9295774647887324,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "fallback naive (failed (innovations_mle: AttributeError))",
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.37500426357396943,
+                "MAE_without_event_windows": 1.1769196602262968,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9193548387096774,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 71,
+                "MAE": 1.1314858950477256,
+                "RMSE": 1.6317051042766813,
+                "pinball_q10": 0.33104977023198273,
+                "pinball_q90": 0.32906880607310535,
+                "coverage_formula": 0.9295774647887324,
+                "coverage_empirical": 0.7959183673469388,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.34986444618832035,
+                "MAE_without_event_windows": 1.1565353538403516,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9193548387096774,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 71,
+                "MAE": 1.4259904625212365,
+                "RMSE": 1.7702227780146413,
+                "pinball_q10": 0.3613616964143405,
+                "pinball_q90": 0.25774933990143784,
+                "coverage_formula": 0.8450704225352113,
+                "coverage_empirical": 0.7142857142857143,
+                "n_empirical": 49,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.14877534463181538,
+                "MAE_without_event_windows": 1.4340113635810137,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8225806451612904,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "arima_111",
+            "interval_choice": "покрытие 80% интервала у arima_111: формула 0.930, квантили прошлых ошибок 0.796; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "нет выигрыша у naive: наименьший MAE у arima_111, но DM p = 0.350"
+          }
+        },
+        "differencing": {
+          "tests": {
+            "level": {
+              "adf_p": 0.22441767388529682,
+              "kpss_p": 0.07315952147814793
+            },
+            "first_difference": {
+              "adf_p": 1.5503464447091723e-16,
+              "kpss_p": 0.1
+            }
+          },
+          "models": {
+            "ar1": {
+              "d": 0,
+              "aicc": 377.6537601609586,
+              "ljung_box_p_lag12": 0.1615392901870418,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 3.272794028588862,
+              "chosen_within_d": false
+            },
+            "arima_011": {
+              "d": 1,
+              "aicc": 371.1833938987674,
+              "ljung_box_p_lag12": 0.11792526069364836,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 0.8749600872491214,
+              "chosen_within_d": false
+            },
+            "arima_110": {
+              "d": 1,
+              "aicc": 370.3084338115183,
+              "ljung_box_p_lag12": 0.1715633441368594,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            },
+            "arima_111": {
+              "d": 1,
+              "aicc": 370.86902611428195,
+              "ljung_box_p_lag12": 0.24162786499708436,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 0.5605923027636663,
+              "chosen_within_d": false
+            },
+            "arima_200": {
+              "d": 0,
+              "aicc": 374.38096613236974,
+              "ljung_box_p_lag12": 0.691052517576552,
+              "status": "ok (statespace)",
+              "n_params": 4,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            }
+          }
+        },
+        "ar1": [
+          {
+            "period": "весь ряд",
+            "n": 133,
+            "c": 0.18977326698880556,
+            "phi": 0.934153032942551,
+            "mean": 2.882035049894335,
+            "half_life_months": 10.176130160102801
+          },
+          {
+            "period": "начало – 2020-03",
+            "n": 54,
+            "c": 0.3261711513332017,
+            "phi": 0.8502624842860922,
+            "mean": 2.178286114726201,
+            "half_life_months": 4.273142500721116
+          },
+          {
+            "period": "2020-03 – 2026-01",
+            "n": 70,
+            "c": 0.13570287929004693,
+            "phi": 0.9492550059106374,
+            "mean": 2.674212141025622,
+            "half_life_months": 13.309838283486409
+          },
+          {
+            "period": "2026-01 – 2026-06",
+            "n": 5,
+            "status": "слишком короткий (< 24 наблюдений)"
+          },
+          {
+            "period": "2026-06 – конец",
+            "n": 4,
+            "status": "слишком короткий (< 24 наблюдений)"
+          }
+        ],
+        "ar1_words": "отклонение от среднего 2.88 уменьшается вдвое примерно за 10.2 мес. (phi = 0.934)",
+        "current_forecasts": {
+          "arima_111": {
+            "series": "real_rate",
+            "cutoff": "2026-09",
+            "method": "arima_111",
+            "n_used": 133,
+            "target_months": [
+              "2026-10",
+              "2026-11",
+              "2026-12"
+            ],
+            "point": [
+              6.96556869529015,
+              6.9742354497154215,
+              6.979060043611577
+            ],
+            "lower_80": [
+              5.7315035503641845,
+              5.074254427589448,
+              4.519509968342419
+            ],
+            "upper_80": [
+              8.199633840216116,
+              8.874216471841395,
+              9.438610118880735
+            ],
+            "status": "ok (statespace)"
+          },
+          "naive": {
+            "series": "real_rate",
+            "cutoff": "2026-09",
+            "method": "naive",
+            "n_used": 133,
+            "target_months": [
+              "2026-10",
+              "2026-11",
+              "2026-12"
+            ],
+            "point": [
+              6.949999999999999,
+              6.949999999999999,
+              6.949999999999999
+            ],
+            "lower_80": [
+              5.686109287022352,
+              5.162588612349609,
+              4.760877069908261
+            ],
+            "upper_80": [
+              8.213890712977648,
+              8.73741138765039,
+              9.139122930091737
+            ],
+            "status": "ok"
+          }
+        }
+      },
+      "imports_log": {
+        "status": "ok",
+        "label": "revised-data backtest",
+        "n_observations": 140,
+        "first_month": "2015-01",
+        "last_month": "2026-08",
+        "first_origin_observations": 60,
+        "benchmark": "seasonal_naive",
+        "n_origins": 80,
+        "n_models": 11,
+        "horizons": {
+          "1": {
+            "table": {
+              "naive": {
+                "n": 80,
+                "MAE": 9.531669641770298,
+                "RMSE": 13.660770964051135,
+                "pinball_q10": 3.315258166527934,
+                "pinball_q90": 1.860569437150201,
+                "coverage_formula": 0.825,
+                "coverage_empirical": 0.8833333333333333,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.1376181065752231,
+                "MAE_without_event_windows": 9.531669641770298,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 80,
+                "MAE": 11.521732073553983,
+                "RMSE": 15.041529605233642,
+                "pinball_q10": 3.0221779809188845,
+                "pinball_q90": 2.510906872689179,
+                "coverage_formula": 0.825,
+                "coverage_empirical": 0.7,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 11.521732073553983,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 80,
+                "MAE": 11.148942619250395,
+                "RMSE": 13.669792048348471,
+                "pinball_q10": 2.4872677904485094,
+                "pinball_q90": 1.975843663009718,
+                "coverage_formula": 0.8,
+                "coverage_empirical": 0.8666666666666667,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.7490036821220241,
+                "MAE_without_event_windows": 11.148942619250395,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.7857142857142857,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ses": {
+                "n": 80,
+                "MAE": 9.04437096020437,
+                "RMSE": 12.89876733782214,
+                "pinball_q10": 3.1117414558774987,
+                "pinball_q90": 1.7679401845530578,
+                "coverage_formula": 0.8625,
+                "coverage_empirical": 0.85,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.06079469998364559,
+                "MAE_without_event_windows": 9.04437096020437,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8714285714285714,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 80,
+                "MAE": 8.950946994749401,
+                "RMSE": 12.912060504962723,
+                "pinball_q10": 3.1121579242540633,
+                "pinball_q90": 1.803619291343784,
+                "coverage_formula": 0.8625,
+                "coverage_empirical": 0.85,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.05491446878176044,
+                "MAE_without_event_windows": 8.950946994749401,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8714285714285714,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 80,
+                "MAE": 6.379005305456417,
+                "RMSE": 8.223986684954351,
+                "pinball_q10": 1.3803494191796817,
+                "pinball_q90": 1.5654896200460313,
+                "coverage_formula": 0.775,
+                "coverage_empirical": 0.8833333333333333,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 1.6924494475884967e-05,
+                "MAE_without_event_windows": 6.379005305456417,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.7571428571428571,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 80,
+                "MAE": 10.700391953470662,
+                "RMSE": 13.859013813197937,
+                "pinball_q10": 3.249600570423044,
+                "pinball_q90": 1.7226752655250934,
+                "coverage_formula": 0.7875,
+                "coverage_empirical": 0.8333333333333334,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.49225166722527125,
+                "MAE_without_event_windows": 10.700391953470662,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.7857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 80,
+                "MAE": 9.04745508589562,
+                "RMSE": 12.904878105415177,
+                "pinball_q10": 3.1134916750991275,
+                "pinball_q90": 1.7699380083983627,
+                "coverage_formula": 0.8625,
+                "coverage_empirical": 0.85,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.06112463769754714,
+                "MAE_without_event_windows": 9.04745508589562,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8714285714285714,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 80,
+                "MAE": 9.131765415783423,
+                "RMSE": 13.066238940186228,
+                "pinball_q10": 3.1414298132322456,
+                "pinball_q90": 1.8213769908255084,
+                "coverage_formula": 0.85,
+                "coverage_empirical": 0.85,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.073132624029686,
+                "MAE_without_event_windows": 9.131765415783423,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8571428571428571,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 80,
+                "MAE": 9.244530348489613,
+                "RMSE": 12.938815482761196,
+                "pinball_q10": 3.0577747340031913,
+                "pinball_q90": 1.7876620844695807,
+                "coverage_formula": 0.8,
+                "coverage_empirical": 0.8333333333333334,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.0655558525997843,
+                "MAE_without_event_windows": 9.244530348489613,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 80,
+                "MAE": 10.502374832416805,
+                "RMSE": 13.466804939753427,
+                "pinball_q10": 3.120195349043126,
+                "pinball_q90": 1.7465110027329864,
+                "coverage_formula": 0.8,
+                "coverage_empirical": 0.85,
+                "n_empirical": 60,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.3933225183459349,
+                "MAE_without_event_windows": 10.502374832416805,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.5,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "holt_winters",
+            "interval_choice": "покрытие 80% интервала у holt_winters: формула 0.775, квантили прошлых ошибок 0.883; ближе к номиналу: формула модели",
+            "verdict": "holt_winters: MAE ниже бенчмарка seasonal_naive, DM p = 0.000 < 0.05"
+          },
+          "2": {
+            "table": {
+              "naive": {
+                "n": 79,
+                "MAE": 11.668437381515155,
+                "RMSE": 15.496124972517581,
+                "pinball_q10": 3.171743726790732,
+                "pinball_q90": 2.5505088595515746,
+                "coverage_formula": 0.8734177215189873,
+                "coverage_empirical": 0.8793103448275862,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.9434385494040703,
+                "MAE_without_event_windows": 11.668437381515155,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 79,
+                "MAE": 11.532494783689923,
+                "RMSE": 15.088736929080719,
+                "pinball_q10": 3.021574215851824,
+                "pinball_q90": 2.537531369079186,
+                "coverage_formula": 0.8227848101265823,
+                "coverage_empirical": 0.6896551724137931,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 11.532494783689923,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 79,
+                "MAE": 11.504367076255877,
+                "RMSE": 13.975228982709366,
+                "pinball_q10": 2.5572571874711945,
+                "pinball_q90": 2.1655210665880094,
+                "coverage_formula": 0.7721518987341772,
+                "coverage_empirical": 0.8448275862068966,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.9852141430846542,
+                "MAE_without_event_windows": 11.504367076255877,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.7571428571428571,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ses": {
+                "n": 79,
+                "MAE": 11.092755582784559,
+                "RMSE": 14.61806439449825,
+                "pinball_q10": 3.014797098988145,
+                "pinball_q90": 2.243993672291356,
+                "coverage_formula": 0.810126582278481,
+                "coverage_empirical": 0.8620689655172413,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.8061282476915774,
+                "MAE_without_event_windows": 11.092755582784559,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 79,
+                "MAE": 10.903997086082915,
+                "RMSE": 14.64362542797729,
+                "pinball_q10": 3.0496605752456176,
+                "pinball_q90": 2.4733799642757117,
+                "coverage_formula": 0.8354430379746836,
+                "coverage_empirical": 0.8620689655172413,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.7345243164274797,
+                "MAE_without_event_windows": 10.903997086082915,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8571428571428571,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 79,
+                "MAE": 7.080311381349742,
+                "RMSE": 9.30878181091646,
+                "pinball_q10": 1.637665263349119,
+                "pinball_q90": 1.8772130460348657,
+                "coverage_formula": 0.8860759493670886,
+                "coverage_empirical": 0.8793103448275862,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.0027713595233464605,
+                "MAE_without_event_windows": 7.080311381349742,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 1.0,
+                  "2020-03 – 2026-01": 0.8857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 79,
+                "MAE": 14.787111639514436,
+                "RMSE": 16.845119866480335,
+                "pinball_q10": 3.376199172723109,
+                "pinball_q90": 2.259603067405299,
+                "coverage_formula": 0.7721518987341772,
+                "coverage_empirical": 0.8448275862068966,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.03518555810499256,
+                "MAE_without_event_windows": 14.787111639514436,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.7857142857142857,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 79,
+                "MAE": 11.095470716980845,
+                "RMSE": 14.62690212028516,
+                "pinball_q10": 3.015764916710631,
+                "pinball_q90": 2.2487192878802755,
+                "coverage_formula": 0.810126582278481,
+                "coverage_empirical": 0.8620689655172413,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.8073839578288691,
+                "MAE_without_event_windows": 11.095470716980845,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 79,
+                "MAE": 11.293755549951046,
+                "RMSE": 14.927284640633951,
+                "pinball_q10": 3.053198550303728,
+                "pinball_q90": 2.327072629704224,
+                "coverage_formula": 0.8227848101265823,
+                "coverage_empirical": 0.8448275862068966,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.8964784331988529,
+                "MAE_without_event_windows": 11.293755549951046,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8428571428571429,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 79,
+                "MAE": 11.732336834887343,
+                "RMSE": 14.580867616301115,
+                "pinball_q10": 2.971667057098131,
+                "pinball_q90": 2.1777847723208614,
+                "coverage_formula": 0.7848101265822784,
+                "coverage_empirical": 0.8620689655172413,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.8982963339000651,
+                "MAE_without_event_windows": 11.732336834887343,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 79,
+                "MAE": 14.030360024440244,
+                "RMSE": 16.077786022922627,
+                "pinball_q10": 3.100729278293014,
+                "pinball_q90": 2.245156305046204,
+                "coverage_formula": 0.810126582278481,
+                "coverage_empirical": 0.8448275862068966,
+                "n_empirical": 58,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.11049485200150763,
+                "MAE_without_event_windows": 14.030360024440244,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": 0.0,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 0.6,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "holt_winters",
+            "interval_choice": "покрытие 80% интервала у holt_winters: формула 0.886, квантили прошлых ошибок 0.879; ближе к номиналу: квантили прошлых ошибок",
+            "verdict": "holt_winters: MAE ниже бенчмарка seasonal_naive, DM p = 0.003 < 0.05"
+          },
+          "3": {
+            "table": {
+              "naive": {
+                "n": 78,
+                "MAE": 13.441482548972985,
+                "RMSE": 17.10338281188108,
+                "pinball_q10": 3.562799676635597,
+                "pinball_q90": 3.007534312675637,
+                "coverage_formula": 0.9230769230769231,
+                "coverage_empirical": 0.8214285714285714,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.4559991952059921,
+                "MAE_without_event_windows": 13.441482548972985,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "seasonal_naive": {
+                "n": 78,
+                "MAE": 11.571253757574196,
+                "RMSE": 15.154554400786694,
+                "pinball_q10": 3.0236637145609007,
+                "pinball_q90": 2.5638008303248085,
+                "coverage_formula": 0.8205128205128205,
+                "coverage_empirical": 0.7142857142857143,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": null,
+                "MAE_without_event_windows": 11.571253757574196,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "mean12": {
+                "n": 78,
+                "MAE": 11.663133693817214,
+                "RMSE": 14.165818333205578,
+                "pinball_q10": 2.6565643682722757,
+                "pinball_q90": 2.346658843591711,
+                "coverage_formula": 0.7564102564102564,
+                "coverage_empirical": 0.8214285714285714,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.9490530972567877,
+                "MAE_without_event_windows": 11.663133693817214,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7285714285714285,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ses": {
+                "n": 78,
+                "MAE": 12.73753507840606,
+                "RMSE": 16.09566799577695,
+                "pinball_q10": 3.1108887990362466,
+                "pinball_q90": 2.5152207718632167,
+                "coverage_formula": 0.8846153846153846,
+                "coverage_empirical": 0.8571428571428571,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.6375374583502589,
+                "MAE_without_event_windows": 12.73753507840606,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_damped": {
+                "n": 78,
+                "MAE": 12.619610244160002,
+                "RMSE": 16.1285403059736,
+                "pinball_q10": 3.384712411535829,
+                "pinball_q90": 2.94557978902007,
+                "coverage_formula": 0.9358974358974359,
+                "coverage_empirical": 0.8571428571428571,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.6766719882545382,
+                "MAE_without_event_windows": 12.619610244160002,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "holt_winters": {
+                "n": 78,
+                "MAE": 8.668478491178199,
+                "RMSE": 10.989139475278435,
+                "pinball_q10": 2.0158812746055044,
+                "pinball_q90": 1.9974422782584413,
+                "coverage_formula": 0.782051282051282,
+                "coverage_empirical": 0.875,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.11040606212640364,
+                "MAE_without_event_windows": 8.668478491178199,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7714285714285715,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "ar1": {
+                "n": 78,
+                "MAE": 17.241199077518853,
+                "RMSE": 19.84021123881667,
+                "pinball_q10": 4.009843402261442,
+                "pinball_q90": 2.673631605015498,
+                "coverage_formula": 0.7564102564102564,
+                "coverage_empirical": 0.8214285714285714,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok"
+                ],
+                "dm_vs_benchmark_p": 0.005052217857704195,
+                "MAE_without_event_windows": 17.241199077518853,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7428571428571429,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_011": {
+                "n": 78,
+                "MAE": 12.744794577876954,
+                "RMSE": 16.105696336574358,
+                "pinball_q10": 3.1163593919817933,
+                "pinball_q90": 2.5208102595398114,
+                "coverage_formula": 0.8846153846153846,
+                "coverage_empirical": 0.8571428571428571,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.6355877909760308,
+                "MAE_without_event_windows": 12.744794577876954,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8857142857142857,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_110": {
+                "n": 78,
+                "MAE": 12.970826996333207,
+                "RMSE": 16.37478546906753,
+                "pinball_q10": 3.1993689449503036,
+                "pinball_q90": 2.602396541209172,
+                "coverage_formula": 0.9102564102564102,
+                "coverage_empirical": 0.875,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.5760013639151322,
+                "MAE_without_event_windows": 12.970826996333207,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.9142857142857143,
+                  "2026-01 – 2026-06": 0.8,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_111": {
+                "n": 78,
+                "MAE": 12.837049731994075,
+                "RMSE": 15.725101486715515,
+                "pinball_q10": 3.1191327420290524,
+                "pinball_q90": 2.246114900724708,
+                "coverage_formula": 0.8461538461538461,
+                "coverage_empirical": 0.8214285714285714,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.5281047847628276,
+                "MAE_without_event_windows": 12.837049731994075,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.8285714285714286,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              },
+              "arima_200": {
+                "n": 78,
+                "MAE": 16.074207286526388,
+                "RMSE": 18.594207825241497,
+                "pinball_q10": 3.62560444089959,
+                "pinball_q90": 2.609316597121831,
+                "coverage_formula": 0.7692307692307693,
+                "coverage_empirical": 0.7678571428571429,
+                "n_empirical": 56,
+                "statuses": [
+                  "ok (statespace)"
+                ],
+                "dm_vs_benchmark_p": 0.03868884655929128,
+                "MAE_without_event_windows": 16.074207286526388,
+                "coverage_by_subperiod": {
+                  "начало – 2020-03": null,
+                  "2020-03 – 2026-01": 0.7428571428571429,
+                  "2026-01 – 2026-06": 1.0,
+                  "2026-06 – конец": 1.0
+                }
+              }
+            },
+            "lowest_mae": "holt_winters",
+            "interval_choice": "покрытие 80% интервала у holt_winters: формула 0.782, квантили прошлых ошибок 0.875; ближе к номиналу: формула модели",
+            "verdict": "нет выигрыша у seasonal_naive: наименьший MAE у holt_winters, но DM p = 0.110"
+          }
+        },
+        "differencing": {
+          "tests": {
+            "level": {
+              "adf_p": 0.8152583176255381,
+              "kpss_p": 0.01
+            },
+            "first_difference": {
+              "adf_p": 3.8408512903908624e-05,
+              "kpss_p": 0.1
+            }
+          },
+          "models": {
+            "ar1": {
+              "d": 0,
+              "aicc": 1117.972587929284,
+              "ljung_box_p_lag12": 4.171937415773805e-11,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 5.5321041544314085,
+              "chosen_within_d": false
+            },
+            "arima_011": {
+              "d": 1,
+              "aicc": 1098.9566155030461,
+              "ljung_box_p_lag12": 7.384984956587351e-11,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 5.0101523768673815,
+              "chosen_within_d": false
+            },
+            "arima_110": {
+              "d": 1,
+              "aicc": 1101.119896656964,
+              "ljung_box_p_lag12": 1.4202589314620994e-10,
+              "status": "ok (statespace)",
+              "n_params": 2,
+              "delta_aicc": 7.17343353078536,
+              "chosen_within_d": false
+            },
+            "arima_111": {
+              "d": 1,
+              "aicc": 1093.9464631261787,
+              "ljung_box_p_lag12": 1.5595148440304087e-08,
+              "status": "ok (statespace)",
+              "n_params": 3,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            },
+            "arima_200": {
+              "d": 0,
+              "aicc": 1112.4404837748525,
+              "ljung_box_p_lag12": 9.921381964147252e-11,
+              "status": "ok (statespace)",
+              "n_params": 4,
+              "delta_aicc": 0.0,
+              "chosen_within_d": true
+            }
+          }
+        },
+        "ar1": [
+          {
+            "period": "весь ряд",
+            "n": 140,
+            "c": 102.43724008063353,
+            "phi": 0.9323449814646603,
+            "mean": 1514.111477585735,
+            "half_life_months": 9.894698376674697
+          },
+          {
+            "period": "начало – 2020-03",
+            "n": 62,
+            "c": 295.6882307158497,
+            "phi": 0.7996835930424018,
+            "mean": 1476.1059026904334,
+            "half_life_months": 3.100786672081597
+          },
+          {
+            "period": "2020-03 – 2026-01",
+            "n": 70,
+            "c": 255.35826311209854,
+            "phi": 0.8338156474980158,
+            "mean": 1536.5963116717003,
+            "half_life_months": 3.813887642687458
+          },
+          {
+            "period": "2026-01 – 2026-06",
+            "n": 5,
+            "status": "слишком короткий (< 24 наблюдений)"
+          },
+          {
+            "period": "2026-06 – конец",
+            "n": 3,
+            "status": "слишком короткий (< 24 наблюдений)"
+          }
+        ],
+        "ar1_words": "отклонение от среднего 1514.11 уменьшается вдвое примерно за 9.9 мес. (phi = 0.932)",
+        "current_forecasts": {
+          "holt_winters": {
+            "series": "imports_log",
+            "cutoff": "2026-08",
+            "method": "holt_winters",
+            "n_used": 140,
+            "target_months": [
+              "2026-09",
+              "2026-10",
+              "2026-11"
+            ],
+            "point": [
+              1549.4795334373784,
+              1554.121461533216,
+              1548.9385752746414
+            ],
+            "lower_80": [
+              1540.1858055100317,
+              1540.9781454533565,
+              1532.841366312755
+            ],
+            "upper_80": [
+              1558.7732613647252,
+              1567.2647776130755,
+              1565.0357842365277
+            ],
+            "status": "ok"
+          },
+          "seasonal_naive": {
+            "series": "imports_log",
+            "cutoff": "2026-08",
+            "method": "seasonal_naive",
+            "n_used": 140,
+            "target_months": [
+              "2026-09",
+              "2026-10",
+              "2026-11"
+            ],
+            "point": [
+              1556.9906866918952,
+              1559.3463091958076,
+              1558.7248211676167
+            ],
+            "lower_80": [
+              1537.0355376079963,
+              1539.3911601119087,
+              1538.7696720837178
+            ],
+            "upper_80": [
+              1576.9458357757942,
+              1579.3014582797066,
+              1578.6799702515157
+            ],
+            "status": "ok"
+          }
+        }
+      },
+      "usd_kzt": {
+        "status": "UNKNOWN: данных нет (шаблон; TODO_HUMAN.md)",
+        "n_observations": 0
+      }
+    },
+    "models_tried": 11,
+    "windows_tried": 234,
+    "yoy_table": "UNKNOWN: месячной инфляции m/m в данных нет; таблица «что нужно для X% в декабре» строится, когда появится ряд m/m (TODO_HUMAN.md)",
+    "runtime_seconds": 45.3,
+    "forecast_ledger_rows_added": 0
+  },
+  "carry_corridor": {
+    "month": "2026-09",
+    "nbk_rate": 16.25,
+    "kz_inflation": 9.3,
+    "kz_real_rate": 6.949999999999999,
+    "partner_real_rates": {
+      "Россия": null,
+      "Китай": null
+    },
+    "partner_notes": {
+      "Россия": "UNKNOWN: данных нет (шаблон)",
+      "Китай": "UNKNOWN: данных нет (шаблон)"
+    },
+    "defaults": {
+      "premium": 2.0,
+      "cap": 6.0
+    },
+    "defaults_status": "допущение пользователя (параметры ползунков)",
+    "credit_constraint": {
+      "n": 126,
+      "first": "2015-09",
+      "last": "2026-02",
+      "slope": 0.16846490029985664,
+      "intercept": 3.8027043757074828,
+      "credit_zero_real_rate": null,
+      "identified": false,
+      "note": "наклон не отрицательный: ограничение по кредиту не идентифицировано и не используется"
+    },
+    "current": {
+      "kz_real_rate": 6.949999999999999,
+      "differentials": {},
+      "lower": null,
+      "upper": null,
+      "status": "UNKNOWN: нет реальных ставок партнёров"
+    },
+    "premium_sensitivity": [
+      {
+        "premium": 0.0,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "premium": 1.0,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "premium": 2.0,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "premium": 3.0,
+        "lower": null,
+        "upper": null
+      },
+      {
+        "premium": 4.0,
+        "lower": null,
+        "upper": null
+      }
+    ],
+    "fx_regression": {
+      "status": "UNKNOWN: нет данных USD/KZT и реальных ставок партнёров (TODO_HUMAN.md)"
+    },
+    "panel_note": "Панель по трём странам с фиксированными эффектами — только иллюстрация: три единицы не дают надёжных стандартных ошибок; строится, когда есть данные.",
+    "benchmark": "курс как случайное блуждание (прогноз изменения = 0)"
   }
 }

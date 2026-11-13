@@ -11,6 +11,21 @@ Only facts that are still `UNKNOWN` or unconfirmed are listed. Do not infer or i
 5. Fill `docs/ai_use.md` and `docs/contributions.md` from your own records (questionnaire below).
 6. Update the pitch and the technical note from `outputs/version_comparison.md` (OLD vs NEW, generated) and the README; do not type numbers from memory.
 
+## Бриф «The Decision Desk» (добавлено 2026-11-13; ход работ в `docs/PROGRESS.md`)
+
+- **Подтвердить решение и потери.** `config/decision_losses.json`: формулировка решения («казначей/портфельный менеджер с тенговыми госбумагами до 4 декабря 2026 решает, удлинять или сокращать дюрацию») и матрица потерь помечены как допущение. Подтвердите или замените, затем `python run.py decision`.
+
+- **Загрузить данные России, Китая и курсы (блок E).** Шаблоны с заголовками лежат в `data/raw/external/`, описание в `config/external_sources.json`. Для каждого файла: скачайте ряд с сайта издателя, сохраните исходный файл без изменений в `data/incoming/`, перенесите значения в шаблон (только строки, без правки заголовка), впишите в `config/external_sources.json` точный URL, дату публикации (`release`) и дату скачивания (`retrieved`), затем `python run.py update`. Нужные ряды:
+  1. `ru_key_rate_daily.csv` (`date,key_rate_pct`): ключевая ставка Банка России (cbr.ru), по одной строке на каждое изменение: дата вступления в силу и новая ставка, с 2015 года.
+  2. `ru_cpi_yoy.csv` (`year_month,cpi_yoy_pct`): ИПЦ Росстата (rosstat.gov.ru), % к соответствующему месяцу прошлого года (можно индексом, где тот же месяц = 100).
+  3. `cn_7d_reverse_repo_daily.csv` (`date,rate_pct`): ставка 7-дневного обратного РЕПО НБК (pbc.gov.cn), строка на каждое изменение. Почему эта ставка, а не LPR: см. `choice_reason` в `config/external_sources.json`; если хотите LPR, скажите, и я поменяю.
+  4. `cn_cpi_yoy.csv` (`year_month,cpi_yoy_pct`): CPI NBS (stats.gov.cn), same month previous year = 100.
+  5. `usd_kzt_daily.csv`, `usd_rub_daily.csv`, `usd_cny_daily.csv` (`date,<курс>`): официальные дневные курсы (nationalbank.kz, cbr.ru, CFETS/PBoC).
+- **Источник для повышения НДС 12%→16% с 2026-01-01.** В `config/intervention_calendar.csv` источник UNKNOWN: впишите ссылку на закон или официальное сообщение и дату публикации. Причина эпизода 2020-03...2020-06 в розничной торговле тоже UNKNOWN.
+
+- **Закоммитить `prereg/` до 2026-12-04.** Заморозка преререгистрации действительна как внешняя отметка только после push на GitHub до решения.
+- **Ответ красной команде.** Заполните `docs/redteam_response.md` после ревью другой команды.
+
 ## Series provenance still UNKNOWN
 
 - `base_rate_history.csv`: publication date and navigation path of the prg.kz table.
