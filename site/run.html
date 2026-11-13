@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Запусти сам · Monetarot</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><header><p class="brand">Monetarot · решения НБ РК</p><nav aria-label="Разделы"><a href="index.html">Главная</a> <a href="methods.html">Методы и пределы</a> <a href="run.html" aria-current="page">Запусти сам</a> <a href="sources.html">Источники</a> <a href="team.html">Команда</a> <a href="data.html">Данные</a> <a href="patterns.html">Паттерны</a> <a href="corridor.html">Коридор</a> <a href="forecasts.html">Журнал прогнозов</a> <a href="redteam.html">Ответ красной команде</a> <a href="asof.html">Просмотр на дату t</a></nav></header>
+<main><h1>Запусти сам</h1><p>Всё работает офлайн из закоммиченных данных на Windows и Linux (Python 3.13).</p>
+<pre><code>git clone https://github.com/lmamraimovasixseven/monetarot.git
+cd monetarot
+python -m pip install -r requirements-dev.txt
+python run.py update      # данные → проверки → модель → прогнозы → журнал → site/
+python run.py acceptance  # приёмные проверки
+python run.py trace n:rmse_ratio</code></pre>
+<p>Одна команда для make: <code>make update</code>.</p></main>
+<footer><p>Сгенерировано <code>python run.py site</code> из <code>model/artifact.json</code>. Каждое число имеет строку в
+<a href="data/evidence_ledger.csv">журнале доказательств</a>.</p></footer></body></html>

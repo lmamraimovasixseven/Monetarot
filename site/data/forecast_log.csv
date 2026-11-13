@@ -1,0 +1,2 @@
+logged_at_utc,target_decision_date,based_on_decision,factor_month,model,p_decrease,p_hold,p_increase,expected_score,git_commit,git_worktree,artifact_sha256,data_sha256
+2026-11-12T17:36:12+00:00,2026-12-04,2026-10-27,2026-08,M0: pre-specified ordered logit (frozen; model/artifact.json),0.386826,0.532071,0.081104,-0.305722,5425a175284d10c7f19a8a555f0cf0bc19af82f0,uncommitted changes,8993051c88e81e1d7c1d98822c7efec100853e72ffe24a9a6a0cdf932f011633,81abaae0d987b7fce74bd7eb6ad80c684775d014666643e3b18dd0a47436a1a2

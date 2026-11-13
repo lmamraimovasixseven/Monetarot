@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from _tolerance import same_within_float_tolerance
 from src import decision_rule as dr
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +39,7 @@ def test_best_action_follows_expected_losses():
 
 def test_artifact_and_memo_hold_the_current_rule():
     artifact = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))
-    assert artifact["decision"] == json.loads(json.dumps(dr.build()))
+    assert same_within_float_tolerance(artifact["decision"], json.loads(json.dumps(dr.build())))  # floats: D38
     memo = (ROOT / "docs" / "decision_memo.md").read_text(encoding="utf-8")
     assert f"{artifact['decision']['binary_threshold_p_cut']:.3f}" in memo
     assert "ждёт подтверждения человека" in memo and "допущение пользователя" in memo.lower()

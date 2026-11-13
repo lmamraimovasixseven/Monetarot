@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Источники · Monetarot</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><header><p class="brand">Monetarot · решения НБ РК</p><nav aria-label="Разделы"><a href="index.html">Главная</a> <a href="methods.html">Методы и пределы</a> <a href="run.html">Запусти сам</a> <a href="sources.html" aria-current="page">Источники</a> <a href="team.html">Команда</a> <a href="data.html">Данные</a> <a href="patterns.html">Паттерны</a> <a href="corridor.html">Коридор</a> <a href="forecasts.html">Журнал прогнозов</a> <a href="redteam.html">Ответ красной команде</a> <a href="asof.html">Просмотр на дату t</a></nav></header>
+<main><h1>Источники</h1><div class="scroll"><table><thead><tr><th>Файл</th><th>Издатель</th><th>URL</th><th>Публикация</th><th>Получено</th></tr></thead><tbody><tr><td>base_rate_history.csv</td><td>secondary: prg.kz (table); primary: National Bank of Kazakhstan, as cited in the table&#x27;s own notes (NBK press releases)</td><td>https://prg.kz/document/?doc_id=36378707&amp;pos=6;67</td><td>UNKNOWN</td><td>2026-10-08</td></tr><tr><td>consumption_history_updated.csv</td><td>Bureau of National Statistics</td><td>https://stat.gov.kz/api/iblock/element/4084/file/ru/</td><td>2026-10-07</td><td>2026-10-08</td></tr><tr><td>export_history.csv</td><td>Bureau of National Statistics</td><td>https://stat.gov.kz/api/iblock/element/446905/file/ru/</td><td>2026-10-05</td><td>2026-10-08</td></tr><tr><td>import_history.csv</td><td>Bureau of National Statistics</td><td>https://stat.gov.kz/api/iblock/element/446906/file/ru/</td><td>2026-10-05</td><td>2026-10-08</td></tr><tr><td>inflation_history.csv</td><td>Bureau of National Statistics</td><td>https://stat.gov.kz/api/iblock/element/1549/file/ru/</td><td>2026-10-01</td><td>2026-10-08</td></tr><tr><td>loans_individuals_history.csv</td><td>National Bank of Kazakhstan</td><td>https://nationalbank.kz/file/download/135680</td><td>2026-09-24</td><td>2026-10-08</td></tr><tr><td>loans_legal_entities_history.csv</td><td>National Bank of Kazakhstan</td><td>https://nationalbank.kz/file/download/135680</td><td>2026-09-24</td><td>2026-10-08</td></tr></tbody></table></div><h2>Источники коридора</h2><div class="scroll"><table><thead><tr><th>Файл</th><th>Издатель</th><th>URL</th><th>Публикация</th><th>Получено</th></tr></thead><tbody><tr><td>ru_key_rate_daily.csv</td><td>Банк России</td><td>UNKNOWN (раздел ключевой ставки на cbr.ru)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>ru_cpi_yoy.csv</td><td>Росстат</td><td>UNKNOWN (раздел цен на rosstat.gov.ru)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>cn_7d_reverse_repo_daily.csv</td><td>Народный банк Китая</td><td>UNKNOWN (pbc.gov.cn)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>cn_cpi_yoy.csv</td><td>National Bureau of Statistics of China</td><td>UNKNOWN (stats.gov.cn)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>usd_kzt_daily.csv</td><td>Национальный Банк Казахстана</td><td>UNKNOWN (nationalbank.kz)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>usd_rub_daily.csv</td><td>Банк России</td><td>UNKNOWN (cbr.ru)</td><td>UNKNOWN</td><td>UNKNOWN</td></tr><tr><td>usd_cny_daily.csv</td><td>China Foreign Exchange Trade System / PBoC</td><td>UNKNOWN</td><td>UNKNOWN</td><td>UNKNOWN</td></tr></tbody></table></div><h2>Аудит данных по рядам</h2>
+<p>Каждый ряд: покрытие, пропуски, ревизии, определение, смены классификации, календарные особенности. Числа посчитаны из файлов; известные свойства взяты из документов проекта (ссылки в тексте). Значения в data/raw никогда не меняются; флаги только помечают.</p>
+<h3>`base_rate_history.csv`</h3>
+<p>- Покрытие: 2015-09 – 2026-10, 134 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Ставка после решения, вступившего в силу в этом месяце; строки до 2026-09 из таблицы prg.kz, 2026-10 со страницы НБ РК (docs/manual_steps_found.md).</p>
+<p>- Источник: secondary: prg.kz (table); primary: National Bank of Kazakhstan, as cited in the table&#x27;s own notes (NBK press releases); публикация UNKNOWN, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Решения вступают в силу в понедельник/вторник после объявления в пятницу; в 5 случаях объявление в предыдущем месяце (docs/model_spec.md, D20).</p>
+<p>- Флаги экрана скачков: 0.</p>
+<p>- События календаря вмешательств: 0.</p>
+<h3>`consumption_history_updated.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-08, 140 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Индекс физического объёма розничной торговли, y/y %.</p>
+<p>- Источник: Bureau of National Statistics; публикация 2026-10-07, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Эпизод 2020-03...2020-06 (резкое падение и восстановление) помечен как временный.</p>
+<p>- Флаги экрана скачков: 9 (2020-04, 2020-05, 2020-06, 2021-04, 2021-05, 2022-01, 2022-02, 2023-01, 2023-02).</p>
+<p>- События календаря вмешательств: 1 (2020-03-01 temporary_episode).</p>
+<h3>`export_history.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-08, 140 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Экспорт, тыс. долл. США, месячные значения (проверено по итогу «январь-август»); ряд смешивает два издания: строки до 2026-07 и строка 2026-08 из более нового издания (D22).</p>
+<p>- Источник: Bureau of National Statistics; публикация 2026-10-05, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Скачок 2026-06 на новый уровень помечен; проверка по источнику ждёт человека.</p>
+<p>- Флаги экрана скачков: 2 (2019-04, 2026-06).</p>
+<p>- События календаря вмешательств: 1 (2026-06-01 level_shift).</p>
+<h3>`import_history.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-08, 140 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Импорт, тыс. долл. США; два издания, как у экспорта (D22); новое издание пересматривает 2026-01...2026-07 на +0.01%...+1.34% (docs/manual_steps_found.md).</p>
+<p>- Источник: Bureau of National Statistics; публикация 2026-10-05, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Январское падение повторяется по годам: сезонный разрыв, не ошибка.</p>
+<p>- Флаги экрана скачков: 5 (2016-01, 2020-01, 2021-01, 2022-01, 2026-01).</p>
+<p>- События календаря вмешательств: 1 (2016-01-01 seasonal_break).</p>
+<h3>`inflation_history.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-09, 141 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Годовая инфляция ИПЦ, % (y/y); месячной m/m в проекте нет.</p>
+<p>- Источник: Bureau of National Statistics; публикация 2026-10-01, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: НДС 12%→16% с 2026-01-01 (config/intervention_calendar.csv) даёт сдвиг уровня цен в январе 2026.</p>
+<p>- Флаги экрана скачков: 7 (2015-10, 2015-11, 2016-10, 2016-11, 2022-03, 2022-09, 2023-03).</p>
+<p>- События календаря вмешательств: 1 (2026-01-01 level_shift).</p>
+<h3>`loans_individuals_history.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-08, 140 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Кредиты физлицам, млн тенге (остатки на конец месяца по файлу НБ РК).</p>
+<p>- Источник: National Bank of Kazakhstan; публикация 2026-09-24, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Ряд нестационарен (ADF и KPSS, outputs/annex_unit_roots.csv).</p>
+<p>- Флаги экрана скачков: 0.</p>
+<p>- События календаря вмешательств: 0.</p>
+<h3>`loans_legal_entities_history.csv`</h3>
+<p>- Покрытие: 2015-01 – 2026-08, 140 строк; пропущенных месяцев 0, дубликатов 0.</p>
+<p>- Определение: Кредиты юрлицам, млн тенге.</p>
+<p>- Источник: National Bank of Kazakhstan; публикация 2026-09-24, получено 2026-10-08; ревизии после публикации: UNKNOWN.</p>
+<p>- Смены классификации: UNKNOWN (в документах источника не проверялись).</p>
+<p>- Календарные особенности: Резкие изменения 2015-06, 2015-08, 2019-01 помечены экраном.</p>
+<p>- Флаги экрана скачков: 4 (2015-06, 2015-08, 2019-01, 2023-12).</p>
+<p>- События календаря вмешательств: 0.</p>
+<h3>Новые источники (блок E)</h3>
+<div class="scroll"><table><thead><tr><th>Ряд</th><th>Файл</th><th>Статус</th><th>Обрабатываемая особенность</th></tr></thead><tbody><tr><td>Ключевая ставка Банка России</td><td>`data/raw/external/ru_key_rate_daily.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>ставка меняется внутри месяца → средневзвешенное по дням (external_data.monthly_step_rate)</td></tr><tr><td>Индекс потребительских цен, % к соответствующему месяцу прошлого года</td><td>`data/raw/external/ru_cpi_yoy.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>ИПЦ как индекс «тот же месяц прошлого года = 100» → y/y = индекс − 100 (external_data.cpi_yoy)</td></tr><tr><td>Ставка 7-дневного обратного РЕПО НБК</td><td>`data/raw/external/cn_7d_reverse_repo_daily.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>ставка меняется внутри месяца → средневзвешенное по дням</td></tr><tr><td>CPI, same month previous year = 100</td><td>`data/raw/external/cn_cpi_yoy.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>январь/февраль смещаются Новым годом по лунному календарю → флаг lunar_new_year_month</td></tr><tr><td>Официальный курс тенге к доллару США</td><td>`data/raw/external/usd_kzt_daily.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>курс публикуется только по рабочим дням → среднее по опубликованным дням, без заполнения пропусков</td></tr><tr><td>Официальный курс рубля к доллару США</td><td>`data/raw/external/usd_rub_daily.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>то же, что USD/KZT; праздники РФ не совпадают с праздниками РК → дни не выравниваются</td></tr><tr><td>Central parity rate USD/CNY</td><td>`data/raw/external/usd_cny_daily.csv`</td><td>UNKNOWN: только шаблон (TODO_HUMAN.md)</td><td>то же; праздники КНР (неделя Нового года) дают месяцы с малым числом дней (колонка days)</td></tr></tbody></table></div>
+<p>Пока файлы содержат только заголовок, особенность обработана в коде и проверена тестами на синтетических данных (tests/test_external_data.py), но в реальных данных не наблюдалась.</p></main>
+<footer><p>Сгенерировано <code>python run.py site</code> из <code>model/artifact.json</code>. Каждое число имеет строку в
+<a href="data/evidence_ledger.csv">журнале доказательств</a>.</p></footer></body></html>

@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from _tolerance import same_within_float_tolerance
 from src import prereg
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,7 +50,7 @@ def test_pinball_and_scoring_by_hand():
 def test_artifact_holds_the_current_reality_check_linked_to_the_logged_forecast():
     artifact = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))
     fresh = json.loads(json.dumps(prereg.reality_check()))
-    assert artifact["reality_check"] == fresh
+    assert same_within_float_tolerance(artifact["reality_check"], fresh)  # floats: D38
     assert fresh["linked_forecast_log_row"]["target_decision_date"] == prereg.TARGET_DATE
     low, high = fresh["interval_80"]
     assert low <= fresh["median_rate"] <= high and artifact["prereg"]["unchanged"] is True

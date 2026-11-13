@@ -31,6 +31,7 @@
   "probability_date": "2026-10-27",
   "binary_threshold_p_cut": 0.5,
   "p_cut": 0.38682571693731294,
+  "switch_ratio_miss_to_false": 1.5851435316076854,
   "binary_action": "not_lengthen",
   "expected_losses": {
     "lengthen": 0.6942778068072667,

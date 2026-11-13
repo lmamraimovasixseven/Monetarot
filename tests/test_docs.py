@@ -126,7 +126,8 @@ def test_demo_answers_that_state_results_match_the_numbers():
 AI_USE_TOOLS = ("Codex", "GitHub Copilot", "Claude Code", "Claude, chat interface")
 AI_USE_SECTIONS = ("What we did ourselves", "What the AI did", "The main prompts", "Suggestions we rejected or changed",
                    "How we checked the work", "Statement")
-AI_USE_ALLOWED_DATES = {"2026-10-07", "2026-10-16", "2026-10-17", "2026-10-19"}
+AI_USE_ALLOWED_DATES = {"2026-10-07", "2026-10-16", "2026-10-17", "2026-10-19",
+                        "2026-11-12", "2026-11-13"}  # D37: session log of the assistant
 
 
 def _markdown_tables(text: str) -> list[list[list[str]]]:

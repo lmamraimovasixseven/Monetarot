@@ -26,6 +26,12 @@ Only facts that are still `UNKNOWN` or unconfirmed are listed. Do not infer or i
 - **Закоммитить `prereg/` до 2026-12-04.** Заморозка преререгистрации действительна как внешняя отметка только после push на GitHub до решения.
 - **Ответ красной команде.** Заполните `docs/redteam_response.md` после ревью другой команды.
 
+- **Включить GitHub Pages.** GitHub → Settings → Pages → Build and deployment → Source: «GitHub Actions». После следующего push workflow `pages` опубликует `site/`; ссылку на сайт впишите в README.
+- **Заполнить `docs/declaration.md`** (поля [FILL IN]; корневой `DECLARATION.md` обновится командой `python run.py update`).
+
+- **Поля [FILL IN] для защиты и светофора.** `docs/ai_use.md` (раздел «Claude Code sessions recorded by the assistant», колонка «Kept by the team»), `docs/contributions.md` (раздел «Traffic-light zones»: кто делал красную, жёлтую и зелёную зоны), `docs/declaration.md` (подписи и даты). После заполнения `python run.py update` обновит корневые копии.
+- **Подготовка к защите.** `docs/DEFENCE_QA.md` (40 вопросов, ответы своими словами) и `docs/quiz2_sheet.md` (лист нужно понять самой; Quiz 2 без ИИ).
+
 ## Series provenance still UNKNOWN
 
 - `base_rate_history.csv`: publication date and navigation path of the prg.kz table.

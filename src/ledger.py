@@ -116,8 +116,37 @@ def prereg_rows(root: Path = ROOT) -> list[dict[str, str]]:
     return rows
 
 
+LOG_FILES = {"forecast_log": ROOT / "docs" / "forecast_log.csv", "forecast_ledger": ROOT / "ledger" / "forecast_ledger.csv"}
+CHART_SOURCES = {"chart:holdout": ROOT / "outputs" / "annex_predictions.csv", "chart:base_rate": ROOT / "data" / "raw" / "base_rate_history.csv"}
+
+
+def log_rows() -> list[dict[str, str]]:
+    """Числа журналов прогнозов (показываются на странице «Журнал прогнозов») и источники графиков."""
+    rows = []
+    for name, path in LOG_FILES.items():
+        if not Path(path).is_file():
+            continue
+        with Path(path).open(encoding="utf-8", newline="") as handle:
+            for i, record in enumerate(csv.DictReader(handle)):
+                for column, value in record.items():
+                    try:
+                        float(value)
+                    except (TypeError, ValueError):
+                        continue
+                    rows.append(_row(id=f"{name}:{i}:{column}", value=value, source=str(Path(path).relative_to(ROOT)).replace("\\", "/"),
+                                     series=name, url="not applicable", retrieved="not applicable", release_or_vintage="append-only log",
+                                     transformation="as logged", script="src/forecast_log.py" if name == "forecast_log" else "src/forecast_desk.py",
+                                     artifact_field="not applicable", used_in="site/forecasts.html", test="tests/test_ledger.py"))
+    for key, path in CHART_SOURCES.items():
+        rows.append(_row(id=key, value=normalized_sha256(path), source=str(Path(path).relative_to(ROOT)).replace("\\", "/"),
+                         series="chart data", url="not applicable", retrieved="not applicable", release_or_vintage="current",
+                         transformation="plotted as is", script="src/site_build.py", artifact_field="not applicable",
+                         used_in="site/index.html", test="tests/test_site.py"))
+    return rows
+
+
 def build() -> list[dict[str, str]]:
-    return number_rows() + artifact_rows() + series_rows() + prereg_rows()
+    return number_rows() + artifact_rows() + series_rows() + prereg_rows() + log_rows()
 
 
 def render(rows: list[dict[str, str]]) -> str:

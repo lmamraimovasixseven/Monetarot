@@ -37,3 +37,8 @@ jobs:
         env:
           PYTHONUTF8: "1"
         run: python run.py check
+      # После строгих проверок закоммиченных файлов: одна команда обновления должна пройти на чистой машине (D36).
+      - name: One-command update (offline, from committed data)
+        env:
+          PYTHONUTF8: "1"
+        run: python run.py update

@@ -1001,7 +1001,7 @@ def run_pipeline(
         stability_p = float(chi2.sf(stability_lr, len(FEATURES)))
         stability = {"name": "LR test of slope equality across 2015-2019 and 2020+", "statistic": stability_lr, "df": len(FEATURES), "p_value": stability_p, "pass_fail": "PASS" if stability_p >= ALPHA else "FAIL", "groups_n": {"2015-2019": int((post == 0).sum()), "2020+": int((post == 1).sum())}, "unrestricted_log_likelihood": float(stability_fit.llf)}
         _finish_spec(records, stable_test_id, status="COMPLETED",
-                     statistic=stability_lr, df=len(FEATURES), p_value=stability_p, log_likelihood=float(stability_fit.llf), message=f"optimizer=lbfgs after BFGS nonconvergence; converged={stability_fit.mle_retvals.get('converged')}")
+                     statistic=stability_lr, df=len(FEATURES), p_value=stability_p, log_likelihood=float(stability_fit.llf), message="optimizers: " + "; ".join(attempts))  # D36: фактическая цепочка, а не устаревшая строка D7
     except Exception as exc:
         if records[stable_fit_id]["status"] == "RUNNING":
             _finish_spec(records, stable_fit_id, status="FAILED", message=exc)

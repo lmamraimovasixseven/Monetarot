@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Коридор · Monetarot</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><header><p class="brand">Monetarot · решения НБ РК</p><nav aria-label="Разделы"><a href="index.html">Главная</a> <a href="methods.html">Методы и пределы</a> <a href="run.html">Запусти сам</a> <a href="sources.html">Источники</a> <a href="team.html">Команда</a> <a href="data.html">Данные</a> <a href="patterns.html">Паттерны</a> <a href="corridor.html" aria-current="page">Коридор</a> <a href="forecasts.html">Журнал прогнозов</a> <a href="redteam.html">Ответ красной команде</a> <a href="asof.html">Просмотр на дату t</a></nav></header>
+<main><h1>Коридор ставки и carry trade</h1>
+<p>Сценарный инструмент, не прогноз курса. Реальная ставка = номинальная − инфляция y/y. Сейчас (2026-09): ставка НБ <span class="num" data-ledger="carry_corridor:nbk_rate">16.25</span>%,
+инфляция <span class="num" data-ledger="carry_corridor:kz_inflation">9.30</span>%, реальная ставка <span class="num" data-ledger="carry_corridor:kz_real_rate">6.95</span>%. Реальные ставки партнёров: Россия: UNKNOWN: данных нет (шаблон), Китай: UNKNOWN: данных нет (шаблон).</p>
+<p>Ограничение по кредиту: наклон роста кредита через 6 мес. на реальную ставку <span class="num" data-ledger="carry_corridor:credit_constraint/slope">0.168</span> (наклон не отрицательный: ограничение по кредиту не идентифицировано и не используется).</p>
+<p>Регрессия изменения USD/KZT на реальный дифференциал: UNKNOWN: нет данных USD/KZT и реальных ставок партнёров (TODO_HUMAN.md). Бенчмарк: курс как случайное блуждание (прогноз изменения = 0). Панель по трём странам с фиксированными эффектами — только иллюстрация: три единицы не дают надёжных стандартных ошибок; строится, когда есть данные.</p>
+<form id="corridor" data-inflation="9.3" data-credit="null">
+<label>Ставка НБ, %: <output id="o-rate"></output><input id="c-rate" type="range" min="5" max="25" step="0.25" value="16.25"></label>
+<label>Реальная ставка РФ, % (условное значение, данных нет): <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.25" value="6.949999999999999"></label>
+<label>Реальная ставка КНР, % (условное значение, данных нет): <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.25" value="6.949999999999999"></label>
+<label>Премия за риск, п.п.: <output id="o-prem"></output><input id="c-prem" type="range" min="0" max="6" step="0.25" value="2.0"></label>
+<label>Потолок реального дифференциала, п.п.: <output id="o-cap"></output><input id="c-cap" type="range" min="1" max="12" step="0.25" value="6.0"></label>
+</form><p id="corridor-out" aria-live="polite"></p>
+<script src="assets/corridor.js"></script><script src="assets/app.js"></script></main>
+<footer><p>Сгенерировано <code>python run.py site</code> из <code>model/artifact.json</code>. Каждое число имеет строку в
+<a href="data/evidence_ledger.csv">журнале доказательств</a>.</p></footer></body></html>

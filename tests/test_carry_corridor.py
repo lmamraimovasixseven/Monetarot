@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from _tolerance import same_within_float_tolerance
 from src import carry_corridor as cc
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,6 +95,6 @@ def test_browser_engine_matches_python_to_1e6(tmp_path):
 
 def test_artifact_block_reports_unknown_partners_honestly():
     block = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))["carry_corridor"]
-    assert block == json.loads(json.dumps(cc.build()))
+    assert same_within_float_tolerance(block, json.loads(json.dumps(cc.build())))  # floats: D38
     if None in block["partner_real_rates"].values():
         assert block["current"]["status"].startswith("UNKNOWN") and block["fx_regression"]["status"].startswith("UNKNOWN")

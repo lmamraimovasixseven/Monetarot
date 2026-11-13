@@ -82,6 +82,16 @@ Automated checks (these run code against code and data; they do not replace a hu
 
 Which assistant wrote which file: Codex wrote the first data code, model and website files (`src/ingest.py`, `src/hashing.py`, `src/model.py`, `model/artifact.json`, `src/app.py`); Copilot added robustness checks in `src/model.py` and `outputs/robustness_table.md`; Claude Code wrote the rest. This is our reading of the chat history; the commit history (`git log`) shows the details.
 
+## Claude Code sessions recorded by the assistant
+
+This section was written by the assistant (Claude Code in VS Code; the session reported the model Claude Opus 5.5) at the owner's request in the course brief task. It lists only the sessions of 2026-11-12 and 2026-11-13; who made the earlier changes after 2026-10-19 is for the team to record. What the team kept, rejected or verified is [FILL IN] by the team.
+
+| Date | What was asked | What the assistant produced | What the assistant checked | Kept by the team |
+|---|---|---|---|---|
+| 2026-11-12 | Fix failing tests, make updates safe, instructor review items, forecast log | D27 to D31: release-lag edition rule, data-contract and append-only tests, jump screen in the data step, `run.py needs`, `run.py compare`, CI workflow, runbook, development plan, verdict wording, forecast logged for the next decision | full test suite and `python run.py check` after each phase; old versus new values read from the git tag | [FILL IN] |
+| 2026-11-12 | Fix CI on Linux and Windows | D32 to D34: cross-platform tolerance for standard errors and p-values, Newton fallbacks for RB02, the stability test and expanding windows, stable report lines | simulated early-stopping optimizers; estimated numbers compared with git HEAD | [FILL IN] |
+| 2026-11-13 | Bring the project to the course brief (blocks A to J) | D35 to D37: decision memo and loss function, evidence ledger, data audit, intervention calendar, preregistration and reality check, series-forecast module and traps, carry-trade corridor, patterns, static site and Pages workflow, one-command update, acceptance checks, update drill, defence questions, Quiz 2 sheet | tests after each block; JavaScript formulas compared with Python; every number on the site traced to the ledger | [FILL IN] |
+
 ## Responsibility for numbers and references
 
 - Every number in the technical note comes from `outputs/numbers_for_note.json`, where each number records its source in `model/artifact.json`.

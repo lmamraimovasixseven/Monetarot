@@ -9,6 +9,7 @@ forecasts once decisions are in the data). The Makefile only delegates here, so 
 from __future__ import annotations
 
 import argparse
+import os
 import socket
 import subprocess
 import sys
@@ -35,6 +36,8 @@ TASKS = {
     "needs": [[sys.executable, "-m", "src.data_needs"]],
     "decision": [[sys.executable, "-m", "src.decision_rule"]],
     "desk": [[sys.executable, "-m", "src.forecast_desk", "desk"]],
+    "site": [[sys.executable, "-m", "src.site_build"]],
+    "patterns": [[sys.executable, "-m", "src.patterns"]],
     "corridor": [[sys.executable, "-m", "src.carry_corridor"]],
     "traps": [[sys.executable, "-m", "src.traps"]],
     "forecast": [[sys.executable, "-m", "src.forecast_desk", "forecast"]],
@@ -46,6 +49,16 @@ TASKS = {
     "forecast-log": [[sys.executable, "-m", "src.forecast_log", "log"]],
     "forecast-score": [[sys.executable, "-m", "src.forecast_log", "score"]],
 }
+TASKS["defence"] = [[sys.executable, "-m", "src.defence_doc"]]
+TASKS["drill"] = [[sys.executable, "-m", "src.drill"]]
+TASKS["trace"] = [[sys.executable, "-m", "src.trace"]]
+TASKS["acceptance"] = [[sys.executable, "-m", "src.acceptance"]]
+TASKS["root-docs"] = [[sys.executable, "-m", "src.root_docs"]]
+# Одна команда (бриф, блок G): данные → проверки → модель → прогнозы → журнал → site/. Офлайн, из закоммиченных данных.
+TASKS["update"] = (TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["decision"]
+                   + TASKS["prereg"] + TASKS["desk"] + TASKS["corridor"] + TASKS["patterns"] + TASKS["model-card"]
+                   + TASKS["forecast-score"] + TASKS["ledger"] + TASKS["site"] + TASKS["defence"] + TASKS["root-docs"]
+                   + TASKS["prereg-check"] + TASKS["traps"])
 TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
 
 
@@ -142,7 +155,8 @@ def run_task(name: str, extra: list[str] | None = None) -> int:
         commands[-1] += extra  # e.g. `python run.py needs 2026-12-04`
     for command in commands:
         print("+ " + " ".join(command[1:] if command[0] == sys.executable else command), flush=True)
-        code = subprocess.call(command, cwd=ROOT)
+        # Generated text contains characters such as "→" and "−" that a Windows console (cp1251) cannot encode.
+        code = subprocess.call(command, cwd=ROOT, env={**os.environ, "PYTHONIOENCODING": "utf-8"})
         if code:
             return code
     return 0

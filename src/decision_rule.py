@@ -102,6 +102,8 @@ def build(artifact_path: Path = ARTIFACT_PATH, losses_path: Path = LOSSES_PATH,
         "loss_status": config["status"], "loss_matrix": config["loss_matrix"], "binary_losses": binary,
         "probabilities": probabilities, "probability_date": artifact["latest_prediction"]["date"],
         "binary_threshold_p_cut": threshold, "p_cut": p_cut,
+        # соотношение потерь r = L_miss / L_false, при котором бинарный ответ меняется: p_cut = 1 / (1 + r*)
+        "switch_ratio_miss_to_false": (1 - p_cut) / p_cut if p_cut > 0 else None,
         "binary_action": "lengthen" if p_cut > threshold else "not_lengthen",
         "expected_losses": losses, "best_action": best_action(probabilities, config["loss_matrix"]),
         "sensitivity": sensitivity(config["sensitivity_ratios"], binary["lengthen_but_no_cut"]),

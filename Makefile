@@ -1,7 +1,7 @@
 PYTHON ?= python
 
 # Every target delegates to run.py, which works on Windows, macOS and Linux without make.
-.PHONY: data model robust report facts app test check regression all
+.PHONY: data model robust report facts app test check regression all update
 
 data:
 	$(PYTHON) run.py data
@@ -32,3 +32,6 @@ regression:
 
 all:
 	$(PYTHON) run.py all
+
+update:
+	$(PYTHON) run.py update
