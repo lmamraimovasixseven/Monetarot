@@ -13,13 +13,14 @@ import re
 from datetime import date
 from typing import Any
 
+from src.site_i18n import tr as english
+
 # Палитра Render (зелёный / синий / красный) в оттенках Okabe–Ito: различимы при дальтонизме; цвет никогда не
 # единственный признак — у каждой полосы подпись и значок (▲ ■ ▼).
 CLASS_TONE = {"Increase": "tone-increase", "Hold": "tone-hold", "Decrease": "tone-decrease"}
 CLASS_MARK = {"Increase": "▲", "Hold": "■", "Decrease": "▼"}
 CLASS_COLOUR = {"Increase": "#009E73", "Hold": "#6E6E6E", "Decrease": "#D55E00"}
 DISPLAY = ["Increase", "Hold", "Decrease"]
-RU_CLASS = {"Increase": "повышение", "Hold": "сохранение", "Decrease": "снижение"}
 
 
 def esc(text: Any) -> str:
@@ -59,7 +60,7 @@ def cell(L, key: str, value: Any, kind: str) -> str:
     if isinstance(value, list):
         return "–".join(cell(L, f"{key}/{i}", v, kind) for i, v in enumerate(value))
     if isinstance(value, bool) or not isinstance(value, (int, float)) or kind in ("text", "verdict", "flag"):
-        return esc(MISSING.get(kind, "") if value is None else value)
+        return esc(MISSING.get(kind, "") if value is None else english(value) if isinstance(value, str) else value)
     shown = fmt_number(float(L.raw(key)), kind)
     return f'<span class="num" data-ledger="{esc(key)}">{esc(shown)}</span>'
 
@@ -98,7 +99,7 @@ def _date(text: str | None) -> date | None:
 def headline(L, d: dict) -> str:
     most = d["most_likely"]
     first = _date(d["rounds"]["default"][0])
-    return f"""<div class="metrics" id="headline" lang="en">
+    return f"""<div class="metrics" id="headline">
 <div class="metric"><p class="m-label">Policy pressure score</p><p class="m-value">{L.num('dashboard:score', 3, signed=True)}</p>
 <p class="m-cap">95% band: {L.num('dashboard:band/0', 3, signed=True)} to {L.num('dashboard:band/1', 3, signed=True)}</p><p class="m-cap">{esc(d['direction_flag'])}</p></div>
 <div class="metric"><p class="m-label">Change versus previous decision</p><p class="m-value">{L.num('dashboard:score_change', 3, signed=True)}</p>
@@ -110,7 +111,7 @@ def headline(L, d: dict) -> str:
 
 
 def context_strip(d: dict) -> str:
-    return f"""<div class="context" id="context" lang="en"><p>Unit: {esc(d['unit'])}</p>
+    return f"""<div class="context" id="context"><p>Unit: {esc(d['unit'])}</p>
 <p>Period: NBK decision of {esc(d['latest_decision'])}, factor data month {esc(d['data_month'])} ({esc(d['lag_label'])})</p>
 <p>Latest change: <span class="num" data-ledger="dashboard:score_change">{d['score_change']:+.3f}</span> versus the decision of {esc(d['previous_decision'])}</p>
 <p>Local factor data and model artifact as of {esc(d['latest_decision'])}. A static page does not contact the calendar source; round dates come from config/forecast_rounds.json.</p></div>"""
@@ -128,7 +129,7 @@ def round_card(L, number: int, day: date | None, d: dict) -> str:
             f'<span class="probability-value">{L.num(f"dashboard:probabilities/{label}", 1, pct=True)}</span>'
             f'<span class="probability-interval">95% CI {L.num(f"dashboard:intervals/{label}/0", 1, pct=True)}–{L.num(f"dashboard:intervals/{label}/1", 1, pct=True)}</span></div>')
     head = "NEXT DECISION" if number == 1 else "SECOND NEXT DECISION"
-    return (f'<section class="forecast-card" id="round-{number}" lang="en"><div class="forecast-card-head">ROUND {number} &nbsp;·&nbsp; {head}</div>'
+    return (f'<section class="forecast-card" id="round-{number}"><div class="forecast-card-head">ROUND {number} &nbsp;·&nbsp; {head}</div>'
             f'<h3 class="forecast-date" data-round="{number}">{esc(long_date(day))}</h3>{"".join(rows)}'
             f'<div class="forecast-card-foot">{esc(d["card_foot"])}</div></section>')
 
@@ -136,21 +137,21 @@ def round_card(L, number: int, day: date | None, d: dict) -> str:
 def round_cards(L, d: dict) -> str:
     days = [_date(x) for x in d["rounds"]["default"]]
     rounds = json.dumps(d["rounds"]["dates"])
-    message = f'<p class="caption" id="rounds-message" lang="en">{esc(d["rounds"]["default_message"])}</p>' if d["rounds"]["default_message"] else '<p class="caption" id="rounds-message" lang="en"></p>'
-    return (f'<h3 lang="en">Next scheduled NBK decisions</h3>'
+    message = f'<p class="caption" id="rounds-message">{esc(d["rounds"]["default_message"])}</p>' if d["rounds"]["default_message"] else '<p class="caption" id="rounds-message"></p>'
+    return (f'<h3>Next scheduled NBK decisions</h3>'
             f'<div class="cards" id="round-cards" data-rounds="{esc(rounds)}" data-latest="{esc(d["latest_decision"])}" data-verified="{str(d["rounds"]["verified"]).lower()}">'
             + "".join(round_card(L, i, day, d) for i, day in enumerate(days, start=1)) + "</div>"
-            f'<p class="caption" id="rounds-caption" lang="en">{esc(d["rounds_caption"])}</p>{message}'
-            f'<details id="why" lang="en"><summary>Why these probabilities?</summary><ul>'
+            f'<p class="caption" id="rounds-caption">{esc(d["rounds_caption"])}</p>{message}'
+            f'<details id="why"><summary>Why these probabilities?</summary><ul>'
             + "".join(f"<li>{md_inline(item)}</li>" for item in d["why"]) + "</ul></details>")
 
 
 def boxes(d: dict) -> str:
     rule = d.get("decision_rule")
-    rule_html = (f'<div class="box info" id="decision-rule" lang="en"><strong>{esc(rule["head"])}</strong> {esc(rule["text"])}</div>'
-                 if rule else '<div class="box info" id="decision-rule" lang="en">Decision rule: not recorded.</div>')
-    return (f'<div class="box warn" id="verdict-box" lang="en">{esc(d["verdict_box"])}</div>{rule_html}'
-            f'<p class="caption" id="forecast-log" lang="en">{esc(d["forecast_log_sentence"])} <a href="forecasts.html">Журнал прогнозов</a>.</p>')
+    rule_html = (f'<div class="box info" id="decision-rule"><strong>{esc(rule["head"])}</strong> {esc(rule["text"])}</div>'
+                 if rule else '<div class="box info" id="decision-rule">Decision rule: not recorded.</div>')
+    return (f'<div class="box warn" id="verdict-box">{esc(d["verdict_box"])}</div>{rule_html}'
+            f'<p class="caption" id="forecast-log">{esc(d["forecast_log_sentence"])} <a href="forecasts.html">Forecast log</a>.</p>')
 
 
 # ----------------------------------------------------------------------------- графики (SVG без библиотек)
@@ -196,14 +197,14 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
             parts.append(f'<rect x="{cx - 3:.1f}" y="{cy - 3:.1f}" width="6" height="6" fill="{colour}">{tip}</rect>')
         parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {score:+.3f}</title></circle>')
     parts.append("</svg>")
-    legend = ('<p class="legend" lang="en"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
+    legend = ('<p class="legend"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
               '<span><span class="mark tone-increase">▲</span> Increase</span><span><span class="mark tone-hold-grey">■</span> Hold</span>'
               '<span><span class="mark tone-decrease">▼</span> Decrease</span><span class="key" style="border-color:#FFF4D6">Holdout</span></p>')
     caption = (f"Blue line: the policy pressure score implied by the stored model at each decision. Dots: what the NBK actually "
                f"decided (−1 cut, 0 hold, +1 hike). Shaded: holdout from {tr['holdout_start']}, where the frozen model is "
                "forecasting out of sample; earlier values are in-sample fits and flatter the model. A useful score would sit "
                "above zero before hikes and below zero before cuts.")
-    return (f'<figure id="track-record" lang="en"><figcaption><strong>Track record of the score</strong></figcaption>{"".join(parts)}'
+    return (f'<figure id="track-record"><figcaption><strong>Track record of the score</strong></figcaption>{"".join(parts)}'
             f'{legend}<p class="caption">{esc(caption)}</p></figure>')
 
 
@@ -227,7 +228,7 @@ def svg_contributions(L, d: dict, palette: dict[str, str]) -> str:
         parts.append(f'<rect x="{x_start:.1f}" y="{top}" width="{max(length, 0.5):.1f}" height="{bar}" fill="{colour}"><title>{esc(row[0])}: {v:+.4f}</title></rect>')
         parts.append(f'<text x="{(zero + v * scale + 6) if v >= 0 else (zero + 6):.1f}" y="{top + bar / 2 + 4:.1f}" font-size="12" fill="{palette["black"]}">{v:+.4f}</text>')
     parts.append("</svg>")
-    return f'<figure lang="en"><figcaption><strong>Contribution to score change</strong> (blue: pushes towards a hike, vermillion: towards a cut)</figcaption>{"".join(parts)}</figure>'
+    return f'<figure><figcaption><strong>Contribution to score change</strong> (blue: pushes towards a hike, vermillion: towards a cut)</figcaption>{"".join(parts)}</figure>'
 
 
 def drivers(L, d: dict, palette: dict[str, str]) -> str:
@@ -236,7 +237,7 @@ def drivers(L, d: dict, palette: dict[str, str]) -> str:
     cards = "".join(f'<div class="metric"><p class="m-label">Driver {rank}: {esc(rows[i][0])}</p>'
                     f'<p class="m-value">{L.num(f"dashboard:contributions/rows/{i}/1", 4, signed=True)}</p></div>'
                     for rank, i in enumerate(order, start=1))
-    return (f'<div id="drivers" lang="en"><h3>Latest score-change contributions</h3><p class="caption">Top three drivers by absolute contribution</p>'
+    return (f'<div id="drivers"><h3>Latest score-change contributions</h3><p class="caption">Top three drivers by absolute contribution</p>'
             f'<div class="metrics three">{cards}</div>{svg_contributions(L, d, palette)}'
             + render_table(L, "dashboard:contributions", d["contributions"])
             + '<p class="caption">Contributions come from the model artifact; the stored method notes that they are not additive.</p></div>')
@@ -277,7 +278,7 @@ def svg_history(L, d: dict, palette: dict[str, str]) -> str:
     charts.append(step_chart(h["dates"], "dashboard:history/score", len(h["dates"]), -1.2, 1.2,
                              [(-1, "Decrease (-1)"), (0, "Hold (0)"), (1, "Increase (+1)")],
                              "Step line: direction of each NBK decision (−1 decrease, 0 hold, +1 increase).", palette["black"], 230))
-    return (f'<section id="ev-history" lang="en"><h2>History</h2><figure><figcaption><strong>Base rate, % and decision direction score</strong></figcaption>'
+    return (f'<section id="ev-history"><h2>History</h2><figure><figcaption><strong>Base rate, % and decision direction score</strong></figcaption>'
             f'{"".join(charts)}</figure><p class="caption">{esc(h["source"])}</p></section>')
 
 
@@ -302,7 +303,7 @@ def scenario(L, d: dict) -> str:
     s = model_json["slider"][default]
     probs = "".join(f'<div class="metric"><p class="m-label">Scenario P({label})</p><p class="m-value" id="sc-p-{label}">'
                     f'{L.num(f"dashboard:probabilities/{label}", 1, pct=True)}</p><p class="m-cap" id="sc-d-{label}">+0.0 pp</p></div>' for label in DISPLAY)
-    return f"""<div id="scenario" lang="en"><h3>Scenario control</h3>
+    return f"""<div id="scenario"><h3>Scenario control</h3>
 <p class="caption">Change one observed factor while holding the other latest inputs fixed. The interval uses the stored covariance and delta method.</p>
 <script type="application/json" id="model-json">{json.dumps(model_json)}</script>
 <label for="sc-factor">Factor to change</label><select id="sc-factor">{options}</select>

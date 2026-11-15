@@ -43,11 +43,12 @@ def test_every_number_on_the_site_has_a_ledger_row():
 def test_show_it_home_page_has_no_placeholders_or_apologies():
     text = (SITE / "index.html").read_text(encoding="utf-8")
     assert not APOLOGY.search(text), APOLOGY.search(text).group(0)
-    for step in ("1. Решение", "2. Напряжение", "3. Доказательства", "4. Прогноз", "5. Механизм", "6. Риск", "7. Действие"):
+    for step in ("1. The decision", "2. The tension", "3. The evidence", "4. The forecast", "5. The mechanism", "6. The risk", "7. The ask"):
         assert step in text
-    assert text.count("<svg") <= 3 and 'lang="en"' in text
-    assert "ждёт подтверждения" not in text and "(ждёт" not in text, "service notes belong on methods.html"
-    assert "при равных потерях" in text and "calibration is unverified" in text
+    assert text.count("<svg") <= 3 and '<html lang="en">' in text
+    assert "awaiting confirmation" not in text and "USER ASSUMPTION" not in text, "service notes belong on methods.html"
+    assert "with equal losses" in text and "calibration is unverified" in text
+    assert "English summary" not in text, "the whole site is English; one short introduction is enough"
 
 
 def test_home_page_follows_the_render_placement():
@@ -82,6 +83,33 @@ def test_every_parity_element_is_on_the_site():
         assert row["Статус"] in {"перенесено", "иначе"}, row
         if row["Статус"] == "иначе":
             assert any(page_name == "methods.html" for page_name, _ in targets), "every difference is explained on methods.html"
+
+
+# Proper names that may stay in Cyrillic on the site (none so far); data files in site/data/ are not checked.
+ALLOWED_CYRILLIC: set[str] = set()
+
+
+def test_site_is_english_without_cyrillic():
+    """D41: every page, script and stylesheet of the site is English; Russian sources go through src/site_i18n.py."""
+    files = [*SITE.glob("*.html"), *SITE.glob("assets/*.js"), *SITE.glob("assets/*.css")]
+    assert files
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        words = set(re.findall("[Ѐ-ӿ]+", text)) - ALLOWED_CYRILLIC
+        assert not words, (path.name, sorted(words)[:10])
+        if path.suffix == ".html":
+            assert '<html lang="en">' in text and '<meta name="description" content="' in text, path.name
+
+
+def test_translation_layer_fails_loudly_and_keeps_numbers():
+    from src import site_i18n
+
+    with pytest.raises(site_i18n.UntranslatedError):
+        site_i18n.tr("строка без перевода")
+    reason = "новый уровень держится: в следующих 4 мес. (предварительно: меньше 6 мес.) сохраняется 87% скачка"
+    english = site_i18n.tr(reason)
+    assert "4 months" in english and "87%" in english and "fewer than 6 months" in english
+    assert site_i18n.tr("plain English 0.995") == "plain English 0.995"
 
 
 def test_readable_at_360px():

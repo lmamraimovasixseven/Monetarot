@@ -1,6 +1,6 @@
-/* Ползунки и раунды сайта. Формулы — те же, что src/app.py (ordered_probabilities, score_gradient,
-   score_and_delta_band) и src/decision_rule.py::binary_threshold. ES3, чтобы чистые функции до первого
-   немедленно вызываемого блока можно было сверить с Python в cscript (tests/test_site.py). */
+/* Sliders and rounds of the site. The formulas are those of src/app.py (ordered_probabilities, score_gradient,
+   score_and_delta_band) and src/decision_rule.py::binary_threshold. ES3, so that the pure functions before the first
+   immediately invoked block can be checked against Python in cscript (tests/test_site.py). */
 function threshold(ratio) { return 1 / (1 + ratio); }
 function logistic(v) { if (v >= 0) { return 1 / (1 + Math.exp(-v)); } var e = Math.exp(v); return e / (1 + e); }
 function density(v) { var c = Math.max(-700, Math.min(700, v)); var p = 1 / (1 + Math.exp(-c)); return p * (1 - p); }
@@ -34,14 +34,14 @@ function longDate(s) {
   return WEEKDAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].toUpperCase() + " " + d.getFullYear();
 }
 function shortDate(s) { if (!s) { return "date not confirmed"; } var d = parseIso(s); return pad2(d.getDate()) + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
-/* Как app.load_next_decisions: до двух подтверждённых дат строго после сегодняшней. */
+/* As app.load_next_decisions: up to two confirmed dates strictly after today. */
 function nextRounds(dates, today, verified) {
   var out = [], i;
   if (verified) { for (i = 0; i < dates.length; i++) { if (dates[i] > today && out.length < 2) { out.push(dates[i]); } } }
   while (out.length < 2) { out.push(null); }
   return out;
 }
-/* Как app.passed_rounds_missing_from_data: заседания после последнего решения в данных, но уже прошедшие. */
+/* As app.passed_rounds_missing_from_data: meetings after the latest decision in the data that have already taken place. */
 function missedRounds(dates, latest, today) {
   var out = [], i;
   for (i = 0; i < dates.length; i++) { if (dates[i] > latest && dates[i] < today) { out.push(dates[i]); } }
@@ -56,8 +56,8 @@ function missedRounds(dates, latest, today) {
     var update = function () {
       var r = parseFloat(ratio.value), p = threshold(r);
       byId("ratio-out").textContent = r.toFixed(2);
-      byId("ratio-text").textContent = "Порог p* = " + p.toFixed(3) + "; P(снижение) = " + pcut.toFixed(3) +
-        " → " + (pcut > p ? "удлинять дюрацию" : "не удлинять дюрацию") + ".";
+      byId("ratio-text").textContent = "Threshold p* = " + p.toFixed(3) + "; P(cut) = " + pcut.toFixed(3) +
+        " → " + (pcut > p ? "extend duration" : "do not extend duration") + ".";
     };
     ratio.addEventListener("input", update); update();
   }
@@ -100,7 +100,7 @@ function missedRounds(dates, latest, today) {
     };
     var choose = function () {
       var s = m.slider[parseInt(factor.value, 10)];
-      slider.min = s.min; slider.max = s.max; slider.value = s.baseline;  // как в Render: новый фактор — с последнего значения
+      slider.min = s.min; slider.max = s.max; slider.value = s.baseline;  // as in Render: a newly chosen factor starts at its latest value
       byId("sc-name").textContent = m.labels[parseInt(factor.value, 10)];
       byId("sc-min").textContent = s.min.toFixed(2); byId("sc-max").textContent = s.max.toFixed(2);
       redraw();
@@ -128,10 +128,10 @@ function missedRounds(dates, latest, today) {
       for (i = 0; i < ids.length; i++) { v[ids[i]] = parseFloat(byId("c-" + ids[i]).value);
         byId("o-" + ids[i]).textContent = v[ids[i]].toFixed(2); }
       var credit = JSON.parse(form.getAttribute("data-credit"));
-      var res = corridor(v.rate, parseFloat(form.getAttribute("data-inflation")), {"Россия": v.ru, "Китай": v.cn}, v.prem, v.cap, credit);
-      byId("corridor-out").textContent = "Коридор: " + res.lower.toFixed(2) + "–" + res.upper.toFixed(2) +
-        "%; реальный дифференциал к РФ " + res.differentials["Россия"].toFixed(2) + ", к КНР " + res.differentials["Китай"].toFixed(2) +
-        " п.п.; " + res.label + ".";
+      var res = corridor(v.rate, parseFloat(form.getAttribute("data-inflation")), {"Russia": v.ru, "China": v.cn}, v.prem, v.cap, credit);
+      byId("corridor-out").textContent = "Corridor: " + res.lower.toFixed(2) + "–" + res.upper.toFixed(2) +
+        "%; real differential to Russia " + res.differentials["Russia"].toFixed(2) + " pp, to China " + res.differentials["China"].toFixed(2) +
+        " pp; " + res.label + ".";
     };
     for (var n = 0; n < ids.length; n++) { byId("c-" + ids[n]).addEventListener("input", redrawCorridor); }
     redrawCorridor();

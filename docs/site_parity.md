@@ -4,11 +4,12 @@
 Decision Desk (`python run.py site`, GitHub Pages). Числа сайта берутся из блока `dashboard` в `model/artifact.json`
 (`python run.py dashboard`, `src/dashboard_view.py`), который вызывает те же функции `src/app.py`; каждое число имеет
 строку в `ledger/evidence_ledger.csv`. `tests/test_site.py::test_every_parity_element_is_on_the_site` читает таблицу
-ниже и проверяет для каждой строки, что на странице есть элемент с указанным `id` и контрольный текст.
+ниже и проверяет для каждой строки, что на странице есть элемент с указанным `id` и контрольный текст. Сайт целиком на
+английском (D41), поэтому контрольные тексты — английские фразы со страницы.
 
 Способ: **число** — готовое значение из артефакта в HTML; **JS** — пересчёт или выбор в браузере; **SVG** — график
 без библиотек; **HTML** — таблица, плашка или раскрывающийся блок. Статус: **перенесено** — выглядит и работает как в
-Render; **иначе** — статичная страница не может сделать то же, причина записана на странице «Методы и пределы».
+Render; **иначе** — статичная страница не может сделать то же, причина записана на странице «Methods and limits» (`methods.html#static-limits`).
 
 Скриншоты (`python scripts/site_parity_shots.py`, нужен playwright и Google Chrome): `docs/site_parity/render_*.jpg`
 (вкладки Render, раскрывающиеся блоки открыты) и `docs/site_parity/site_{1400,360}_*.jpg` (сайт на компьютере и на 360 px).
@@ -24,8 +25,8 @@ Render; **иначе** — статичная страница не может �
 | Предупреждение об устаревших данных (прошедшее заседание не в данных) | `index.html#freshness` | JS | перенесено | Data are out of date |
 | Предупреждение о скачке в сырых данных | `index.html#anomaly-warning` | число | перенесено | Check the source data |
 | Блок «Unit / Period / Latest change» | `index.html#context` | число | перенесено | Unit: probability difference |
-| Статус проверки календаря («CACHED DATA» / «Calendar source responded») | `methods.html#static-limits` | HTML | иначе | Проверка календаря НБ РК |
-| Вкладки Overview / Drivers and scenario / Evidence / Data and provenance | `methods.html#static-limits` | HTML | иначе | Вкладки. |
+| Статус проверки календаря («CACHED DATA» / «Calendar source responded») | `methods.html#static-limits` | HTML | иначе | NBK calendar check |
+| Вкладки Overview / Drivers and scenario / Evidence / Data and provenance | `methods.html#static-limits` | HTML | иначе | Tabs. |
 | Заголовок «Next scheduled NBK decisions» | `index.html#round-cards` | HTML | перенесено | Next scheduled NBK decisions |
 | Карточка Round 1: дата, полоски Increase / Hold / Decrease, проценты, 95% CI | `index.html#round-1` | число + JS | перенесено | ROUND 1 |
 | Карточка Round 2 (дата не подтверждена, те же вероятности) | `index.html#round-2` | число + JS | перенесено | SECOND NEXT DECISION |
@@ -60,11 +61,11 @@ Render; **иначе** — статичная страница не может �
 | Таблица происхождения данных (поля из docs/facts_to_fill.csv) | `data.html#data-provenance` | HTML | перенесено | Data and provenance |
 | Таблица «Field / Value» (лаг, пользователь, календарь, окно выборки, время оценки, хеш, seed) | `data.html#data-values` | HTML | перенесено | Random seed |
 | Таблица «Factor / Latest value / Model input unit» | `data.html#data-latest` | HTML | перенесено | Model input unit |
-| Строка «Cached dashboard render time» | `methods.html#static-limits` | HTML | иначе | Время отрисовки |
-| Сортировка таблиц щелчком по заголовку | `methods.html#static-limits` | HTML | иначе | Сортировка таблиц |
-| Ссылка на интерактивную версию (Render) | `index.html#render-link` | HTML | перенесено | интерактивная версия |
-| Порог p* «при равных потерях» и ползунок потерь | `index.html#step-2` | JS | перенесено | при равных потерях |
-| Служебные пометки о статусе решения и потерь | `methods.html#statuses` | HTML | перенесено | Статусы, которые ждут человека |
+| Строка «Cached dashboard render time» | `methods.html#static-limits` | HTML | иначе | Render time |
+| Сортировка таблиц щелчком по заголовку | `methods.html#static-limits` | HTML | иначе | Table sorting |
+| Ссылка на интерактивную версию (Render) | `index.html#render-link` | HTML | перенесено | interactive version |
+| Порог p* «with equal losses» (при равных потерях) и ползунок потерь | `index.html#step-2` | JS | перенесено | with equal losses |
+| Служебные пометки о статусе решения и потерь | `methods.html#statuses` | HTML | перенесено | Statuses awaiting a person |
 
 ## Что воспроизводится иначе и почему
 
@@ -72,8 +73,8 @@ Render; **иначе** — статичная страница не может �
   он не ответил. Статичная страница не обращается к внешним адресам (требование брифа); даты раундов берутся из
   `config/forecast_rounds.json`, а ближайшие два раунда выбираются в браузере по сегодняшней дате, как
   `app.load_next_decisions`. Без JavaScript показываются раунды после последнего решения в данных.
-- **Вкладки.** Четыре вкладки Render разложены по семи шагам брифа на главной и по страницам «Доказательства» и
-  «Данные»; повторы таблиц внутри «Full results stored in artifact» не дублируются, потому что те же таблицы стоят
+- **Вкладки.** Четыре вкладки Render разложены по семи шагам брифа на главной и по страницам «Evidence» и
+  «Data»; повторы таблиц внутри «Full results stored in artifact» не дублируются, потому что те же таблицы стоят
   выше на той же странице.
 - **Время отрисовки и сортировка таблиц** относятся к серверу Streamlit и его компоненту таблиц.
 - **Формат чисел в сырых таблицах** («Full results»): четыре знака после запятой; Streamlit показывает числа в своём

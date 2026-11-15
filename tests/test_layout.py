@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_brief_layout_exists():
     for relative in ("README.md", "AI_USE.md", "CONTRIBUTIONS.md", "DECLARATION.md", "data/raw", "data/processed",
                      "ledger/evidence_ledger.csv", "prereg/prereg.md", "src", "model/artifact.json", "site/index.html",
-                     "site/evidence.html", "docs/site_parity.md", "config/site_links.json", "src/dashboard_view.py"):
+                     "site/evidence.html", "docs/site_parity.md", "config/site_links.json", "src/dashboard_view.py",
+                     "src/site_i18n.py", "docs/site_i18n.md"):
         assert (ROOT / relative).exists(), relative
 
 

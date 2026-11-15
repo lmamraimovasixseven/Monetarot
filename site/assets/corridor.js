@@ -1,9 +1,10 @@
-/* Движок коридора carry trade для сайта. Та же формула, что src/carry_corridor.py::corridor
-   (тест сверки tests/test_carry_corridor.py, до 1e-6). Синтаксис ES3: работает в node и в Windows cscript. */
-var POSITION_LABELS = ["коридор сломан: нижняя граница выше верхней",
-                       "ниже коридора: риск оттока в carry trade",
-                       "выше коридора: риск избыточного притока и вреда кредиту",
-                       "внутри коридора"];
+/* Carry-trade corridor engine of the site. The same formula as src/carry_corridor.py::corridor
+   (parity test tests/test_carry_corridor.py, to 1e-6). ES3 syntax: runs in node and in Windows cscript.
+   The labels are the English versions of the Python position labels (src/site_i18n.py). */
+var POSITION_LABELS = ["corridor broken: the lower bound is above the upper bound",
+                       "below the corridor: risk of outflows into the carry trade",
+                       "above the corridor: risk of excessive inflows and harm to credit",
+                       "inside the corridor"];
 
 function corridor(nbkRate, kzInflation, partners, premium, cap, creditZero) {
   var kzReal = nbkRate - kzInflation, maxPartner = null, name, differentials = {}, count = 0;

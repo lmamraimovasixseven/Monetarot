@@ -80,7 +80,7 @@ Run these commands from the repository root (the folder that contains run.py), n
 - Static site (Decision Desk, GitHub Pages, built by `python run.py site` into `site/`): https://lmamraimovasixseven.github.io/Monetarot/
 - Interactive version (Render, the Streamlit app `src/app.py`): https://monetarot.onrender.com/
 
-Both read the same `model/artifact.json`; `docs/site_parity.md` maps every element of the interactive version to its place on the static site.
+Both read the same `model/artifact.json`; `docs/site_parity.md` maps every element of the interactive version to its place on the static site. The static site is entirely in English: Russian text stored in the artifact and in the generated documents is translated while the site is built (`src/site_i18n.py`, `docs/site_i18n.md`), and the build stops if any Cyrillic text would reach a page.
 
 ## Run the site
 

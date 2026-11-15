@@ -38,6 +38,6 @@ def test_rounds_are_reproducible_and_honest_about_missing_dates():
 
 
 def test_no_estimation_in_the_dashboard_or_site_code():
-    for name in ("dashboard_view.py", "site_dashboard.py", "site_build.py"):
+    for name in ("dashboard_view.py", "site_dashboard.py", "site_build.py", "site_i18n.py"):
         text = (ROOT / "src" / name).read_text(encoding="utf-8")
         assert not re.search(r"\.fit\(|\bOLS\(|minimize\(", text), name

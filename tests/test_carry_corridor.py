@@ -12,7 +12,7 @@ import pandas as pd
 import pytest
 
 from _tolerance import same_within_float_tolerance
-from src import carry_corridor as cc
+from src import carry_corridor as cc, site_i18n
 
 ROOT = Path(__file__).resolve().parents[1]
 JS = ROOT / "src" / "site_assets" / "corridor.js"
@@ -79,16 +79,17 @@ def test_browser_engine_matches_python_to_1e6(tmp_path):
     literal = lambda v: "null" if v is None else repr(v)  # noqa: E731
     calls = "\n".join(
         f"res = corridor({literal(a)}, {literal(b)}, {{r: {literal(p['r'])}, c: {literal(p['c'])}}}, {literal(d)}, {literal(e)}, {literal(f)});"
-        f" out(res.code + '|' + res.lower + '|' + res.upper + '|' + res.kzReal);" for a, b, p, d, e, f in cases)
+        f" out(res.code + '|' + res.lower + '|' + res.upper + '|' + res.kzReal + '|' + res.label);" for a, b, p, d, e, f in cases)
     script = tmp_path / "parity.js"
     script.write_text(JS.read_text(encoding="utf-8") + "\nvar res; var out = (typeof console !== 'undefined') ? "
                       "function (s) { console.log(s); } : function (s) { WScript.Echo(s); };\n" + calls + "\n", encoding="utf-8")
-    lines = subprocess.run([*engine, str(script)], capture_output=True, text=True, check=True).stdout.split()
+    lines = [line for line in subprocess.run([*engine, str(script)], capture_output=True, text=True, check=True).stdout.splitlines() if line.strip()]
     assert len(lines) == len(cases)
     for (a, b, p, d, e, f), line in zip(cases, lines):
-        code, lower, upper, kz_real = line.split("|")
+        code, lower, upper, kz_real, label = line.split("|")
         expected = cc.corridor(a, b, {"Россия": p["r"], "Китай": p["c"]}, d, e, f)
         assert int(code) == _code(expected["position"])
+        assert label == site_i18n.tr(expected["position"])  # the site shows the English version of the Python label (D41)
         assert float(lower) == pytest.approx(expected["lower"], abs=1e-6) and float(upper) == pytest.approx(expected["upper"], abs=1e-6)
         assert float(kz_real) == pytest.approx(expected["kz_real_rate"], abs=1e-6)
 
