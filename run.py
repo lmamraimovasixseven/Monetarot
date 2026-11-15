@@ -48,6 +48,7 @@ TASKS = {
     "compare": [[sys.executable, "-m", "src.compare"]],
     "forecast-log": [[sys.executable, "-m", "src.forecast_log", "log"]],
     "forecast-score": [[sys.executable, "-m", "src.forecast_log", "score"]],
+    "dashboard": [[sys.executable, "-m", "src.dashboard_view"]],
 }
 TASKS["defence"] = [[sys.executable, "-m", "src.defence_doc"]]
 TASKS["drill"] = [[sys.executable, "-m", "src.drill"]]
@@ -57,7 +58,7 @@ TASKS["root-docs"] = [[sys.executable, "-m", "src.root_docs"]]
 # Одна команда (бриф, блок G): данные → проверки → модель → прогнозы → журнал → site/. Офлайн, из закоммиченных данных.
 TASKS["update"] = (TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["decision"]
                    + TASKS["prereg"] + TASKS["desk"] + TASKS["corridor"] + TASKS["patterns"] + TASKS["model-card"]
-                   + TASKS["forecast-score"] + TASKS["ledger"] + TASKS["site"] + TASKS["defence"] + TASKS["root-docs"]
+                   + TASKS["forecast-score"] + TASKS["dashboard"] + TASKS["ledger"] + TASKS["site"] + TASKS["defence"] + TASKS["root-docs"]
                    + TASKS["prereg-check"] + TASKS["traps"])
 TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
 

@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
+from src import site_dashboard as sd
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -25,8 +25,8 @@ ASSETS_SRC = ROOT / "src" / "site_assets"
 LEDGER = ROOT / "ledger" / "evidence_ledger.csv"
 ARTIFACT = ROOT / "model" / "artifact.json"
 PALETTE = {"blue": "#0072B2", "orange": "#E69F00", "vermillion": "#D55E00", "green": "#009E73", "sky": "#56B4E9",
-           "grey": "#6E6E6E", "black": "#000000"}
-PAGES = [("index.html", "Главная"), ("methods.html", "Методы и пределы"), ("run.html", "Запусти сам"),
+           "grey": "#6E6E6E", "black": "#000000", "shade": "#FFF4D6"}
+PAGES = [("index.html", "Главная"), ("evidence.html", "Доказательства"), ("methods.html", "Методы и пределы"), ("run.html", "Запусти сам"),
          ("sources.html", "Источники"), ("team.html", "Команда"), ("data.html", "Данные"), ("patterns.html", "Паттерны"),
          ("corridor.html", "Коридор"), ("forecasts.html", "Журнал прогнозов"), ("redteam.html", "Ответ красной команде"),
          ("asof.html", "Просмотр на дату t")]
@@ -66,7 +66,7 @@ def page(title: str, body: str, current: str) -> str:
                    for href, label in PAGES)
     return f"""<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{esc(title)} · Monetarot</title><link rel="stylesheet" href="assets/style.css"></head>
+<title>{esc(title)} · Monetarot</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/style.css"></head>
 <body><header><p class="brand">Monetarot · решения НБ РК</p><nav aria-label="Разделы">{nav}</nav></header>
 <main>{body}</main>
 <footer><p>Сгенерировано <code>python run.py site</code> из <code>model/artifact.json</code>. Каждое число имеет строку в
@@ -148,62 +148,165 @@ def md_to_html(text: str) -> str:
 
 # ----------------------------------------------------------------------------- страницы
 
+def site_links() -> dict[str, str]:
+    """Адреса сайта и Render-приложения (config/site_links.json); неизвестный адрес — UNKNOWN, на главной не показывается."""
+    path = ROOT / "config" / "site_links.json"
+    links = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    return {"render_url": str(links.get("render_url") or "UNKNOWN"), "pages_url": str(links.get("pages_url") or "UNKNOWN")}
+
+
 def index_page(L: Ledger, artifact: dict) -> str:
-    decision = artifact["decision"]
-    rc = artifact["reality_check"]
-    holdout = pd.read_csv(ROOT / "outputs" / "annex_predictions.csv")
-    rates = pd.read_csv(ROOT / "data" / "raw" / "base_rate_history.csv")
-    L.raw("chart:holdout"), L.raw("chart:base_rate")
+    decision, rc, d = artifact["decision"], artifact["reality_check"], artifact["dashboard"]
+    links = site_links()
     p_cut = float(L.raw("decision:p_cut"))
     threshold = float(L.raw("decision:binary_threshold_p_cut"))
     action = "удлинять дюрацию" if p_cut > threshold else "не удлинять дюрацию"
     best = {"lengthen": "удлинить", "keep": "оставить", "shorten": "сократить"}[decision["best_action"]]
-    ci_low, ci_high = float(L.raw("n:rmse_ratio_ci_low")), float(L.raw("n:rmse_ratio_ci_high"))
-    chart1_title = (f"Модель и Always Hold на holdout неразличимы: отношение RMSE {float(L.raw('n:rmse_ratio')):.3f}, "
-                    f"95% интервал {ci_low:.2f}–{ci_high:.2f} содержит 1" if ci_low <= 1 <= ci_high else
-                    f"Отношение RMSE на holdout {float(L.raw('n:rmse_ratio')):.3f}, интервал не содержит 1")
-    chart1 = svg_line(chart1_title, "Линия: ожидаемый балл модели на 18 решениях holdout; квадраты: фактические решения (−1 снижение, 0 сохранение, +1 повышение).",
-                      [("ожидаемый балл модели", holdout["expected_score"].tolist(), PALETTE["blue"])],
-                      holdout["decision_date"].tolist(), "балл: −1 снижение … +1 повышение",
-                      points=[(i, float(v), PALETTE["vermillion"]) for i, v in enumerate(holdout["actual_score"])])
-    chart2 = svg_line(f"Базовая ставка сейчас {rates['rate'].iloc[-1]:g}%: после пика идёт снижение",
-                      "Линия: базовая ставка НБ РК по месяцам с 2015 года.",
-                      [("базовая ставка, %", rates["rate"].tolist(), PALETTE["orange"])], rates["year_month"].tolist(), "%")
+    most = d["most_likely"]
+    band_lo, band_hi = float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))
+    # Шаг 2: очевидный взгляд и один факт из артефакта, который его усложняет.
+    obvious = (f"Очевидный взгляд: самый вероятный исход — {sd.RU_CLASS[most]} ставки "
+               f"({L.num(f'dashboard:probabilities/{most}', 1, pct=True)}).")
+    if band_lo <= 0 <= band_hi:
+        complication = (f"Что усложняет: у вероятности снижения ({L.num('dashboard:probabilities/Decrease', 1, pct=True)}) 95% интервал "
+                        f"{L.num('dashboard:intervals/Decrease/0', 1, pct=True)}–{L.num('dashboard:intervals/Decrease/1', 1, pct=True)}, "
+                        f"а 95% полоса балла давления ({L.num('dashboard:band/0', 3, signed=True)} … {L.num('dashboard:band/1', 3, signed=True)}) "
+                        "включает ноль: модель не отличает давление к снижению от давления к повышению.")
+    else:
+        side = "выше" if band_lo > 0 else "ниже"
+        complication = (f"Что усложняет: 95% полоса балла давления ({L.num('dashboard:band/0', 3, signed=True)} … "
+                        f"{L.num('dashboard:band/1', 3, signed=True)}) целиком {side} нуля, хотя самый вероятный исход — {sd.RU_CLASS[most]}.")
+    loss_slider = "" if d["losses_confirmed"] else (
+        '<p>Соотношение потерь — допущение; передвиньте его и посмотрите, как меняется порог.</p>'
+        '<label for="ratio">Соотношение потерь r = L<sub>упущ.</sub>/L<sub>ложн.</sub>: <output id="ratio-out">1.00</output></label>'
+        f'<input id="ratio" type="range" min="0.25" max="4" step="0.05" value="1" data-pcut="{p_cut!r}">'
+        '<p id="ratio-text" aria-live="polite"></p>')
+    render_link = (f'<a id="render-link" href="{esc(links["render_url"])}">интерактивная версия (Render)</a>'
+                   if links["render_url"].startswith("https://") else
+                   '<a id="render-link" href="methods.html#render-app">интерактивная версия (Streamlit-приложение)</a>')
     rps = [("модель", float(L.raw("n:rps_model")), PALETTE["blue"]), ("частоты классов", float(L.raw("n:rps_class_frequency")), PALETTE["sky"]),
            ("Always Hold", float(L.raw("n:rps_hold")), PALETTE["grey"])]
-    chart3 = svg_bars("По RPS модель почти не отличается от простых частот классов (меньше — лучше)",
-                      "Столбцы: ранжированный вероятностный балл на holdout для модели, частот классов и Always Hold.", rps)
+    chart_rps = svg_bars("По RPS модель почти не отличается от простых частот классов (меньше — лучше)",
+                         "Столбцы: ранжированный вероятностный балл на holdout для модели, частот классов и Always Hold.", rps)
     limits = __import__("src.model_card", fromlist=["limits"]).limits()[:3]
     risk = "".join(f"<li><strong>{esc(i['title'])}.</strong> {esc(i['text'])}</li>" for i in limits)
+    anomaly = (f'<div class="box warn" id="anomaly-warning" lang="en">{esc(d["anomaly_warning"])} '
+               f'<a href="evidence.html#ev-anomalies">Raw-data anomaly screen</a></div>' if d["anomaly_warning"] else
+               '<div class="box info" id="anomaly-warning" lang="en">No flagged raw-data jump enters the latest score.</div>')
+    look_ahead = d["look_ahead_sentence"] or "Look-ahead status: see Evidence → Limitations."
     return f"""
-<section class="lead"><h1>Удлинять ли дюрацию тенговых облигаций до заседания НБ РК?</h1>
-<p class="summary" lang="en">English summary: an ordered-logit monitor of National Bank of Kazakhstan rate decisions, turned into a duration decision with an explicit loss function. The model cannot be told apart from "always hold"; the page shows that as prominently as any result.</p></section>
-<section><h2>1. Решение</h2><p>{esc(decision['decision'])} <em>({esc(decision['decision_status'])}; потери — {esc(decision['loss_status'].split(':')[0].lower())})</em></p></section>
-<section><h2>2. Напряжение</h2><p>Вероятность снижения ставки на заседании {esc(rc['target'].split('НБ РК ')[-1].split(' (')[0])}: {L.num('decision:p_cut', 1, pct=True)};
-порог действия из функции потерь p* = {L.num('decision:binary_threshold_p_cut', 3)}. Сохранение: {L.num('decision:probabilities/Hold', 1, pct=True)}, повышение: {L.num('decision:probabilities/Increase', 1, pct=True)}.</p></section>
-<section><h2>3. Доказательства</h2>{chart1}{chart2}{chart3}</section>
-<section><h2>4. Прогноз</h2><p>Ожидаемая ставка после решения: {L.num('reality_check:expected_rate', 2)}%, 80% диапазон
+<section class="lead" id="top"><p class="eyebrow" lang="en">{esc(d['title'])}</p>
+<h1>Удлинять ли дюрацию тенговых облигаций до заседания НБ РК?</h1>
+<p class="summary" lang="en">{esc(d['intro'])} English summary: an ordered-logit monitor of National Bank of Kazakhstan rate decisions, turned into a duration decision with an explicit loss function. The model cannot be told apart from "always hold"; the page shows that as prominently as any result.</p>
+<p class="links">Эта страница статична и быстра; есть и {render_link}. Подробные таблицы — на странице <a href="evidence.html">Доказательства</a>.</p>
+{sd.context_strip(d)}</section>
+<section id="step-1"><h2>1. Решение</h2><p>{esc(decision['decision'])}</p></section>
+<section id="step-2"><h2>2. Напряжение</h2><p>{obvious}</p><p>{complication}</p>
+<p>Порог действия p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>при равных потерях</strong>; вероятность снижения {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}</section>
+<section id="step-3"><h2>3. Доказательства</h2>{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
+<p><a href="evidence.html">Holdout, фальсификация, диагностика, устойчивость, стресс-тесты, история</a></p></section>
+<section id="step-4"><h2>4. Прогноз</h2>{sd.headline(L, d)}{sd.round_cards(L, d)}{sd.boxes(d)}
+<p>Ожидаемая ставка после решения {esc(rc['target'].split('НБ РК ')[-1].split(' (')[0])}: {L.num('reality_check:expected_rate', 2)}%, 80% диапазон
 {L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; бенчмарк Always Hold: {L.num('reality_check:benchmark_always_hold', 2)}%.
-Прошлый результат: отношение RMSE на holdout {L.num('n:rmse_ratio')} (интервал {L.num('n:rmse_ratio_ci_low')}–{L.num('n:rmse_ratio_ci_high')}, DM p = {L.num('n:dm_squared_error_p')}).
-Прогноз записан до решения в <a href="forecasts.html">журнал прогнозов</a>.</p></section>
-<section><h2>5. Механизм</h2><p>Порог зависит от того, во сколько раз упущенное снижение дороже ложного удлинения.</p>
-<label for="ratio">Соотношение потерь r = L<sub>упущ.</sub>/L<sub>ложн.</sub>: <output id="ratio-out">1.0</output></label>
-<input id="ratio" type="range" min="0.25" max="4" step="0.05" value="1" data-pcut="{p_cut!r}">
-<p id="ratio-text" aria-live="polite">Порог p* = 0.500.</p></section>
-<section><h2>6. Риск</h2><ul>{risk}</ul><p><a href="methods.html">Все пределы модели</a></p></section>
-<section class="action"><h2>7. Действие</h2><p>Сейчас по бинарному правилу: <strong>{action}</strong>; по трёхисходным потерям: <strong>{best} дюрацию</strong>.
+Прошлый результат: отношение RMSE на holdout {L.num('n:rmse_ratio')} (интервал {L.num('n:rmse_ratio_ci_low')}–{L.num('n:rmse_ratio_ci_high')}, DM p = {L.num('n:dm_squared_error_p')}).</p></section>
+<section id="step-5"><h2>5. Механизм</h2><p>Как меняется давление, если сдвинуть один фактор, а остальные пять оставить на последних значениях.</p>{sd.scenario(L, d)}</section>
+<section id="step-6"><h2>6. Риск</h2>
+<div class="box warn" id="freshness" lang="en" hidden></div>{anomaly}
+<div class="box info" id="staleness" lang="en">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
+<div class="box warn" id="look-ahead" lang="en">{esc(look_ahead)} Real publication lags are not documented; details: <a href="evidence.html#ev-limitations">Evidence → Limitations</a>.</div>
+<h3 lang="en">Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
+<ul>{risk}</ul><p><a href="methods.html">Все пределы модели</a></p></section>
+<section class="action" id="step-7"><h2>7. Действие</h2><p>Сейчас по бинарному правилу: <strong>{action}</strong>; по трёхисходным потерям: <strong>{best} дюрацию</strong>.
 Ответ меняется, если вероятность снижения превысит {L.num('decision:binary_threshold_p_cut', 3)} или если упущенное снижение станет дороже ложного удлинения более чем в {L.num('decision:switch_ratio_miss_to_false', 2)} раза.</p></section>
 <script src="assets/app.js"></script>
 """
 
 
-def methods_page(L: Ledger) -> str:
+def evidence_page(L: Ledger, artifact: dict) -> str:
+    d = artifact["dashboard"]
+    ev, full, stress = d["evidence"], d["full_results"], d["stress"]
+
+    def T(path: str, tbl: dict) -> str:
+        return sd.render_table(L, f"dashboard:{path}", tbl)
+
+    robustness_caption = (
+        "Ratios in different rows use different holdouts and are not comparable with each other. The differenced non-stationary-factor "
+        "check first-differences household and corporate 12-month log growth and inflation; other factors retain their main-model "
+        f"transformations. Total specifications run: {ev['robustness_total']}. Checks marked not comparable are left out of the count "
+        f"of checks with an RMSE ratio below 1 ({ev['noncomparable_reason']}).")
+    full_parts = "".join(
+        f"<h4>{esc(title)}</h4>" + T(f"full_results/{key}", full[key])
+        for title, key in (("Robustness coefficients by specification", "coefficient_detail"), ("Main-model coefficients", "coefficients"),
+                           ("Robust (HC0) covariance", "covariance"), ("Expanding-window coefficients", "expanding"),
+                           ("All unit-root checks", "unit_roots"), ("Structural-break checks", "structural_breaks"),
+                           ("Economic size from artifact", "economic_size")))
+    designs = stress["designs"]
+    buttons = "".join(f'<button type="button" class="design-tab" data-design="{esc(x["key"])}" aria-pressed="{"true" if i == 0 else "false"}">{esc(x["label"])}</button>'
+                      for i, x in enumerate(designs))
+    panels = "".join(f'<div class="design-panel" data-design="{esc(x["key"])}"><h4>{esc(x["label"])}</h4><p class="caption">{esc(x["caption"])}</p>'
+                     + T(f"stress/designs/{i}/table", x["table"]) + "</div>" for i, x in enumerate(designs))
+    power = (T("evidence/power", ev["power"]) + f'<p class="caption">At this sample size (N = {esc(ev["power_n"])}), failure to reject a zero slope is not evidence that the factor has no effect.</p>'
+             if ev["power"] else "<p>Power table: not available.</p>")
+    return f"""<h1>Доказательства</h1><p>Всё, что Render-приложение показывает на вкладке Evidence, в той же последовательности. Числа — из блока
+<code>dashboard</code> артефакта; модель здесь не переоценивается.</p>
+<div lang="en">
+<div class="box info" id="ev-summary">{esc(ev['summary'])}</div><p>{esc(ev['inference'])}</p><p>{esc(ev['version_change'])}</p>
+<h2 id="ev-holdout">Holdout comparison</h2>{T('evidence/holdout', ev['holdout'])}
+<p class="caption">RPS = ranked probability score (lower is better), exploratory and supplementary; the pre-specified verdict is the RMSE ratio.</p>
+<p class="caption">Always Hold assigns probability zero to Increase and Decrease, so the log score cannot be computed on a holdout that contains them.</p>
+<p class="caption">RMSE ratio (model / Always Hold): {L.num('dashboard:evidence/ratio', 3)} · Winner: {esc(ev['winner'])}</p>
+<p class="caption">{esc(ev['verdict_rule'])}</p><p>{esc(ev['rps_sentence'])}</p>
+<h2 id="ev-falsification">Falsification</h2>{T('evidence/falsification', ev['falsification'])}
+<h2 id="ev-diagnostics">Diagnostics</h2>{T('evidence/diagnostics', ev['diagnostics'])}
+<p class="caption" id="ev-na">Tests that do not apply to the ordinal model</p>{T('evidence/diagnostics_na', ev['diagnostics_na'])}
+<h2 id="ev-robustness">Robustness specifications</h2>{T('evidence/robustness', ev['robustness'])}<p class="caption">{esc(robustness_caption)}</p>
+<details id="ev-full"><summary>Full results stored in artifact</summary>{full_parts}</details>
+<h2 id="ev-power">Power: minimum detectable effects</h2>{power}
+<h2 id="ev-limitations">Limitations</h2>{''.join(f'<p>{esc(s)}</p>' for s in ev['limitations'])}
+<p class="caption">Generated from config/release_lag.json, docs/facts_to_fill.csv and the raw files by <code>python run.py facts</code>.</p>
+<h2 id="ev-stress">Stress tests (exploratory)</h2><div class="box warn">{esc(stress['label'])}</div>
+<ul>{''.join(f'<li>{esc(s)}</li>' for s in stress['sentences'])}</ul>
+<div id="ev-designs"><p class="m-label">Evaluation design</p><div class="design-tabs" role="group" aria-label="Evaluation design">{buttons}</div>{panels}
+<p class="caption">RPS = ranked probability score of the three-class forecast (0 perfect, 0.5 = Always Hold on a cut or hike). RPS skill = 1 − RPS / RPS(Always Hold). DM = Harvey–Leybourne–Newbold-corrected Diebold–Mariano test against Always Hold. Ridge penalties are chosen at each forecast origin from earlier decisions only.</p></div>
+<h3 id="ev-forecasts">Next-meeting probabilities under each specification</h3>{T('stress/forecasts', stress['forecasts'])}
+<p class="caption">Disagreement between rows is model uncertainty that the single headline band does not show. The policy-rule rows use the NBK's own previous decision and the ex-post real rate.</p>
+<details id="ev-anomalies"><summary>Raw-data anomaly screen ({len(stress['anomalies']['rows'])} flagged months)</summary>{T('stress/anomalies', stress['anomalies'])}
+<p class="caption">Modified z-score of monthly changes (log change for levels, first difference for rates); flag at |z| ≥ {esc(stress['z_threshold'])}. A flag means: re-check this value against the publisher. Nothing is changed.</p></details>
+{sd.svg_history(L, d, PALETTE)}
+</div><script src="assets/app.js"></script>"""
+
+
+def methods_page(L: Ledger, artifact: dict) -> str:
     from src import model_card
 
+    decision, d = artifact["decision"], artifact["dashboard"]
+    links = site_links()
     limits = "".join(f"<h3>{esc(i['title'])}</h3><p>{esc(i['text'])}</p>" for i in model_card.limits())
+    render = (f'<p>Адрес Render-приложения: <a href="{esc(links["render_url"])}">{esc(links["render_url"])}</a>.</p>'
+              if links["render_url"].startswith("https://") else
+              f'<p>Адрес Render-приложения в репозитории не записан ({esc(links["render_url"])}; см. TODO_HUMAN.md). Приложение '
+              "запускается локально: <code>python run.py app</code> (адрес http://localhost:8503).</p>")
+    static = ("<ul><li><strong>Вкладки.</strong> Четыре вкладки Render (Overview, Drivers and scenario, Evidence, Data and provenance) разложены по семи шагам на главной и по страницам «Доказательства» и «Данные».</li>"
+              "<li><strong>Проверка календаря НБ РК.</strong> Render при каждом открытии делает запрос к источнику календаря и "
+              "показывает «CACHED DATA», если он не ответил за 2 с. Статичная страница не обращается к внешним адресам; даты раундов "
+              "берутся из config/forecast_rounds.json и выбираются по сегодняшней дате в браузере.</li>"
+              "<li><strong>Время отрисовки.</strong> Строка «Cached dashboard render time» относится к серверу Streamlit; у статичной "
+              "страницы её нет.</li><li><strong>Сортировка таблиц.</strong> Таблицы Streamlit сортируются щелчком по заголовку; здесь "
+              "они статичны, в том же порядке строк.</li><li><strong>Ползунок сценария.</strong> Пересчитывается в браузере по тем же "
+              "формулам (ordered logit и дельта-метод), что src/app.py; совпадение проверяется тестом до 1e-6.</li></ul>")
+    units = "".join(f"<li>{esc(row[0])}: {esc(row[2])}</li>" for row in d["provenance"]["latest"]["rows"])
     return (f"<h1>Методы и пределы</h1><p>Модель: ordered logit на шести факторах, замороженная спецификация; holdout — последние "
             f"{L.num('n:n_holdout')} из {L.num('n:n_usable')} пригодных решений. {esc(L.raw('n:verdict_inference_sentence'))}</p>"
-            f"<p>{esc(L.raw('n:rps_supplementary_sentence'))}</p><h2>Пределы</h2>{limits}"
+            f"<p>{esc(L.raw('n:rps_supplementary_sentence'))}</p>"
+            f'<h2 id="statuses">Статусы, которые ждут человека</h2><ul><li>Решение: {esc(decision["decision_status"])}.</li>'
+            f'<li>Потери: {esc(decision["loss_status"])}. Пока они не подтверждены, на главной порог p* подписан «при равных потерях» '
+            "и рядом показан ползунок соотношения потерь.</li>"
+            f'<li>Даты раундов: календарь {"отмечен как проверенный" if d["rounds"]["verified"] else "не отмечен как проверенный"} '
+            f'(источник: {esc(d["rounds"]["source"])}); если будущих дат меньше двух, карточка второго раунда показывает '
+            "«DATE NOT CONFIRMED» с теми же вероятностями.</li></ul><h3>Единицы факторов модели</h3><ul>" + units + "</ul>"
+            f'<h2 id="render-app">Интерактивная версия (Render)</h2>{render}'
+            f'<h2 id="static-limits">Что статичная страница воспроизводит иначе</h2>{static}'
+            f"<h2>Пределы</h2>{limits}"
             + md_to_html((ROOT / "docs" / "decision_memo.md").read_text(encoding="utf-8")))
 
 
@@ -235,9 +338,16 @@ def team_page() -> str:
     return "<h1>Команда</h1>" + md_to_html((ROOT / "docs" / "contributions.md").read_text(encoding="utf-8"))
 
 
-def data_page() -> str:
+def data_page(L: Ledger, artifact: dict) -> str:
+    d = artifact["dashboard"]["provenance"]
     links = "".join(f'<li><a href="data/{Path(p).name}" download>{esc(p)}</a></li>' for p in DOWNLOADS if (ROOT / p).is_file())
-    return f"<h1>Данные</h1><p>Файлы для скачивания (CSV, как в репозитории):</p><ul>{links}</ul>"
+    return (f"<h1>Данные</h1><p>Файлы для скачивания (CSV, как в репозитории):</p><ul>{links}</ul>"
+            '<div lang="en"><h2 id="data-provenance">Data and provenance</h2>'
+            + sd.render_table(L, "dashboard:provenance/series", d["series"])
+            + '<p class="caption">Source fields come from docs/facts_to_fill.csv via <code>python run.py facts</code>. Release lag = days '
+            "from the end of the reference month to publication.</p>"
+            + sd.render_table(L, "dashboard:provenance/values", d["values"], element_id="data-values")
+            + sd.render_table(L, "dashboard:provenance/latest", d["latest"], element_id="data-latest") + "</div>")
 
 
 def patterns_page(L: Ledger, artifact: dict) -> str:
@@ -321,8 +431,8 @@ def build(site: Path = SITE) -> dict[str, Any]:
     for relative in DOWNLOADS:
         if (ROOT / relative).is_file():
             shutil.copy(ROOT / relative, site / "data" / Path(relative).name)
-    contents = {"index.html": index_page(L, artifact), "methods.html": methods_page(L), "run.html": run_page(),
-                "sources.html": sources_page(), "team.html": team_page(), "data.html": data_page(),
+    contents = {"index.html": index_page(L, artifact), "evidence.html": evidence_page(L, artifact), "methods.html": methods_page(L, artifact), "run.html": run_page(),
+                "sources.html": sources_page(), "team.html": team_page(), "data.html": data_page(L, artifact),
                 "patterns.html": patterns_page(L, artifact), "corridor.html": corridor_page(L, artifact),
                 "forecasts.html": forecasts_page(L), "redteam.html": redteam_page(), "asof.html": asof_page(L, artifact)}
     titles = dict(PAGES)

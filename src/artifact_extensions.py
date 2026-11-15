@@ -15,7 +15,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_PATH = ROOT / "model" / "artifact.json"
 EXTENSION_KEYS = {"decision", "evidence_ledger", "forecast_desk", "patterns", "carry_corridor", "prereg",
-                  "reality_check", "site"}
+                  "reality_check", "site", "dashboard"}
 
 
 def merge(key: str, value: Any, path: Path = ARTIFACT_PATH) -> None:

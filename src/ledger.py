@@ -3,7 +3,7 @@
 Одна строка на каждое число, которое может попасть в README, отчёт или на сайт:
 * каждый ключ outputs/numbers_for_note.json (источник — путь в артефакте или правило вывода);
 * каждое скалярное значение блоков продукта в model/artifact.json (decision, forecast_desk, patterns,
-  carry_corridor, prereg, reality_check);
+  carry_corridor, prereg, reality_check, dashboard);
 * каждый сырой ряд data/raw/*.csv и data/external/*.csv (источник, URL, даты, преобразование);
 * хеши файлов преререгистрации (prereg/).
 Колонки: id, value, source, series, url, retrieved, release_or_vintage, transformation, script, artifact_field,
@@ -33,7 +33,8 @@ COLUMNS = ["id", "value", "source", "series", "url", "retrieved", "release_or_vi
 UNKNOWN = "UNKNOWN"
 BLOCK_SCRIPTS = {"decision": "src/decision_rule.py", "forecast_desk": "src/forecast_desk.py", "patterns": "src/patterns.py",
                  "carry_corridor": "src/carry_corridor.py", "prereg": "src/prereg.py", "reality_check": "src/prereg.py",
-                 "site": "src/site_build.py", "evidence_ledger": "src/ledger.py"}
+                 "site": "src/site_build.py", "evidence_ledger": "src/ledger.py",
+                 "dashboard": "src/dashboard_view.py"}
 SKIP_BLOCKS = {"evidence_ledger", "site"}  # описывают сам журнал и сборку сайта, не числа результата
 
 

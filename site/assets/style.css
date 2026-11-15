@@ -1,28 +1,94 @@
-/* Без внешних шрифтов: системный стек. Читается на 360 px: никаких фиксированных ширин больше экрана. */
-:root { --ink: #1a1a1a; --muted: #555; --line: #d0d0d0; --accent: #0072B2; --bg: #ffffff; }
+/* Оформление Render-приложения (src/app.py) без внешних шрифтов: системный стек, близкий к Source Sans.
+   Читается на 360 px: фиксированных ширин больше экрана нет. Цвета классов — Okabe–Ito (различимы при дальтонизме),
+   и у каждого класса есть подпись и значок ▲ ■ ▼, так что цвет не единственный признак. */
+:root {
+  --bg: #f6f8fb; --card: #ffffff; --ink: #172b4d; --text: #24364c; --muted: #667386; --line: #d9e0e8; --soft: #edf0f3;
+  --accent: #174a7e; --increase: #009E73; --hold: #0072B2; --decrease: #D55E00; --hold-grey: #6E6E6E;
+  --warn-bg: #fffbe6; --warn-ink: #6b5200; --warn-line: #f2d675; --info-bg: #e8f1fb; --info-ink: #174a7e;
+  --bad-bg: #fde8e7; --bad-ink: #8f211a; --ok-bg: #e7f4ec; --ok-ink: #17633d;
+}
 * { box-sizing: border-box; }
-body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); background: var(--bg); }
-header, main, footer { max-width: 920px; margin: 0 auto; padding: 0 16px; }
-header { border-bottom: 1px solid var(--line); padding-top: 12px; padding-bottom: 8px; }
-.brand { font-weight: 700; margin: 0 0 6px; }
-nav { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 14px; }
-nav a { color: var(--accent); text-decoration: none; }
-nav a[aria-current="page"] { font-weight: 700; text-decoration: underline; }
-h1 { font-size: 1.5rem; line-height: 1.25; } h2 { font-size: 1.2rem; margin-top: 1.6rem; }
-section { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+body { margin: 0; font: 16px/1.55 "Source Sans Pro", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); }
+header, main, footer { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+header { border-bottom: 1px solid var(--line); padding-top: 12px; padding-bottom: 8px; background: var(--bg); }
+.brand { font-weight: 700; margin: 0 0 6px; color: var(--ink); }
+nav { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+nav a { color: var(--muted); text-decoration: none; font-weight: 600; padding: 2px 0; }
+nav a[aria-current="page"] { color: var(--accent); border-bottom: 2px solid var(--accent); }
+a { color: var(--accent); }
+h1 { font-size: 1.6rem; line-height: 1.25; color: var(--ink); letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; margin-top: 1.6rem; color: var(--ink); }
+h3 { font-size: 1.05rem; color: var(--ink); }
+section { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.eyebrow { color: var(--muted); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase; margin-bottom: 0; }
 .summary { color: var(--muted); font-size: 0.95rem; }
-.action { background: #f3f8fc; border-left: 4px solid var(--accent); padding: 4px 12px; }
-figure { margin: 16px 0; max-width: 100%; }
-figcaption { margin-bottom: 4px; }
+.caption { color: var(--muted); font-size: 0.85rem; }
+.action { background: var(--info-bg); border-left: 4px solid var(--accent); padding: 4px 12px; }
+.context { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; color: var(--muted); font-size: 0.85rem; }
+.context p { margin: 2px 0; }
+/* Метрики (st.metric) */
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 12px 0; }
+.metric { background: var(--card); border: 1px solid #dfe5ec; border-radius: 12px; padding: 0.8rem 1rem; }
+.m-label { margin: 0; color: var(--muted); font-size: 0.85rem; }
+.m-value { margin: 2px 0; color: var(--ink); font-size: 1.7rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.m-cap { margin: 2px 0; color: var(--muted); font-size: 0.78rem; }
+/* Карточки раундов (forecast_card_html) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 12px 0; }
+.forecast-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; box-shadow: 0 3px 12px rgba(31, 47, 70, 0.045); border-bottom: 1px solid var(--line); }
+.forecast-card-head { color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.11em; }
+.forecast-date { margin: 18px 0 23px; color: var(--ink); font-size: 1.38rem; line-height: 1.3; font-weight: 750; letter-spacing: 0.035em; }
+.probability-row { display: grid; grid-template-columns: 96px minmax(60px, 1fr) 54px; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 7px; margin: 2px 0; }
+.probability-row.is-top { background: #f0f5fa; }
+.probability-label { color: #35445a; font-size: 0.88rem; font-weight: 600; }
+.probability-track { display: block; height: 8px; overflow: hidden; background: #e9edf2; border-radius: 99px; }
+.probability-fill { display: block; height: 100%; border-radius: 99px; }
+.probability-fill.tone-increase, .mark.tone-increase { background: var(--increase); }
+.probability-fill.tone-hold { background: var(--hold); }
+.probability-fill.tone-decrease, .mark.tone-decrease { background: var(--decrease); }
+.mark { display: inline-block; min-width: 1.2em; text-align: center; color: #ffffff; border-radius: 3px; font-size: 0.7rem; line-height: 1.3; }
+.mark.tone-hold { background: var(--hold); }
+.mark.tone-hold-grey { background: var(--hold-grey); }
+.probability-value { text-align: right; color: var(--text); font-size: 0.86rem; font-variant-numeric: tabular-nums; font-weight: 700; }
+.probability-interval { grid-column: 2 / 4; color: #6c7888; text-align: right; font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+.forecast-card-foot { border-top: 1px solid var(--soft); margin-top: 21px; padding-top: 12px; color: #6c7888; font-size: 0.76rem; }
+/* Плашки (st.warning / st.info) */
+.box { border-radius: 8px; padding: 12px 16px; margin: 12px 0; border: 1px solid transparent; }
+.box.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-line); }
+.box.warn::before { content: "⚠ "; font-weight: 700; }
+.box.info { background: var(--info-bg); color: var(--info-ink); }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; margin: 12px 0; }
+summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+/* Таблицы (st.dataframe) */
+.scroll { overflow-x: auto; max-width: 100%; margin: 8px 0; }
+table { border-collapse: collapse; font-size: 14px; min-width: 100%; background: var(--card); }
+caption { text-align: left; color: var(--muted); font-size: 0.85rem; padding: 4px 0; }
+th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+th { background: #f0f3f7; color: var(--ink); font-weight: 600; }
+td.v-bad { background: var(--bad-bg); color: var(--bad-ink); font-weight: 700; }
+td.v-ok { background: var(--ok-bg); color: var(--ok-ink); font-weight: 700; }
+td.v-bad::before { content: "✗ "; } td.v-ok::before { content: "✓ "; }
+/* Графики */
+main p, main li, main summary { overflow-wrap: anywhere; }
+figure { margin: 16px 0; max-width: min(100%, 860px); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+figcaption { margin-bottom: 4px; color: var(--ink); }
 svg { width: 100%; height: auto; max-width: 100%; display: block; }
-.legend { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; }
+.legend { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 14px; }
 .key { border-left: 14px solid; padding-left: 4px; }
-.scroll { overflow-x: auto; max-width: 100%; }
-table { border-collapse: collapse; font-size: 14px; min-width: 100%; }
-th, td { border: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
-input[type=range] { width: 100%; }
-label { display: block; margin-top: 10px; }
-pre { overflow-x: auto; background: #f5f5f5; padding: 8px; }
+/* Ползунки и вкладки */
+input[type=range] { width: 100%; accent-color: var(--accent); }
+select { font: inherit; padding: 4px 6px; max-width: 100%; }
+label { display: block; margin-top: 10px; font-weight: 600; color: var(--ink); }
+.range-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; margin: 0; }
+.design-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+.design-tab { font: inherit; font-size: 0.9rem; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 99px; padding: 4px 12px; cursor: pointer; }
+.design-tab[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+pre { overflow-x: auto; background: #eef1f5; padding: 8px; border-radius: 6px; }
 code { font-size: 0.9em; }
 .num { font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 13px; padding-top: 12px; padding-bottom: 24px; }
+@media (max-width: 480px) {
+  .forecast-card { padding: 16px 12px; }
+  .probability-row { grid-template-columns: 86px minmax(40px, 1fr) 50px; gap: 6px; padding: 6px 4px; }
+  .m-value { font-size: 1.4rem; }
+  h1 { font-size: 1.35rem; }
+}

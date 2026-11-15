@@ -75,6 +75,13 @@ python3 -m venv .venv
 
 Run these commands from the repository root (the folder that contains run.py), not from your home folder. Activation is not needed: the commands call the virtual-environment Python directly, so Windows' script-execution policy (the 'running scripts is disabled' error for Activate.ps1) does not apply. If `python` is not found on Windows, use `py` instead of `python` in the first line. To use the environment interactively you may activate it (`.venv\Scripts\Activate.ps1` on Windows, `source .venv/bin/activate` elsewhere), but nothing here depends on it.
 
+## Web addresses
+
+- Static site (Decision Desk, GitHub Pages, built by `python run.py site` into `site/`): https://lmamraimovasixseven.github.io/Monetarot/
+- Interactive version (Render, the Streamlit app `src/app.py`): https://monetarot.onrender.com/
+
+Both read the same `model/artifact.json`; `docs/site_parity.md` maps every element of the interactive version to its place on the static site.
+
 ## Run the site
 
 ```text

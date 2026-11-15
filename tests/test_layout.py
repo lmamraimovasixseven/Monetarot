@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_brief_layout_exists():
     for relative in ("README.md", "AI_USE.md", "CONTRIBUTIONS.md", "DECLARATION.md", "data/raw", "data/processed",
-                     "ledger/evidence_ledger.csv", "prereg/prereg.md", "src", "model/artifact.json", "site/index.html"):
+                     "ledger/evidence_ledger.csv", "prereg/prereg.md", "src", "model/artifact.json", "site/index.html",
+                     "site/evidence.html", "docs/site_parity.md", "config/site_links.json", "src/dashboard_view.py"):
         assert (ROOT / relative).exists(), relative
 
 
@@ -23,7 +24,7 @@ def test_update_runs_every_stage_in_order():
 
     modules = [command[2] for command in run.TASKS["update"]]
     order = ["src.ingest", "src.model", "src.robust_eval", "src.report", "src.facts", "src.decision_rule", "src.prereg",
-             "src.forecast_desk", "src.carry_corridor", "src.patterns", "src.model_card", "src.forecast_log", "src.ledger",
+             "src.forecast_desk", "src.carry_corridor", "src.patterns", "src.model_card", "src.forecast_log", "src.dashboard_view", "src.ledger",
              "src.site_build", "src.root_docs", "src.traps"]
     positions = [modules.index(m) for m in order]
     assert positions == sorted(positions)
