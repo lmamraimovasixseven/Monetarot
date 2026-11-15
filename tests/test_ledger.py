@@ -53,3 +53,17 @@ def test_look_ahead_counts_of_every_factor_are_in_the_ledger_and_come_last():
         assert values[f"lookahead:{series['feature']}"] == str(series["decisions_where_bound_exceeds_window"])
     tail = [row["id"] for row in rows[-len(limitation["series"]):]]
     assert all(key.startswith("lookahead:") for key in tail)
+
+
+def test_evidence_ledger_block_of_the_artifact_matches_the_ledger_file():
+    """D45: the evidence_ledger block in model/artifact.json records the row count and SHA-256 of the ledger file
+    (CRLF normalized to LF, as src/ledger.py writes it); `python -m src.ledger` keeps them in step."""
+    import hashlib
+
+    block = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))["evidence_ledger"]
+    path = ROOT / block["path"]
+    content = path.read_bytes().replace(b"\r\n", b"\n")
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert block["rows"] == len(rows)
+    assert block["sha256"] == hashlib.sha256(content).hexdigest()
