@@ -152,6 +152,27 @@ PHRASES: dict[str, str] = {
     "## Новые источники (блок E)": "## New sources (block E)",
     "Файл": "File", "Статус": "Status", "Обрабатываемая особенность": "Handled feature",
     "UNKNOWN: только шаблон (TODO_HUMAN.md)": "UNKNOWN: template only (TODO_HUMAN.md)",
+    # docs/DATA.md, external sources with real data (D46)
+    "значение на каждый рабочий день, ставка меняется внутри месяца → средняя по календарным дням, выходные берут последний "
+    "рабочий день (external_data.monthly_step_rate)":
+        "a value for every working day; the rate changes within the month → mean over calendar days, weekends take the last "
+        "working day (external_data.monthly_step_rate)",
+    "таблица Банка России даёт y/y в процентах; если бы пришёл индекс «тот же месяц прошлого года = 100», вычиталось бы 100 "
+    "(external_data.cpi_yoy)":
+        "the Bank of Russia table gives y/y in percent; an index with the same month of the previous year = 100 would have 100 "
+        "subtracted (external_data.cpi_yoy)",
+    "y/y в процентах (FRED); январь/февраль смещаются Новым годом по лунному календарю → флаг lunar_new_year_month":
+        "y/y in percent (FRED); January and February shift with the lunar New Year → flag lunar_new_year_month",
+    "отчёт НБ РК даёт значение на каждый календарный день (в выходные повторяется последний курс) → среднее по опубликованным "
+    "дням, без заполнения пропусков":
+        "the NBK report gives a value for every calendar day (weekends repeat the last rate) → mean over the published days, "
+        "gaps are not filled",
+    "курс Банка России публикуется по рабочим дням РФ → среднее по опубликованным дням; дни не выравниваются с USD/KZT":
+        "the Bank of Russia rate is published on Russian working days → mean over the published days; days are not aligned "
+        "with USD/KZT",
+    "FRED DEXCHUS публикуется по рабочим дням США, дни без значения пропущены → среднее по опубликованным дням (колонка days)":
+        "FRED DEXCHUS is published on US working days, days without a value are skipped → mean over the published days "
+        "(column days)",
     "ставка меняется внутри месяца → средневзвешенное по дням (external_data.monthly_step_rate)":
         "the rate changes within the month → day-weighted average (external_data.monthly_step_rate)",
     "ИПЦ как индекс «тот же месяц прошлого года = 100» → y/y = индекс − 100 (external_data.cpi_yoy)":
@@ -234,6 +255,21 @@ _PATTERNS: list[tuple[str, str]] = [
     (r"месяц (\S+)", "month {0}"),
     (r"UNKNOWN: мало наблюдений \((\d+)\)", "UNKNOWN: too few observations ({0})"),
     (r"данные есть \((\d+) строк\)", "data present ({0} rows)"),
+    # carry_corridor with partial partner data (D46); groups are file names or the partner labels Россия / Китай
+    (r"UNKNOWN: данных нет \(шаблон: ([\w.]+(?:, [\w.]+)*)\)", "UNKNOWN: no data (template file only: {0})"),
+    (r"UNKNOWN: нет реальной ставки: (Россия|Китай|Россия, Китай); по одной стране границы коридора не считаются",
+     "UNKNOWN: no real rate for {0}; the corridor bounds are not computed from one country"),
+    (r"КЗ − (Россия|Китай) \(нет данных: (Россия|Китай)\)", "KZ − {0} (no data: {1})"),
+    (r"КЗ − (Россия|Китай)", "KZ − {0}"),
+    (r"КЗ − наибольшая из: Россия, Китай", "KZ − the higher of Russia and China"),
+    (r"UNKNOWN: нет данных USD/KZT \(data/raw/external/usd_kzt_daily\.csv — шаблон\)",
+     "UNKNOWN: no USD/KZT data (data/raw/external/usd_kzt_daily.csv is a template)"),
+    (r"UNKNOWN: ряды ставки и инфляции не пересекаются", "UNKNOWN: the rate and inflation series do not overlap"),
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46\)\. "
+     r"Только шаблон: ([\w.]+(?:, [\w.]+)*)\.",
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46). Template only: {0}."),
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46\)\. Все файлы заполнены\.",
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46). All files are filled."),
     # patterns: outlier reasons (src/patterns.py)
     (r"в следующих (\d+) мес\. \(предварительно: меньше (\d+) мес\.\)", "over the next {0} months (provisional: fewer than {1} months),"),
     (r"в следующих (\d+) мес\.", "over the next {0} months,"),

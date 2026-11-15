@@ -97,5 +97,73 @@ def test_browser_engine_matches_python_to_1e6(tmp_path):
 def test_artifact_block_reports_unknown_partners_honestly():
     block = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))["carry_corridor"]
     assert same_within_float_tolerance(block, json.loads(json.dumps(cc.build())))  # floats: D38
-    if None in block["partner_real_rates"].values():
-        assert block["current"]["status"].startswith("UNKNOWN") and block["fx_regression"]["status"].startswith("UNKNOWN")
+    partners = block["partner_real_rates"]
+    if None in partners.values():  # D46: bounds only from both partners, never from one
+        assert block["current"]["status"].startswith("UNKNOWN") and block["current"]["lower"] is None
+        assert all(row["lower"] is None for row in block["premium_sensitivity"])
+    else:
+        assert block["current"]["status"] == "ok" and block["current"]["lower"] is not None
+    has_fx = not cc.external_data.read_raw("usd_kzt").empty
+    if has_fx and any(v is not None for v in partners.values()):
+        assert block["fx_regression"]["status"] in ("ok",) or block["fx_regression"]["status"].startswith("UNKNOWN: мало")
+    else:
+        assert block["fx_regression"]["status"].startswith("UNKNOWN")
+    for key, value in partners.items():  # a partner's real rate is reported with its month or with an UNKNOWN note
+        assert block["partner_notes"][key].startswith("месяц " if value is not None else "UNKNOWN")
+
+
+# ----------------------------------------------------------------------------- D46: empty, partial and full partner data
+
+
+def _write_external(directory: Path, filled: set[str]) -> None:
+    """Header-only templates in `directory`; series in `filled` get synthetic monthly data (2020-01 … 2022-12)."""
+    config = cc.external_data.sources()
+    months = pd.period_range("2020-01", "2022-12", freq="M")
+    for name, spec in config.items():
+        lines = [",".join(spec["columns"])]
+        if name in filled:
+            if spec["columns"][0] == "year_month":
+                lines += [f"{m},{3.0 + (i % 5) * 0.1:.2f}" for i, m in enumerate(months)]
+            else:
+                days = pd.date_range("2020-01-01", "2022-12-31", freq="D")
+                lines += [f"{d.date()},{(10.0 if name.endswith('rate') or 'rate' in spec['columns'][1] else 450.0) + (d.month % 3):.2f}"
+                          for d in days]
+        (directory / spec["file"]).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_partner_real_rates_for_empty_partial_and_full_data(tmp_path):
+    _write_external(tmp_path, set())
+    rates, notes = cc.partner_real_rates(tmp_path)
+    assert rates == {"russia": None, "china": None} and all(n.startswith("UNKNOWN") for n in notes.values())
+
+    _write_external(tmp_path, {"ru_key_rate", "ru_cpi_yoy"})
+    series, notes = cc.partner_real_series(tmp_path)
+    assert len(series["russia"]) and not len(series["china"]) and notes["russia"] == f"месяц {series['russia'].index[-1]}"
+    assert "cn_7d_reverse_repo_daily.csv" in notes["china"] and "cn_cpi_yoy.csv" in notes["china"]
+    # monthly real rate = calendar-day mean of the daily rate minus CPI y/y of the same month
+    month = series["russia"].index[-1]
+    rate = cc.external_data.monthly_step_rate(cc.external_data.read_raw("ru_key_rate", tmp_path))[month]
+    cpi = cc.external_data.cpi_yoy(cc.external_data.read_raw("ru_cpi_yoy", tmp_path), "cpi_yoy_pct")["yoy"][month]
+    assert series["russia"][month] == pytest.approx(rate - cpi)
+
+    _write_external(tmp_path, {"ru_key_rate", "ru_cpi_yoy", "cn_policy_rate", "cn_cpi_yoy"})
+    rates, _ = cc.partner_real_rates(tmp_path)
+    assert all(v is not None for v in rates.values())
+
+
+def test_corridor_bounds_need_both_partners():
+    # The engine itself is general (the site uses it with assumed values); build() withholds partners until both exist.
+    partial = cc.corridor(16.0, 9.0, {}, 2.0, 6.0, None)
+    assert partial["lower"] is None and partial["status"].startswith("UNKNOWN")
+    block = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))["carry_corridor"]
+    if sum(v is not None for v in block["partner_real_rates"].values()) == 1:
+        assert block["current"]["status"].startswith("UNKNOWN: нет реальной ставки")
+        assert set(block["real_differentials"]) == {k for k, v in block["partner_real_rates"].items() if v is not None}
+
+
+def test_fx_block_without_fx_data_or_partners_is_unknown(monkeypatch):
+    frame = cc.monthly_inputs()
+    monkeypatch.setattr(cc, "usd_kzt_monthly", lambda directory=None: pd.Series(dtype=float))
+    assert cc.fx_block(frame, {"russia": pd.Series([1.0], index=pd.period_range("2020-01", periods=1, freq="M"))})["status"].startswith("UNKNOWN")
+    monkeypatch.setattr(cc, "usd_kzt_monthly", lambda directory=None: pd.Series([1.0, 2.0], index=pd.period_range("2020-01", periods=2, freq="M")))
+    assert cc.fx_block(frame, {"russia": pd.Series(dtype=float), "china": pd.Series(dtype=float)})["status"].startswith("UNKNOWN")

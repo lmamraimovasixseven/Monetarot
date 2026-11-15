@@ -95,7 +95,7 @@ def fx_regression(fx: pd.Series, differential: pd.Series) -> dict[str, Any]:
     data = pd.concat({"dfx": fx.diff(), "diff": differential.shift(1), "diff2": differential.shift(2)}, axis=1).dropna()
     if len(data) < 24:
         return {"status": f"UNKNOWN: мало наблюдений ({len(data)})"}
-    specs = {"дифференциал t-1": ["diff"], "дифференциал t-1 и t-2": ["diff", "diff2"]}
+    specs = {"lag1": ["diff"], "lag1_lag2": ["diff", "diff2"]}  # дифференциал t-1; t-1 и t-2 (ASCII-ключи для id журнала)
     table = {}
     for label, columns in specs.items():
         design = sm.add_constant(data[columns])
@@ -107,7 +107,7 @@ def fx_regression(fx: pd.Series, differential: pd.Series) -> dict[str, Any]:
     design = sm.add_constant(data[["diff", "diff2"]])
     vif = {c: float(variance_inflation_factor(design.to_numpy(), i)) for i, c in enumerate(design.columns) if c != "const"}
     rw_mae = float(np.mean(np.abs(data["dfx"])))  # случайное блуждание: прогноз изменения = 0
-    main = table["дифференциал t-1"]
+    main = table["lag1"]
     return {"status": "ok", "specifications": table, "vif": vif, "random_walk_mae_of_change": rw_mae,
             "verdict": ("связь значима на 5% (HC1)" if main["p"] < 0.05 else "связи не видно (p ≥ 0.05, HC1)"),
             "ovb_compass": OVB_COMPASS}
@@ -123,24 +123,63 @@ OVB_COMPASS = [
 ]
 
 
-def partner_real_rates(directory: Path = external_data.EXTERNAL_DIR) -> tuple[dict[str, float | None], dict[str, str]]:
-    """Последние реальные ставки РФ и КНР из data/raw/external (средневзвешенная ставка − ИПЦ y/y)."""
+PARTNERS = {"russia": ("ru_key_rate", "ru_cpi_yoy", False), "china": ("cn_policy_rate", "cn_cpi_yoy", True)}
+PARTNER_LABELS = {"russia": "Россия", "china": "Китай"}  # ключи блока — ASCII, чтобы id журнала годились для сайта (D46)
+
+
+def partner_real_series(directory: Path = external_data.EXTERNAL_DIR) -> tuple[dict[str, pd.Series], dict[str, str]]:
+    """Месячные реальные ставки партнёров: средняя по календарным дням ставка (external_data.monthly_step_rate) минус
+    ИПЦ y/y того же месяца; только месяцы, где есть оба ряда. Пустой ряд и примечание UNKNOWN, если файла нет."""
     out, notes = {}, {}
-    pairs = {"Россия": ("ru_key_rate", "ru_cpi_yoy", False), "Китай": ("cn_policy_rate", "cn_cpi_yoy", True)}
-    for label, (rate_name, cpi_name, china) in pairs.items():
+    for key, (rate_name, cpi_name, china) in PARTNERS.items():
         rates, cpi = external_data.read_raw(rate_name, directory), external_data.read_raw(cpi_name, directory)
-        if rates.empty or cpi.empty:
-            out[label], notes[label] = None, "UNKNOWN: данных нет (шаблон)"
+        missing = [name for name, frame in ((rate_name, rates), (cpi_name, cpi)) if frame.empty]
+        if missing:
+            out[key] = pd.Series(dtype=float)
+            notes[key] = "UNKNOWN: данных нет (шаблон: " + ", ".join(external_data.sources()[m]["file"] for m in missing) + ")"
             continue
         monthly = external_data.monthly_step_rate(rates)
         yoy = external_data.cpi_yoy(cpi, cpi.columns[1], china=china)["yoy"]
         joined = pd.concat([monthly, yoy], axis=1, join="inner").dropna()
-        if joined.empty:
-            out[label], notes[label] = None, "UNKNOWN: ряды ставки и инфляции не пересекаются"
-            continue
-        out[label] = float(joined.iloc[-1, 0] - joined.iloc[-1, 1])
-        notes[label] = f"месяц {joined.index[-1]}"
+        out[key] = (joined.iloc[:, 0] - joined.iloc[:, 1]).rename(key)
+        notes[key] = f"месяц {joined.index[-1]}" if len(joined) else "UNKNOWN: ряды ставки и инфляции не пересекаются"
     return out, notes
+
+
+def partner_real_rates(directory: Path = external_data.EXTERNAL_DIR) -> tuple[dict[str, float | None], dict[str, str]]:
+    """Последние реальные ставки РФ и КНР из data/raw/external (средняя ставка за месяц − ИПЦ y/y)."""
+    series, notes = partner_real_series(directory)
+    return {key: (float(s.iloc[-1]) if len(s) else None) for key, s in series.items()}, notes
+
+
+def usd_kzt_monthly(directory: Path = external_data.EXTERNAL_DIR) -> pd.Series:
+    """100*log среднего за месяц официального курса USD/KZT по опубликованным дням (пропуски не заполняются)."""
+    daily = external_data.read_raw("usd_kzt", directory)
+    if daily.empty:
+        return pd.Series(dtype=float)
+    return 100 * np.log(external_data.monthly_average(daily)["value"])
+
+
+def fx_block(frame: pd.DataFrame, series: dict[str, pd.Series]) -> dict[str, Any]:
+    """Регрессия изменения USD/KZT на реальный дифференциал КЗ минус наибольшая реальная ставка партнёров с данными
+    (тот партнёр, куда выгоднее carry trade); бенчмарк — случайное блуждание. UNKNOWN без курса или без партнёров."""
+    fx = usd_kzt_monthly()
+    available = {key: s for key, s in series.items() if len(s)}
+    if fx.empty:
+        return {"status": "UNKNOWN: нет данных USD/KZT (data/raw/external/usd_kzt_daily.csv — шаблон)"}
+    if not available:
+        return {"status": "UNKNOWN: нет реальных ставок партнёров"}
+    partner_max = pd.concat(available, axis=1).dropna().max(axis=1)
+    differential = (frame["real_rate"] - partner_max).dropna()
+    result = fx_regression(fx, differential)
+    missing = [PARTNER_LABELS[key] for key in series if key not in available]
+    result["differential"] = ("КЗ − " + (PARTNER_LABELS[next(iter(available))] if len(available) == 1 else
+                                         "наибольшая из: " + ", ".join(PARTNER_LABELS[k] for k in available))
+                              + (" (нет данных: " + ", ".join(missing) + ")" if missing else ""))
+    result["partners_used"] = sorted(available)
+    if len(differential):
+        result["differential_months"] = {"first": str(differential.index.min()), "last": str(differential.index.max())}
+    return result
 
 
 def build() -> dict[str, Any]:
@@ -148,18 +187,31 @@ def build() -> dict[str, Any]:
     last = frame.dropna(subset=["rate", "inflation"]).iloc[-1]
     month = str(frame.dropna(subset=["rate", "inflation"]).index[-1])
     credit = credit_constraint(frame)
-    partners, notes = partner_real_rates()
-    current = corridor(float(last["rate"]), float(last["inflation"]), partners, DEFAULTS["premium"], DEFAULTS["cap"],
+    series, notes = partner_real_series()
+    partners = {key: (float(s.iloc[-1]) if len(s) else None) for key, s in series.items()}
+    kz_real = float(last["rate"] - last["inflation"])
+    available = {key: value for key, value in partners.items() if value is not None}
+    missing = [PARTNER_LABELS[key] for key, value in partners.items() if value is None]
+    # Границы коридора считаются только по обоим партнёрам: по одной стране нижняя граница занижалась бы (D46).
+    used = partners if not missing else {}
+    current = corridor(float(last["rate"]), float(last["inflation"]), used, DEFAULTS["premium"], DEFAULTS["cap"],
                        credit["credit_zero_real_rate"])
+    if missing:
+        current["status"] = ("UNKNOWN: нет реальной ставки: " + ", ".join(missing)
+                             + "; по одной стране границы коридора не считаются")
     sensitivity = [{"premium": p, **{k: current_k for k, current_k in corridor(
-        float(last["rate"]), float(last["inflation"]), partners, p, DEFAULTS["cap"], credit["credit_zero_real_rate"]).items()
+        float(last["rate"]), float(last["inflation"]), used, p, DEFAULTS["cap"], credit["credit_zero_real_rate"]).items()
         if k in ("lower", "upper", "position")}} for p in (0.0, 1.0, 2.0, 3.0, 4.0)]
-    fx_status = "UNKNOWN: нет данных USD/KZT и реальных ставок партнёров (TODO_HUMAN.md)"
     return {"month": month, "nbk_rate": float(last["rate"]), "kz_inflation": float(last["inflation"]),
-            "kz_real_rate": float(last["rate"] - last["inflation"]), "partner_real_rates": partners,
-            "partner_notes": notes, "defaults": DEFAULTS, "defaults_status": "допущение пользователя (параметры ползунков)",
+            "kz_real_rate": kz_real, "partner_real_rates": partners, "partner_labels": PARTNER_LABELS,
+            "partner_notes": notes,
+            # Реальный дифференциал к каждому партнёру с данными: KZ в месяце блока минус партнёр в его последнем месяце.
+            "real_differentials": {key: float(frame.loc[series[key].index[-1], "real_rate"]) - value
+                                   if series[key].index[-1] in frame.index and pd.notna(frame.loc[series[key].index[-1], "real_rate"])
+                                   else None for key, value in available.items()},
+            "defaults": DEFAULTS, "defaults_status": "допущение пользователя (параметры ползунков)",
             "credit_constraint": credit, "current": current, "premium_sensitivity": sensitivity,
-            "fx_regression": {"status": fx_status} if None in partners.values() else {"status": "pending"},
+            "fx_regression": fx_block(frame, series),
             "panel_note": "Панель по трём странам с фиксированными эффектами — только иллюстрация: три единицы не дают "
                           "надёжных стандартных ошибок; строится, когда есть данные.",
             "benchmark": "курс как случайное блуждание (прогноз изменения = 0)"}

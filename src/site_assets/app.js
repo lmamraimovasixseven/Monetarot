@@ -125,6 +125,7 @@ function missedRounds(dates, latest, today) {
   var form = byId("corridor");
   if (form && typeof corridor === "function") {
     var ids = ["rate", "ru", "cn", "prem", "cap"], partnerData = form.getAttribute("data-partner-data") === "true";
+    var missingPartners = form.getAttribute("data-missing") || "";
     var redrawCorridor = function () {
       var v = {}, i;
       for (i = 0; i < ids.length; i++) { v[ids[i]] = parseFloat(byId("c-" + ids[i]).value);
@@ -133,7 +134,8 @@ function missedRounds(dates, latest, today) {
       var res = corridor(v.rate, parseFloat(form.getAttribute("data-inflation")), {"Russia": v.ru, "China": v.cn}, v.prem, v.cap, credit);
       var bounds = "Corridor: " + fixed(res.lower, 2) + "–" + fixed(res.upper, 2) + "%";
       /* Without partner data the verdict would rest on assumed partner rates: only the bounds are shown (D42). */
-      byId("corridor-out").textContent = !partnerData ? bounds + ". Illustration with your assumptions; no partner data." :
+      byId("corridor-out").textContent = !partnerData ? bounds + ". Illustration with your assumptions; no partner data" +
+        (missingPartners ? " for " + missingPartners : "") + "." :
         bounds + "; real differential to Russia " + fixed(res.differentials["Russia"], 2) + " pp, to China " +
         fixed(res.differentials["China"], 2) + " pp; " + res.label + ".";
     };

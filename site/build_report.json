@@ -15,9 +15,20 @@
  ],
  "ledger_ids_used": [
   "carry_corridor:credit_constraint/slope",
+  "carry_corridor:fx_regression/random_walk_mae_of_change",
+  "carry_corridor:fx_regression/specifications/lag1/coef",
+  "carry_corridor:fx_regression/specifications/lag1/n",
+  "carry_corridor:fx_regression/specifications/lag1/p",
+  "carry_corridor:fx_regression/specifications/lag1/r2",
+  "carry_corridor:fx_regression/specifications/lag1/se",
+  "carry_corridor:fx_regression/specifications/lag1_lag2/coef",
+  "carry_corridor:fx_regression/specifications/lag1_lag2/p",
+  "carry_corridor:fx_regression/vif/diff",
   "carry_corridor:kz_inflation",
   "carry_corridor:kz_real_rate",
   "carry_corridor:nbk_rate",
+  "carry_corridor:partner_real_rates/russia",
+  "carry_corridor:real_differentials/russia",
   "dashboard:band/0",
   "dashboard:band/1",
   "dashboard:contributions/rows/0/1",
@@ -1819,5 +1830,5 @@
   "reality_check:interval_80/0",
   "reality_check:interval_80/1"
  ],
- "index_bytes_with_assets": 67063
+ "index_bytes_with_assets": 67196
 }

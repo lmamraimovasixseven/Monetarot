@@ -4,7 +4,7 @@
 * каждый ключ outputs/numbers_for_note.json (источник — путь в артефакте или правило вывода);
 * каждое скалярное значение блоков продукта в model/artifact.json (decision, forecast_desk, patterns,
   carry_corridor, prereg, reality_check, dashboard);
-* каждый сырой ряд data/raw/*.csv и data/external/*.csv (источник, URL, даты, преобразование);
+* каждый сырой ряд data/raw/*.csv и data/raw/external/*.csv (источник, URL, даты, преобразование);
 * хеши файлов преререгистрации (prereg/).
 Колонки: id, value, source, series, url, retrieved, release_or_vintage, transformation, script, artifact_field,
 used_in, test. Неизвестное — UNKNOWN. Ничего не оценивает.
@@ -95,7 +95,7 @@ def series_rows(root: Path = ROOT) -> list[dict[str, str]]:
                              used_in="data/processed/*; model", test="tests/test_data_contract.py"))
     if Path(EXTERNAL_SOURCES).is_file():
         for name, spec in json.loads(Path(EXTERNAL_SOURCES).read_text(encoding="utf-8"))["series"].items():
-            path = root / "data" / "external" / spec["file"]
+            path = root / "data" / "raw" / "external" / spec["file"]  # D46: was data/external/, so the hash was always UNKNOWN
             rows.append(_row(id=f"external:{spec['file']}", value=normalized_sha256(path) if path.is_file() else UNKNOWN,
                              source=spec["publisher"], series=spec["title"], url=spec["url"],
                              retrieved=spec.get("retrieved", UNKNOWN), release_or_vintage=spec.get("release", UNKNOWN),

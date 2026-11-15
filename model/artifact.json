@@ -5859,12 +5859,19 @@
     "kz_inflation": 9.3,
     "kz_real_rate": 6.949999999999999,
     "partner_real_rates": {
-      "Россия": null,
-      "Китай": null
+      "russia": 7.65,
+      "china": null
+    },
+    "partner_labels": {
+      "russia": "Россия",
+      "china": "Китай"
     },
     "partner_notes": {
-      "Россия": "UNKNOWN: данных нет (шаблон)",
-      "Китай": "UNKNOWN: данных нет (шаблон)"
+      "russia": "месяц 2026-09",
+      "china": "UNKNOWN: данных нет (шаблон: cn_7d_reverse_repo_daily.csv)"
+    },
+    "real_differentials": {
+      "russia": -0.7000000000000011
     },
     "defaults": {
       "premium": 2.0,
@@ -5886,7 +5893,7 @@
       "differentials": {},
       "lower": null,
       "upper": null,
-      "status": "UNKNOWN: нет реальных ставок партнёров"
+      "status": "UNKNOWN: нет реальной ставки: Китай; по одной стране границы коридора не считаются"
     },
     "premium_sensitivity": [
       {
@@ -5916,7 +5923,57 @@
       }
     ],
     "fx_regression": {
-      "status": "UNKNOWN: нет данных USD/KZT и реальных ставок партнёров (TODO_HUMAN.md)"
+      "status": "ok",
+      "specifications": {
+        "lag1": {
+          "n": 131,
+          "coef": 0.2854827837328097,
+          "se": 0.10344609317074754,
+          "p": 0.005785001108926782,
+          "r2": 0.09561099112924754
+        },
+        "lag1_lag2": {
+          "n": 131,
+          "coef": 0.5222074943821141,
+          "se": 0.34791627284288906,
+          "p": 0.13336658765130993,
+          "r2": 0.10767261479529067
+        }
+      },
+      "vif": {
+        "diff": 6.450412717187132,
+        "diff2": 6.450412717187132
+      },
+      "random_walk_mae_of_change": 1.8781706868160477,
+      "verdict": "связь значима на 5% (HC1)",
+      "ovb_compass": [
+        {
+          "omitted": "цена нефти",
+          "corr_with_differential": "+ (доходы → ставка выше)",
+          "effect_on_kzt": "укрепление (USD/KZT ↓)",
+          "bias": "коэффициент смещён вниз (к более отрицательному)"
+        },
+        {
+          "omitted": "глобальный аппетит к риску",
+          "corr_with_differential": "− (в стрессе премии и инфляция растут)",
+          "effect_on_kzt": "в стрессе ослабление (USD/KZT ↑)",
+          "bias": "знак смещения неоднозначен"
+        },
+        {
+          "omitted": "курс рубля",
+          "corr_with_differential": "неоднозначно",
+          "effect_on_kzt": "ослабление рубля тянет тенге",
+          "bias": "неоднозначно; проверяется добавлением USD/RUB, когда есть данные"
+        }
+      ],
+      "differential": "КЗ − Россия (нет данных: Китай)",
+      "partners_used": [
+        "russia"
+      ],
+      "differential_months": {
+        "first": "2015-09",
+        "last": "2026-09"
+      }
     },
     "panel_note": "Панель по трём странам с фиксированными эффектами — только иллюстрация: три единицы не дают надёжных стандартных ошибок; строится, когда есть данные.",
     "benchmark": "курс как случайное блуждание (прогноз изменения = 0)"
@@ -8476,8 +8533,8 @@
   },
   "evidence_ledger": {
     "path": "ledger/evidence_ledger.csv",
-    "rows": 4164,
-    "sha256": "6a8c70c276913beb63515330e94e97e421bdbf6e30a432b74810d3ce01c404bb"
+    "rows": 4179,
+    "sha256": "7b11d3599f09fe738261a4a17b782c999b19dcef13ac30a7633b1e981a881c18"
   },
   "dashboard": {
     "label": "Render dashboard (src/app.py) values for the static site; computed from the stored model, nothing estimated",

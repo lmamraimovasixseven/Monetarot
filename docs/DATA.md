@@ -77,12 +77,12 @@
 
 | Ряд | Файл | Статус | Обрабатываемая особенность |
 |---|---|---|---|
-| Ключевая ставка Банка России | `data/raw/external/ru_key_rate_daily.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | ставка меняется внутри месяца → средневзвешенное по дням (external_data.monthly_step_rate) |
-| Индекс потребительских цен, % к соответствующему месяцу прошлого года | `data/raw/external/ru_cpi_yoy.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | ИПЦ как индекс «тот же месяц прошлого года = 100» → y/y = индекс − 100 (external_data.cpi_yoy) |
+| Ключевая ставка Банка России | `data/raw/external/ru_key_rate_daily.csv` | данные есть (2978 строк) | значение на каждый рабочий день, ставка меняется внутри месяца → средняя по календарным дням, выходные берут последний рабочий день (external_data.monthly_step_rate) |
+| Индекс потребительских цен, % к соответствующему месяцу прошлого года | `data/raw/external/ru_cpi_yoy.csv` | данные есть (141 строк) | таблица Банка России даёт y/y в процентах; если бы пришёл индекс «тот же месяц прошлого года = 100», вычиталось бы 100 (external_data.cpi_yoy) |
 | Ставка 7-дневного обратного РЕПО НБК | `data/raw/external/cn_7d_reverse_repo_daily.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | ставка меняется внутри месяца → средневзвешенное по дням |
-| CPI, same month previous year = 100 | `data/raw/external/cn_cpi_yoy.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | январь/февраль смещаются Новым годом по лунному календарю → флаг lunar_new_year_month |
-| Официальный курс тенге к доллару США | `data/raw/external/usd_kzt_daily.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | курс публикуется только по рабочим дням → среднее по опубликованным дням, без заполнения пропусков |
-| Официальный курс рубля к доллару США | `data/raw/external/usd_rub_daily.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | то же, что USD/KZT; праздники РФ не совпадают с праздниками РК → дни не выравниваются |
-| Central parity rate USD/CNY | `data/raw/external/usd_cny_daily.csv` | UNKNOWN: только шаблон (TODO_HUMAN.md) | то же; праздники КНР (неделя Нового года) дают месяцы с малым числом дней (колонка days) |
+| FRED CPALTT01CNM659N: consumer price index for China, growth rate same period previous year, percent | `data/raw/external/cn_cpi_yoy.csv` | данные есть (124 строк) | y/y в процентах (FRED); январь/февраль смещаются Новым годом по лунному календарю → флаг lunar_new_year_month |
+| Официальный курс тенге к доллару США | `data/raw/external/usd_kzt_daily.csv` | данные есть (4305 строк) | отчёт НБ РК даёт значение на каждый календарный день (в выходные повторяется последний курс) → среднее по опубликованным дням, без заполнения пропусков |
+| Официальный курс рубля к доллару США | `data/raw/external/usd_rub_daily.csv` | данные есть (2929 строк) | курс Банка России публикуется по рабочим дням РФ → среднее по опубликованным дням; дни не выравниваются с USD/KZT |
+| FRED DEXCHUS: Chinese yuan renminbi per U.S. dollar, noon buying rates in New York (not the CFETS central parity) | `data/raw/external/usd_cny_daily.csv` | данные есть (2962 строк) | FRED DEXCHUS публикуется по рабочим дням США, дни без значения пропущены → среднее по опубликованным дням (колонка days) |
 
-Пока файлы содержат только заголовок, особенность обработана в коде и проверена тестами на синтетических данных (tests/test_external_data.py), но в реальных данных не наблюдалась.
+Источник, URL и дата получения каждого заполненного файла — в config/external_sources.json (D46). Только шаблон: cn_7d_reverse_repo_daily.csv.

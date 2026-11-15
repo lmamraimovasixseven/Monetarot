@@ -474,27 +474,60 @@ def patterns_page(L: Ledger, artifact: dict) -> str:
 def corridor_page(L: Ledger, artifact: dict) -> str:
     block = artifact["carry_corridor"]
     rates = block["partner_real_rates"]
-    partners = ", ".join(f"{esc(tr(k))}: {esc(v if v is not None else tr(block['partner_notes'][k]))}" for k, v in rates.items())
+    labels = {key: tr(label) for key, label in block.get("partner_labels", {}).items()}
+    differentials = block.get("real_differentials", {})
+    partners = "; ".join(
+        f"{esc(labels.get(k, k))}: {L.num(f'carry_corridor:partner_real_rates/{k}', 2)}% ({esc(tr(block['partner_notes'][k]))}"
+        + (f"; real differential KZ − {esc(labels.get(k, k))} {L.num(f'carry_corridor:real_differentials/{k}', 2, signed=True)} pp"
+           if differentials.get(k) is not None else "") + ")"
+        if v is not None else f"{esc(labels.get(k, k))}: {esc(tr(block['partner_notes'][k]))}" for k, v in rates.items())
     credit = block["credit_constraint"]
     kz_real = float(block["kz_real_rate"])
 
     def partner(key: str) -> tuple[float, str]:
-        value = next((v for k, v in rates.items() if tr(k) == key), None)
-        return (kz_real, " (illustrative value; no data)") if value is None else (float(value), "")
+        value = rates.get(key)
+        return (kz_real, " (illustrative value; no data)") if value is None else (float(value), f" (data: {tr(block['partner_notes'][key])})")
 
-    (ru, ru_note), (cn, cn_note) = partner("Russia"), partner("China")
+    (ru, ru_note), (cn, cn_note) = partner("russia"), partner("china")
     # Without a real rate for every partner the position verdict would rest on invented numbers: the page shows only the
-    # corridor bounds of the user's assumptions (D42).
+    # corridor bounds of the user's assumptions (D42), and the bounds in the artifact stay UNKNOWN (D46).
     partner_data = "true" if all(v is not None for v in rates.values()) else "false"
+    missing = ", ".join(labels.get(k, k) for k, v in rates.items() if v is None)
+    fx = block["fx_regression"]
+    if fx.get("status") == "ok":
+        p = "carry_corridor:fx_regression"
+        months = fx.get("differential_months", {})
+        regression = (f"<p>Regression of the monthly change of 100·log USD/KZT (monthly mean of the official NBK rate) on the real "
+                      f"differential {esc(tr(fx['differential']))}, months {esc(months.get('first', ''))}–{esc(months.get('last', ''))}: "
+                      f"differential at t−1: coefficient {L.num(f'{p}/specifications/lag1/coef', 3, signed=True)} (HC1 s.e. "
+                      f"{L.num(f'{p}/specifications/lag1/se', 3)}, p = {L.num(f'{p}/specifications/lag1/p', 3)}, R² = "
+                      f"{L.num(f'{p}/specifications/lag1/r2', 3)}, n = {L.num(f'{p}/specifications/lag1/n')}); with t−1 and t−2: "
+                      f"coefficient on t−1 {L.num(f'{p}/specifications/lag1_lag2/coef', 3, signed=True)} (p = "
+                      f"{L.num(f'{p}/specifications/lag1_lag2/p', 3)}), VIF {L.num(f'{p}/vif/diff', 2)}. Verdict: {esc(tr(fx['verdict']))}. "
+                      + ("The sign is positive: a higher differential is followed by a rise in USD/KZT (a weaker tenge), the "
+                         "opposite of what carry-trade inflows would imply. "
+                         if float(L.raw(f"{p}/specifications/lag1/coef")) > 0 else
+                         "The sign is negative: a higher differential is followed by a fall in USD/KZT (a stronger tenge), as "
+                         "carry-trade inflows would imply. ")
+                      + "This is an in-sample association, not a causal estimate and not a forecast; omitted variables such as the "
+                      "oil price, global risk appetite and the rouble can bias it.</p>"
+                      f"<p>Benchmark: {esc(tr(block['benchmark']))}; mean absolute monthly change of 100·log USD/KZT "
+                      f"{L.num(f'{p}/random_walk_mae_of_change', 3)}. {esc(tr(block['panel_note']))}</p>")
+    else:
+        regression = (f"<p>Regression of the USD/KZT change on the real differential: {esc(tr(fx['status']))}. "
+                      f"Benchmark: {esc(tr(block['benchmark']))}. {esc(tr(block['panel_note']))}</p>")
     return f"""<h1>Policy-rate corridor and carry trade</h1>
-<p>A scenario tool, not an exchange-rate forecast. Real rate = nominal rate − year-on-year inflation. Now ({esc(block['month'])}): NBK rate {L.num('carry_corridor:nbk_rate', 2)}%,
+<p>A scenario tool, not an exchange-rate forecast. Real rate = nominal rate − year-on-year inflation; a partner's monthly rate is the
+average over the calendar days of the month. Now ({esc(block['month'])}): NBK rate {L.num('carry_corridor:nbk_rate', 2)}%,
 inflation {L.num('carry_corridor:kz_inflation', 2)}%, real rate {L.num('carry_corridor:kz_real_rate', 2)}%. Partner real rates: {partners}.</p>
+<p id="corridor-bounds">Corridor bounds: {esc(tr(block['current']['status'])) if block['current']['status'] != 'ok' else
+f"{L.num('carry_corridor:current/lower', 2)}–{L.num('carry_corridor:current/upper', 2)}%"}.</p>
 <p>Credit constraint: slope of credit growth 6 months ahead on the real rate {L.num('carry_corridor:credit_constraint/slope', 3)} ({esc(tr(credit['note']))}).</p>
-<p>Regression of the USD/KZT change on the real differential: {esc(tr(block['fx_regression']['status']))}. Benchmark: {esc(tr(block['benchmark']))}. {esc(tr(block['panel_note']))}</p>
-<form id="corridor" autocomplete="off" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}" data-partner-data="{partner_data}">
+{regression}
+<form id="corridor" autocomplete="off" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}" data-partner-data="{partner_data}" data-missing="{esc(missing)}">
 <label>NBK rate, %: <output id="o-rate"></output><input id="c-rate" type="range" min="5" max="25" step="0.25" value="{float(block['nbk_rate'])!r}"></label>
-<label>Russia real rate, %{ru_note}: <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.25" value="{ru!r}"></label>
-<label>China real rate, %{cn_note}: <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.25" value="{cn!r}"></label>
+<label>Russia real rate, %{esc(ru_note)}: <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.05" value="{ru!r}"></label>
+<label>China real rate, %{esc(cn_note)}: <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.05" value="{cn!r}"></label>
 <label>Risk premium, pp: <output id="o-prem"></output><input id="c-prem" type="range" min="0" max="6" step="0.25" value="{block['defaults']['premium']!r}"></label>
 <label>Cap on the real differential, pp: <output id="o-cap"></output><input id="c-cap" type="range" min="1" max="12" step="0.25" value="{block['defaults']['cap']!r}"></label>
 </form><p id="corridor-out" aria-live="polite"></p>

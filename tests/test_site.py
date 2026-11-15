@@ -340,7 +340,7 @@ def test_corridor_starts_at_the_current_rate_and_gives_no_verdict_without_partne
              "getAttribute: function (k) { return this.attrs.hasOwnProperty(k) ? this.attrs[k] : null; }, addEventListener: function () {}}; }\n"
              "var document = {getElementById: function (id) { return els.hasOwnProperty(id) ? els[id] : null; }, querySelectorAll: function () { return []; }};\n"
              "if (typeof JSON === 'undefined') { var JSON = {parse: function (s) { return eval('(' + s + ')'); }}; }\n"
-             f"el('corridor', {{'data-inflation': '{attrs['data-inflation']}', 'data-credit': '{attrs['data-credit']}', 'data-partner-data': '{attrs['data-partner-data']}'}}, null);\n"
+             f"el('corridor', {{'data-inflation': '{attrs['data-inflation']}', 'data-credit': '{attrs['data-credit']}', 'data-partner-data': '{attrs['data-partner-data']}', 'data-missing': '{attrs.get('data-missing', '')}'}}, null);\n"
              "el('corridor-out', {}, null);\n"
              + "".join(f"el('c-{k}', {{}}, '{v}'); el('o-{k}', {{}}, null);\n" for k, v in inputs.items())
              + "els['c-rate'].value = '9';\n"
@@ -350,7 +350,8 @@ def test_corridor_starts_at_the_current_rate_and_gives_no_verdict_without_partne
                       full=True, prefix=stubs)
     assert float(lines[0]) == float(block["nbk_rate"])
     if not has_data:
-        assert lines[1].endswith("Illustration with your assumptions; no partner data.")
+        missing = attrs.get("data-missing", "")
+        assert lines[1].endswith("Illustration with your assumptions; no partner data" + (f" for {missing}" if missing else "") + ".")
         assert not any(label in lines[1] for label in ("below the corridor", "above the corridor", "inside the corridor", "corridor broken"))
 
 
