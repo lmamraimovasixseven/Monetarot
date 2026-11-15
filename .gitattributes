@@ -1,2 +1,4 @@
 *.csv text eol=lf
 *.md text eol=lf
+site/** text eol=lf
+src/site_assets/** text eol=lf
