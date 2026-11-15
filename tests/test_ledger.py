@@ -41,3 +41,15 @@ def test_every_raw_and_external_series_is_in_the_ledger():
 
 def test_committed_ledger_equals_a_fresh_build():
     assert (ROOT / "ledger" / "evidence_ledger.csv").read_text(encoding="utf-8") == ledger.render(ledger.build())
+
+
+def test_look_ahead_counts_of_every_factor_are_in_the_ledger_and_come_last():
+    """D44: one row per factor from data/processed/provenance.json, appended after the earlier rows."""
+    limitation = json.loads((ROOT / "data" / "processed" / "provenance.json").read_text(encoding="utf-8"))["release_lag_limitation"]
+    with (ROOT / "ledger" / "evidence_ledger.csv").open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    values = {row["id"]: row["value"] for row in rows}
+    for series in limitation["series"]:
+        assert values[f"lookahead:{series['feature']}"] == str(series["decisions_where_bound_exceeds_window"])
+    tail = [row["id"] for row in rows[-len(limitation["series"]):]]
+    assert all(key.startswith("lookahead:") for key in tail)

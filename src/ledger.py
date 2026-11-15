@@ -146,8 +146,33 @@ def log_rows() -> list[dict[str, str]]:
     return rows
 
 
+PROVENANCE_PATH = ROOT / "data" / "processed" / "provenance.json"
+
+
+def look_ahead_rows(provenance_path: Path = PROVENANCE_PATH) -> list[dict[str, str]]:
+    """Числа плашки look-ahead на главной (D44): для каждого фактора — число решений, где верхняя граница лага публикации
+    (по дате обновления файла) выходит за окно доступности «месяц решения минус допущение»; из
+    data/processed/provenance.json (src/facts.py::release_lag_limitation). Идут в конце журнала, чтобы прежние строки
+    не сдвигались."""
+    path = Path(provenance_path)
+    if not path.is_file():
+        return []
+    limitation = json.loads(path.read_text(encoding="utf-8")).get("release_lag_limitation") or {}
+    rows = []
+    for i, series in enumerate(limitation.get("series", [])):
+        rows.append(_row(id=f"lookahead:{series['feature']}", value=series["decisions_where_bound_exceeds_window"],
+                         source="data/processed/provenance.json", series=series["series_file"], url="not applicable (computed)",
+                         retrieved="not applicable", release_or_vintage=f"file update date {series.get('file_update_date', UNKNOWN)}",
+                         transformation=f"decisions (of {limitation.get('decisions', UNKNOWN)}) where the release-lag upper bound "
+                                        "exceeds the availability window",
+                         script="src/facts.py", artifact_field=f"data/processed/provenance.json#/release_lag_limitation/series/{i}/"
+                                                               "decisions_where_bound_exceeds_window",
+                         used_in="site/index.html#look-ahead", test="tests/test_ledger.py; tests/test_site.py"))
+    return rows
+
+
 def build() -> list[dict[str, str]]:
-    return number_rows() + artifact_rows() + series_rows() + prereg_rows() + log_rows()
+    return number_rows() + artifact_rows() + series_rows() + prereg_rows() + log_rows() + look_ahead_rows()
 
 
 def render(rows: list[dict[str, str]]) -> str:

@@ -227,18 +227,21 @@ def aligned_latest(dashboard: dict) -> dict:
     return {**table, "rows": rows}
 
 
-def look_ahead_box(L: Ledger, sentence: str | None) -> str:
-    """One sentence for step 6 (D43): 'Look-ahead cannot be excluded: real publication lags are not documented (N of M
-    decisions for …)'. The counts per factor are taken from the stored sentence (data/processed/provenance.json via the
-    dashboard block); they have no ledger rows. The total is the ledger value n:n_usable when it matches."""
+def look_ahead_box(L: Ledger, model: dict, sentence: str | None) -> str:
+    """One sentence for step 6 (D43, D44): 'Look-ahead cannot be excluded: real publication lags are not documented
+    (exports: N of M decisions; …)'. Each count is the ledger row lookahead:<factor> (from data/processed/provenance.json,
+    src/ledger.py::look_ahead_rows) and the total is n:n_usable; factors with no affected decision are left out."""
     link = 'Details: <a href="evidence.html#ev-limitations">Evidence → Limitations</a>.'
-    parts = re.findall(r"(\d+) of (\d+) decisions for ([a-z ,]+?)(?=[).;]| \()", sentence or "")
-    if not parts or "No upper bound" in (sentence or ""):
+    counts = [(feature, label) for feature, label in zip(model["features"], model["labels"])
+              if f"lookahead:{feature}" in L.values and float(L.values[f"lookahead:{feature}"]) > 0]
+    if not counts:
         return f"{esc(sentence or 'Look-ahead status: see Evidence → Limitations.')} {link}"
-    total = L.raw("n:n_usable")
-    counts = "; ".join(f"{esc(n)} of {L.num('n:n_usable') if m == total else esc(m)} decisions for {esc(names)}"
-                       for n, m, names in parts)
-    return f"Look-ahead cannot be excluded: real publication lags are not documented ({counts}). {link}"
+    counts.sort(key=lambda item: -float(L.values[f"lookahead:{item[0]}"]))
+    parts = "; ".join(f"{esc(label.lower())}: {L.num(f'lookahead:{feature}')} of {L.num('n:n_usable')}"
+                      + (" decisions" if i == 0 else "") for i, (feature, label) in enumerate(counts))
+    extra = re.search(r"No upper bound is available for [^.]+\.[^.]*\.", sentence or "")
+    return (f"Look-ahead cannot be excluded: real publication lags are not documented ({parts})."
+            + (f" {esc(extra.group(0))}" if extra else "") + f" {link}")
 
 
 def index_page(L: Ledger, artifact: dict) -> str:
@@ -308,7 +311,7 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <section id="step-6"><h2>6. The risk</h2>
 <div class="box warn" id="freshness" hidden></div>{anomaly}
 <div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
-<div class="box warn" id="look-ahead">{look_ahead_box(L, d["look_ahead_sentence"])}</div>
+<div class="box warn" id="look-ahead">{look_ahead_box(L, d["model"], d["look_ahead_sentence"])}</div>
 <h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
 <ul>{risk}</ul><p><a href="methods.html">All model limits</a></p></section>
 <section class="action" id="step-7"><h2>7. The ask</h2><p class="answer" id="answer"><strong>{action}.</strong></p>

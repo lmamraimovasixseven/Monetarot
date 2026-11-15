@@ -1728,6 +1728,9 @@
   "forecast_log:0:p_decrease",
   "forecast_log:0:p_hold",
   "forecast_log:0:p_increase",
+  "lookahead:consumption",
+  "lookahead:exports",
+  "lookahead:imports",
   "n:dm_squared_error_p",
   "n:n_holdout",
   "n:n_usable",
@@ -1816,5 +1819,5 @@
   "reality_check:interval_80/0",
   "reality_check:interval_80/1"
  ],
- "index_bytes_with_assets": 66847
+ "index_bytes_with_assets": 67063
 }

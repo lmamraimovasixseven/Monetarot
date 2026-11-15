@@ -400,3 +400,20 @@ def test_look_ahead_box_is_one_sentence_with_ledger_total():
     assert "UNKNOWN" not in box and 'data-ledger="n:n_usable"' in box and 'href="evidence.html#ev-limitations"' in box
     total = site_build.Ledger().raw("n:n_usable")
     assert re.findall(r'data-ledger="n:n_usable">([^<]+)<', box) and set(re.findall(r'data-ledger="n:n_usable">([^<]+)<', box)) == {total}
+
+
+# ----------------------------------------------------------------------------- D44: look-ahead counts have ledger rows
+
+
+def test_look_ahead_counts_on_the_home_page_come_from_ledger_rows():
+    import json
+
+    limitation = json.loads((ROOT / "data" / "processed" / "provenance.json").read_text(encoding="utf-8"))["release_lag_limitation"]
+    ledger_values = site_build.Ledger().values
+    assert str(limitation["decisions"]) == ledger_values["n:n_usable"], "the box divides by n:n_usable"
+    box = re.search(r'id="look-ahead">(.*?)</div>', (SITE / "index.html").read_text(encoding="utf-8"), re.S).group(1)
+    shown = dict(re.findall(r'data-ledger="lookahead:(\w+)">([^<]+)<', box))
+    expected = {s["feature"]: str(s["decisions_where_bound_exceeds_window"]) for s in limitation["series"]
+                if s["decisions_where_bound_exceeds_window"]}
+    assert shown == expected
+    assert all(ledger_values[f"lookahead:{feature}"] == value for feature, value in shown.items())
