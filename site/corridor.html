@@ -8,7 +8,7 @@
 inflation <span class="num" data-ledger="carry_corridor:kz_inflation">9.30</span>%, real rate <span class="num" data-ledger="carry_corridor:kz_real_rate">6.95</span>%. Partner real rates: Russia: UNKNOWN: no data (template file only), China: UNKNOWN: no data (template file only).</p>
 <p>Credit constraint: slope of credit growth 6 months ahead on the real rate <span class="num" data-ledger="carry_corridor:credit_constraint/slope">0.168</span> (the slope is not negative, so the credit constraint is not identified and is not used).</p>
 <p>Regression of the USD/KZT change on the real differential: UNKNOWN: no data for USD/KZT or partner real rates (TODO_HUMAN.md). Benchmark: the exchange rate as a random walk (forecast change = 0). A three-country panel with fixed effects is an illustration only: three units do not give reliable standard errors. It is built when the data are available.</p>
-<form id="corridor" data-inflation="9.3" data-credit="null">
+<form id="corridor" autocomplete="off" data-inflation="9.3" data-credit="null" data-partner-data="false">
 <label>NBK rate, %: <output id="o-rate"></output><input id="c-rate" type="range" min="5" max="25" step="0.25" value="16.25"></label>
 <label>Russia real rate, % (illustrative value; no data): <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.25" value="6.949999999999999"></label>
 <label>China real rate, % (illustrative value; no data): <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.25" value="6.949999999999999"></label>

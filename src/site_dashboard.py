@@ -32,23 +32,37 @@ def md_inline(text: str) -> str:
     return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", esc(text))
 
 
+def signed(value: float, digits: int) -> str:
+    """Round first, then sign (D42): a value that rounds to zero is shown as 0.000, never as -0.000 or +0.000."""
+    text = f"{value:.{digits}f}"
+    if float(text) == 0:
+        return f"{0.0:.{digits}f}"
+    return ("+" if value > 0 else "") + text
+
+
+def plain(value: float, digits: int) -> str:
+    """Unsigned format without a negative zero: -0.00004 → 0.0000 (D42)."""
+    text = f"{value:.{digits}f}"
+    return f"{0.0:.{digits}f}" if float(text) == 0 else text
+
+
 def fmt_number(value: float, kind: str) -> str:
     if kind in ("f3", "f3na"):
-        return f"{value:.3f}"
+        return plain(value, 3)
     if kind == "s3":
-        return f"{value:+.3f}"
+        return signed(value, 3)
     if kind == "s4":
-        return f"{value:+.4f}"
+        return signed(value, 4)
     if kind == "s1":
-        return f"{value:+.1f}"
+        return signed(value, 1)
     if kind == "pct1":
         return f"{value * 100:.1f}%"
     if kind == "c2":
-        return f"{value:,.2f}"
+        return f"{0.0:.2f}" if float(f"{value:.2f}") == 0 else f"{value:,.2f}"
     if kind == "int":
         return f"{int(value)}"
     if kind == "g4":
-        return f"{int(value)}" if float(value).is_integer() and abs(value) < 1e15 else f"{value:.4f}"
+        return f"{int(value)}" if float(value).is_integer() and abs(value) < 1e15 else plain(value, 4)
     raise ValueError(kind)
 
 
@@ -89,7 +103,7 @@ def long_date(day: date | None) -> str:
 
 
 def short_date(day: date | None) -> str:
-    return day.strftime("%d %B %Y") if day else "date not confirmed"
+    return f"{day.day} {day.strftime('%B %Y')}" if day else "date not confirmed"
 
 
 def _date(text: str | None) -> date | None:
@@ -113,7 +127,7 @@ def headline(L, d: dict) -> str:
 def context_strip(d: dict) -> str:
     return f"""<div class="context" id="context"><p>Unit: {esc(d['unit'])}</p>
 <p>Period: NBK decision of {esc(d['latest_decision'])}, factor data month {esc(d['data_month'])} ({esc(d['lag_label'])})</p>
-<p>Latest change: <span class="num" data-ledger="dashboard:score_change">{d['score_change']:+.3f}</span> versus the decision of {esc(d['previous_decision'])}</p>
+<p>Latest change: <span class="num" data-ledger="dashboard:score_change">{signed(d['score_change'], 3)}</span> versus the decision of {esc(d['previous_decision'])}</p>
 <p>Local factor data and model artifact as of {esc(d['latest_decision'])}. A static page does not contact the calendar source; round dates come from config/forecast_rounds.json.</p></div>"""
 
 
@@ -146,11 +160,42 @@ def round_cards(L, d: dict) -> str:
             + "".join(f"<li>{md_inline(item)}</li>" for item in d["why"]) + "</ul></details>")
 
 
-def boxes(d: dict) -> str:
+def rule_head(head: str) -> str:
+    """'Decision rule (option 1: direction flag (band clear of zero)), a monitoring rule, not a forecast.' →
+    'Decision rule: direction flag (the 95% band of the score is clear of zero). A monitoring rule, not a forecast.' (D42).
+    A heading of another shape is shown as stored."""
+    match = re.fullmatch(r"Decision rule \(option [^:]+: (.+?) \(band (.+?)\)\), (.+?)\.", head)
+    if not match:
+        return head
+    name, band, kind = match.groups()
+    return f"Decision rule: {name} (the 95% band of the score is {band}). {kind[0].upper()}{kind[1:]}."
+
+
+def sentence_case(text: str) -> str:
+    """A sentence that starts after '. ' starts with a capital letter."""
+    return re.sub(r"(\.\s+)([a-z])", lambda m: m.group(1) + m.group(2).upper(), text)
+
+
+def holdout_sentence(L) -> str:
+    """One sentence on the holdout for the home page (D42); the full paragraph with the data-update effect stays on
+    Evidence. The verdict follows rule 14: distinguishable only if the bootstrap interval and the DM test both separate."""
+    low, high = float(L.raw("n:rmse_ratio_ci_low")), float(L.raw("n:rmse_ratio_ci_high"))
+    interval_separates, test_separates = not (low <= 1 <= high), float(L.raw("n:dm_squared_error_p")) < 0.05
+    if interval_separates and test_separates:
+        verdict = "the bootstrap interval and the Diebold–Mariano test both separate the model from Always Hold"
+    elif interval_separates or test_separates:
+        verdict = "the bootstrap interval and the Diebold–Mariano test disagree on whether the model differs from Always Hold"
+    else:
+        verdict = "the model cannot be distinguished from Always Hold"
+    return (f"Holdout RMSE ratio {L.num('n:rmse_ratio')} (95% interval {L.num('n:rmse_ratio_ci_low')}–{L.num('n:rmse_ratio_ci_high')}, "
+            f"Diebold–Mariano p = {L.num('n:dm_squared_error_p')}): {verdict}.")
+
+
+def boxes(L, d: dict) -> str:
     rule = d.get("decision_rule")
-    rule_html = (f'<div class="box info" id="decision-rule"><strong>{esc(rule["head"])}</strong> {esc(rule["text"])}</div>'
+    rule_html = (f'<div class="box info" id="decision-rule"><strong>{esc(rule_head(rule["head"]))}</strong> {esc(sentence_case(rule["text"]))}</div>'
                  if rule else '<div class="box info" id="decision-rule">Decision rule: not recorded.</div>')
-    return (f'<div class="box warn" id="verdict-box">{esc(d["verdict_box"])}</div>{rule_html}'
+    return (f'<div class="box info" id="verdict-box">{holdout_sentence(L)} <a href="evidence.html#ev-holdout">Details on Evidence</a></div>{rule_html}'
             f'<p class="caption" id="forecast-log">{esc(d["forecast_log_sentence"])} <a href="forecasts.html">Forecast log</a>.</p>')
 
 
@@ -158,6 +203,50 @@ def boxes(d: dict) -> str:
 
 def _days(text: str) -> int:
     return date.fromisoformat(text).toordinal()
+
+
+NUMBER_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+
+
+def number_word(n: int) -> str:
+    return NUMBER_WORDS[n] if 0 <= n < len(NUMBER_WORDS) else str(n)
+
+
+def track_record_title(L, tr: dict) -> str:
+    """Conclusion title of the track-record chart, computed from the holdout points of the chart (D42)."""
+    holdout = [i for i, day in enumerate(tr["dates"]) if day >= tr["holdout_start"]]
+    scores = [float(L.raw(f"dashboard:track_record/score/{i}")) for i in holdout]
+    actual = [int(L.raw(f"dashboard:track_record/actual/{i}")) for i in holdout]
+    if all(s < 0 for s in scores):
+        sign, lean = "The score stayed below zero throughout the holdout", -1
+    elif all(s > 0 for s in scores):
+        sign, lean = "The score stayed above zero throughout the holdout", 1
+    else:
+        sign, lean = "The score changed sign during the holdout", None
+    counts = {k: actual.count(k) for k in (-1, 0, 1)}
+    top = max(counts, key=counts.get)
+    if list(counts.values()).count(counts[top]) > 1:
+        return sign
+    verb = {-1: "cut", 0: "held the rate", 1: "hiked"}[top]
+    how = "at most decisions" if counts[top] * 2 > len(actual) else "more often than anything else"
+    joint = "and" if top == lean else "while"
+    return f"{sign}, {joint} the NBK {verb} {how}"
+
+
+def contributions_title(names: list[str], values: list[float]) -> str:
+    """Conclusion title of the contributions chart, computed from the bars (D42)."""
+    n, down, up = len(values), sum(v < 0 for v in values), sum(v > 0 for v in values)
+    if down == n:
+        head = f"All {number_word(n)} factors push the score towards a cut"
+    elif up == n:
+        head = f"All {number_word(n)} factors push the score towards a hike"
+    else:
+        head = f"{number_word(down).capitalize()} of {number_word(n)} factors push the score towards a cut, {number_word(up)} towards a hike"
+    order = sorted(range(n), key=lambda i: abs(values[i]), reverse=True)[:2]
+    first, second = (names[i].lower() for i in order)
+    a, b = first.rsplit(" ", 1), second.rsplit(" ", 1)
+    pair = f"{a[0]} and {second}" if len(a) == len(b) == 2 and a[1] == b[1] else f"{first} and {second}"
+    return f"{head}; {pair} most" if down == n or up == n else f"{head}; largest: {pair}"
 
 
 def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
@@ -175,7 +264,7 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
              f'<line x1="{left}" y1="{y(0):.1f}" x2="{width - right}" y2="{y(0):.1f}" stroke="{palette["grey"]}" stroke-dasharray="4 4"/>',
              f'<line x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" stroke="{palette["grey"]}"/>']
     for tick in (-1.0, -0.5, 0.0, 0.5, 1.0):
-        parts.append(f'<text x="{left - 4}" y="{y(tick) + 4:.1f}" text-anchor="end" font-size="11" fill="{palette["black"]}">{tick:+.1f}</text>')
+        parts.append(f'<text x="{left - 4}" y="{y(tick) + 4:.1f}" text-anchor="end" font-size="11" fill="{palette["black"]}">{signed(tick, 1)}</text>')
     years = sorted({t[:4] for t in tr["dates"]})
     for year in years[1::2]:
         xv = x(date(int(year), 1, 1).toordinal())
@@ -188,15 +277,16 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
         actual = int(L.raw(f"dashboard:track_record/actual/{i}"))
         score = float(L.raw(f"dashboard:track_record/score/{i}"))
         cx, cy, colour, label = x(xv), y(actual), CLASS_COLOUR[names[actual]], names[actual]
-        tip = f"<title>{day}: {label}, score {score:+.3f}</title>"
+        tip = f"<title>{day}: {label}, score {signed(score, 3)}</title>"
         if actual == 1:
             parts.append(f'<path d="M{cx:.1f},{cy - 5:.1f} L{cx + 4.5:.1f},{cy + 3:.1f} L{cx - 4.5:.1f},{cy + 3:.1f} Z" fill="{colour}">{tip}</path>')
         elif actual == -1:
             parts.append(f'<path d="M{cx:.1f},{cy + 5:.1f} L{cx + 4.5:.1f},{cy - 3:.1f} L{cx - 4.5:.1f},{cy - 3:.1f} Z" fill="{colour}">{tip}</path>')
         else:
             parts.append(f'<rect x="{cx - 3:.1f}" y="{cy - 3:.1f}" width="6" height="6" fill="{colour}">{tip}</rect>')
-        parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {score:+.3f}</title></circle>')
+        parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {signed(score, 3)}</title></circle>')
     parts.append("</svg>")
+    title = track_record_title(L, tr)
     legend = ('<p class="legend"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
               '<span><span class="mark tone-increase">▲</span> Increase</span><span><span class="mark tone-hold-grey">■</span> Hold</span>'
               '<span><span class="mark tone-decrease">▼</span> Decrease</span><span class="key" style="border-color:#FFF4D6">Holdout</span></p>')
@@ -204,7 +294,7 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
                f"decided (−1 cut, 0 hold, +1 hike). Shaded: holdout from {tr['holdout_start']}, where the frozen model is "
                "forecasting out of sample; earlier values are in-sample fits and flatter the model. A useful score would sit "
                "above zero before hikes and below zero before cuts.")
-    return (f'<figure id="track-record"><figcaption><strong>Track record of the score</strong></figcaption>{"".join(parts)}'
+    return (f'<figure id="track-record"><figcaption><strong>{esc(title)}</strong></figcaption>{"".join(parts)}'
             f'{legend}<p class="caption">{esc(caption)}</p></figure>')
 
 
@@ -225,10 +315,11 @@ def svg_contributions(L, d: dict, palette: dict[str, str]) -> str:
         x_start, length = (zero, v * scale) if v >= 0 else (zero + v * scale, -v * scale)
         colour = palette["blue"] if v >= 0 else palette["vermillion"]
         parts.append(f'<text x="{left - 6}" y="{top + bar / 2 + 4:.1f}" text-anchor="end" font-size="12" fill="{palette["black"]}">{esc(row[0])}</text>')
-        parts.append(f'<rect x="{x_start:.1f}" y="{top}" width="{max(length, 0.5):.1f}" height="{bar}" fill="{colour}"><title>{esc(row[0])}: {v:+.4f}</title></rect>')
-        parts.append(f'<text x="{(zero + v * scale + 6) if v >= 0 else (zero + 6):.1f}" y="{top + bar / 2 + 4:.1f}" font-size="12" fill="{palette["black"]}">{v:+.4f}</text>')
+        parts.append(f'<rect x="{x_start:.1f}" y="{top}" width="{max(length, 0.5):.1f}" height="{bar}" fill="{colour}"><title>{esc(row[0])}: {signed(v, 4)}</title></rect>')
+        parts.append(f'<text x="{(zero + v * scale + 6) if v >= 0 else (zero + 6):.1f}" y="{top + bar / 2 + 4:.1f}" font-size="12" fill="{palette["black"]}">{signed(v, 4)}</text>')
     parts.append("</svg>")
-    return f'<figure><figcaption><strong>Contribution to score change</strong> (blue: pushes towards a hike, vermillion: towards a cut)</figcaption>{"".join(parts)}</figure>'
+    title = contributions_title([row[0] for row in rows], values)
+    return f'<figure><figcaption><strong>{esc(title)}</strong> (blue: pushes towards a hike, vermillion: towards a cut)</figcaption>{"".join(parts)}</figure>'
 
 
 def drivers(L, d: dict, palette: dict[str, str]) -> str:
@@ -302,16 +393,16 @@ def scenario(L, d: dict) -> str:
     options = "".join(f'<option value="{i}"{" selected" if i == default else ""}>{esc(label)}</option>' for i, label in enumerate(m["labels"]))
     s = model_json["slider"][default]
     probs = "".join(f'<div class="metric"><p class="m-label">Scenario P({label})</p><p class="m-value" id="sc-p-{label}">'
-                    f'{L.num(f"dashboard:probabilities/{label}", 1, pct=True)}</p><p class="m-cap" id="sc-d-{label}">+0.0 pp</p></div>' for label in DISPLAY)
+                    f'{L.num(f"dashboard:probabilities/{label}", 1, pct=True)}</p><p class="m-cap" id="sc-d-{label}">0.0 pp</p></div>' for label in DISPLAY)
     return f"""<div id="scenario"><h3>Scenario control</h3>
 <p class="caption">Change one observed factor while holding the other latest inputs fixed. The interval uses the stored covariance and delta method.</p>
 <script type="application/json" id="model-json">{json.dumps(model_json)}</script>
 <label for="sc-factor">Factor to change</label><select id="sc-factor">{options}</select>
-<label for="sc-value"><span id="sc-name">{esc(m['labels'][default])}</span>: <output id="sc-out">{s['baseline']:.2f}</output></label>
+<label for="sc-value"><span id="sc-name">{esc(m['labels'][default])}</span>: <output id="sc-out">{plain(s['baseline'], 2)}</output></label>
 <input id="sc-value" type="range" min="{s['min']!r}" max="{s['max']!r}" step="any" value="{s['baseline']!r}">
-<p class="range-ends"><span id="sc-min">{s['min']:.2f}</span><span id="sc-max">{s['max']:.2f}</span></p>
+<p class="range-ends"><span id="sc-min">{plain(s['min'], 2)}</span><span id="sc-max">{plain(s['max'], 2)}</span></p>
 <div class="metrics"><div class="metric"><p class="m-label">Scenario policy pressure score</p><p class="m-value" id="sc-score">{L.num('dashboard:score', 3, signed=True)}</p>
-<p class="m-cap" id="sc-delta">+0.000 vs latest</p></div></div>
+<p class="m-cap" id="sc-delta">0.000 vs latest</p></div></div>
 <p class="caption" id="sc-band">95% delta-method band: [{L.num('dashboard:band/0', 3, signed=True)}, {L.num('dashboard:band/1', 3, signed=True)}]</p>
 <div class="metrics three">{probs}</div>
 <p class="caption">Only the selected factor moves; the other five stay at their latest values. Computed in your browser from the stored coefficients, cutpoints and covariance (same formulas as src/app.py).</p></div>"""

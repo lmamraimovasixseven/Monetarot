@@ -34,16 +34,16 @@ Render; **иначе** — статичная страница не может �
 | Подпись «Both rounds use the latest available factor values …» | `index.html#rounds-caption` | число | перенесено | the probabilities are identical and only the date differs |
 | Сообщение календаря («Fewer than two confirmed future decision dates …») | `index.html#rounds-message` | JS | перенесено | Fewer than two confirmed future decision dates are available. |
 | Раскрывающийся блок «Why these probabilities?» | `index.html#why` | HTML | перенесено | Why these probabilities? |
-| Плашка с вердиктом holdout (RMSE, бутстреп, DM, эффект обновления данных) | `index.html#verdict-box` | число | перенесено | meets the pre-specified criterion |
-| Плашка «Decision rule (option …), a monitoring rule, not a forecast» | `index.html#decision-rule` | число | перенесено | a monitoring rule, not a forecast |
-| График «Track record of the score» с затенённым holdout | `index.html#track-record` | SVG | перенесено | Track record of the score |
+| Плашка с вердиктом holdout: на главной одно предложение (RMSE, бутстреп, DM), полный абзац с эффектом обновления данных на Evidence (D42) | `index.html#verdict-box` | число | перенесено | Holdout RMSE ratio |
+| Плашка «Decision rule (option …), a monitoring rule, not a forecast» (на сайте «Decision rule: … A monitoring rule, not a forecast.», D42) | `index.html#decision-rule` | число | перенесено | A monitoring rule, not a forecast. |
+| График «Track record of the score» с затенённым holdout (заголовок-вывод из данных графика, D42) | `index.html#track-record` | SVG | перенесено | throughout the holdout |
 | Подпись к журналу прогнозов («Forecasts logged before the decision …») | `index.html#forecast-log` | число | перенесено | Forecasts logged before the decision |
 | История: базовая ставка и направление решений, подпись источника | `evidence.html#ev-history` | SVG | перенесено | Original publisher |
 | Вклады факторов: три метрики «Driver», столбчатая диаграмма, таблица, подпись | `index.html#drivers` | число + SVG | перенесено | Top three drivers by absolute contribution |
 | Сценарий: выбор фактора, ползунок, балл сценария с полосой, три вероятности с изменением в п.п. | `index.html#scenario` | JS | перенесено | Scenario policy pressure score |
 | Итоговая плашка Evidence («Robustness results are …») | `evidence.html#ev-summary` | число | перенесено | Robustness results are |
 | Таблица «Holdout comparison» с RPS и подписями | `evidence.html#ev-holdout` | HTML | перенесено | Holdout comparison |
-| Сравнение с Always Hold (RMSE ratio, Winner, правило) | `evidence.html#ev-holdout` | число | перенесено | RMSE ratio (model / Always Hold) |
+| Сравнение с Always Hold (RMSE ratio, Winner, правило; вместо «Winner» — критерий и различимость, D42) | `evidence.html#ev-criterion` | число | перенесено | pre-specified criterion (RMSE ratio |
 | Фальсификация: три правила с вердиктами (на главной, шаг 6) | `index.html#falsification` | HTML | перенесено | Not falsified |
 | Фальсификация на вкладке Evidence | `evidence.html#ev-falsification` | HTML | перенесено | Falsification |
 | Таблица «Diagnostics» | `evidence.html#ev-diagnostics` | HTML | перенесено | What it checks |

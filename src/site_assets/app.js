@@ -22,7 +22,9 @@ function scoreBand(m, x) {
   var score = p.Increase - p.Decrease, se = Math.sqrt(Math.max(v, 0));
   return [score, score - m.z * se, score + m.z * se];
 }
-function signed(v, digits) { return (v >= 0 ? "+" : "") + v.toFixed(digits); }
+/* Round first, then sign: a value that rounds to zero is "0.000", never "-0.000" or "+0.000" (D42). */
+function fixed(v, digits) { var s = v.toFixed(digits); return parseFloat(s) === 0 ? (0).toFixed(digits) : s; }
+function signed(v, digits) { var s = fixed(v, digits); return (parseFloat(s) > 0 ? "+" : "") + s; }
 function pct1(v) { return (v * 100).toFixed(1) + "%"; }
 var WEEKDAYS = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -33,7 +35,7 @@ function longDate(s) {
   var d = parseIso(s);
   return WEEKDAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].toUpperCase() + " " + d.getFullYear();
 }
-function shortDate(s) { if (!s) { return "date not confirmed"; } var d = parseIso(s); return pad2(d.getDate()) + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
+function shortDate(s) { if (!s) { return "date not confirmed"; } var d = parseIso(s); return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
 /* As app.load_next_decisions: up to two confirmed dates strictly after today. */
 function nextRounds(dates, today, verified) {
   var out = [], i;
@@ -89,7 +91,7 @@ function missedRounds(dates, latest, today) {
       var i = parseInt(factor.value, 10), x = m.latest.slice(0), value = parseFloat(slider.value);
       x[i] = value;
       var p = orderedProbabilities(m, x), band = scoreBand(m, x), c;
-      byId("sc-out").textContent = value.toFixed(2);
+      byId("sc-out").textContent = fixed(value, 2);
       byId("sc-score").textContent = signed(band[0], 3);
       byId("sc-delta").textContent = signed(band[0] - baseScore, 3) + " vs latest";
       byId("sc-band").textContent = "95% delta-method band: [" + signed(Math.max(-1, band[1]), 3) + ", " + signed(Math.min(1, band[2]), 3) + "]";
@@ -102,7 +104,7 @@ function missedRounds(dates, latest, today) {
       var s = m.slider[parseInt(factor.value, 10)];
       slider.min = s.min; slider.max = s.max; slider.value = s.baseline;  // as in Render: a newly chosen factor starts at its latest value
       byId("sc-name").textContent = m.labels[parseInt(factor.value, 10)];
-      byId("sc-min").textContent = s.min.toFixed(2); byId("sc-max").textContent = s.max.toFixed(2);
+      byId("sc-min").textContent = fixed(s.min, 2); byId("sc-max").textContent = fixed(s.max, 2);
       redraw();
     };
     factor.addEventListener("change", choose); slider.addEventListener("input", redraw); choose();
@@ -122,18 +124,24 @@ function missedRounds(dates, latest, today) {
 
   var form = byId("corridor");
   if (form && typeof corridor === "function") {
-    var ids = ["rate", "ru", "cn", "prem", "cap"];
+    var ids = ["rate", "ru", "cn", "prem", "cap"], partnerData = form.getAttribute("data-partner-data") === "true";
     var redrawCorridor = function () {
       var v = {}, i;
       for (i = 0; i < ids.length; i++) { v[ids[i]] = parseFloat(byId("c-" + ids[i]).value);
-        byId("o-" + ids[i]).textContent = v[ids[i]].toFixed(2); }
+        byId("o-" + ids[i]).textContent = fixed(v[ids[i]], 2); }
       var credit = JSON.parse(form.getAttribute("data-credit"));
       var res = corridor(v.rate, parseFloat(form.getAttribute("data-inflation")), {"Russia": v.ru, "China": v.cn}, v.prem, v.cap, credit);
-      byId("corridor-out").textContent = "Corridor: " + res.lower.toFixed(2) + "–" + res.upper.toFixed(2) +
-        "%; real differential to Russia " + res.differentials["Russia"].toFixed(2) + " pp, to China " + res.differentials["China"].toFixed(2) +
-        " pp; " + res.label + ".";
+      var bounds = "Corridor: " + fixed(res.lower, 2) + "–" + fixed(res.upper, 2) + "%";
+      /* Without partner data the verdict would rest on assumed partner rates: only the bounds are shown (D42). */
+      byId("corridor-out").textContent = !partnerData ? bounds + ". Illustration with your assumptions; no partner data." :
+        bounds + "; real differential to Russia " + fixed(res.differentials["Russia"], 2) + " pp, to China " +
+        fixed(res.differentials["China"], 2) + " pp; " + res.label + ".";
     };
-    for (var n = 0; n < ids.length; n++) { byId("c-" + ids[n]).addEventListener("input", redrawCorridor); }
+    for (var n = 0; n < ids.length; n++) {
+      var input = byId("c-" + ids[n]);
+      input.value = input.defaultValue;  /* start from the values in the page (current NBK rate), not a value the browser restored */
+      input.addEventListener("input", redrawCorridor);
+    }
     redrawCorridor();
   }
 

@@ -81,7 +81,7 @@ class Ledger:
         value = self.raw(key)
         if digits is not None:
             number = float(value) * (100 if pct else 1)
-            value = f"{number:+.{digits}f}" if signed else f"{number:.{digits}f}"
+            value = sd.signed(number, digits) if signed else sd.plain(number, digits)
             value += "%" if pct else ""
         return f'<span class="num" data-ledger="{html.escape(key)}">{html.escape(value)}</span>'
 
@@ -121,7 +121,7 @@ def svg_line(title: str, alt: str, series: list[tuple[str, list[float], str]], l
              f'<line x1="{left}" y1="{height - bottom}" x2="{width - right}" y2="{height - bottom}" stroke="{PALETTE["grey"]}"/>',
              f'<line x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" stroke="{PALETTE["grey"]}"/>']
     for tick in (lo + pad, (lo + hi) / 2, hi - pad):
-        parts.append(f'<text x="{left - 4}" y="{y(tick) + 4:.1f}" text-anchor="end" font-size="11" fill="{PALETTE["black"]}">{tick:.2f}</text>')
+        parts.append(f'<text x="{left - 4}" y="{y(tick) + 4:.1f}" text-anchor="end" font-size="11" fill="{PALETTE["black"]}">{sd.plain(tick, 2)}</text>')
     for i in (0, len(labels) // 2, len(labels) - 1):
         parts.append(f'<text x="{x(i):.1f}" y="{height - 12}" text-anchor="middle" font-size="11" fill="{PALETTE["black"]}">{esc(labels[i])}</text>')
     for name, ys, color in series:
@@ -143,7 +143,7 @@ def svg_bars(title: str, alt: str, bars: list[tuple[str, float, str]], width: in
         length = (width - left - 60) * value / top_value
         parts.append(f'<text x="{left - 6}" y="{top + bar_h / 2 + 4:.1f}" text-anchor="end" font-size="12" fill="{PALETTE["black"]}">{esc(name)}</text>')
         parts.append(f'<rect x="{left}" y="{top:.1f}" width="{length:.1f}" height="{bar_h:.1f}" fill="{color}"/>')
-        parts.append(f'<text x="{left + length + 6:.1f}" y="{top + bar_h / 2 + 4:.1f}" font-size="12" fill="{PALETTE["black"]}">{value:.3f}</text>')
+        parts.append(f'<text x="{left + length + 6:.1f}" y="{top + bar_h / 2 + 4:.1f}" font-size="12" fill="{PALETTE["black"]}">{sd.plain(value, 3)}</text>')
     return f'<figure><figcaption><strong>{esc(title)}</strong></figcaption>{"".join(parts)}</svg></figure>'
 
 
@@ -204,7 +204,9 @@ def index_page(L: Ledger, artifact: dict) -> str:
     links = site_links()
     p_cut = float(L.raw("decision:p_cut"))
     threshold = float(L.raw("decision:binary_threshold_p_cut"))
-    action = "extend duration" if p_cut > threshold else "do not extend duration"
+    action = "Extend duration" if p_cut > threshold else "Do not extend duration"
+    # Step 7 caveat: the binary answer flips when P(cut) crosses p*, in the direction that applies now.
+    crossing = "falls below" if p_cut > threshold else "rises above"
     most = d["most_likely"]
     band_lo, band_hi = float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))
     next_round = d["rounds"]["default"][0]
@@ -238,7 +240,9 @@ def index_page(L: Ledger, artifact: dict) -> str:
                 "is lower than" if rps_model < rps_freq else "is higher than")
     chart_rps = svg_bars(f"On RPS the model {relation} simple class frequencies (lower is better)",
                          "Bars: ranked probability score on the holdout for the model, class frequencies and Always Hold.", rps)
-    limits = __import__("src.model_card", fromlist=["limits"]).limits()[:3]
+    # Step 6 limits: the holdout comparison (first limit) is the verdict box of step 4 and the RPS comparison (second) is the
+    # chart of step 3; the publication-lag limit is the look-ahead box of step 6 (D42: no repetition).
+    limits = __import__("src.model_card", fromlist=["limits"]).limits()[2:4]
     risk = "".join(f"<li><strong>{esc(tr(i['title']))}.</strong> {esc(tr(i['text']))}</li>" for i in limits)
     anomaly = (f'<div class="box warn" id="anomaly-warning">{esc(d["anomaly_warning"])} '
                f'<a href="evidence.html#ev-anomalies">Raw-data anomaly screen</a></div>' if d["anomaly_warning"] else
@@ -256,10 +260,9 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}</section>
 <section id="step-3"><h2>3. The evidence</h2>{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
 <p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p></section>
-<section id="step-4"><h2>4. The forecast</h2>{sd.headline(L, d)}{sd.round_cards(L, d)}{sd.boxes(d)}
+<section id="step-4"><h2>4. The forecast</h2>{sd.headline(L, d)}{sd.round_cards(L, d)}{sd.boxes(L, d)}
 <p>Expected rate after the decision of {esc(target.group(0) if target else 'the next meeting')}: {L.num('reality_check:expected_rate', 2)}%, 80% range
-{L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.
-Past performance: holdout RMSE ratio {L.num('n:rmse_ratio')} (interval {L.num('n:rmse_ratio_ci_low')}–{L.num('n:rmse_ratio_ci_high')}, DM p = {L.num('n:dm_squared_error_p')}).</p></section>
+{L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.</p></section>
 <section id="step-5"><h2>5. The mechanism</h2><p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}</section>
 <section id="step-6"><h2>6. The risk</h2>
 <div class="box warn" id="freshness" hidden></div>{anomaly}
@@ -267,8 +270,9 @@ Past performance: holdout RMSE ratio {L.num('n:rmse_ratio')} (interval {L.num('n
 <div class="box warn" id="look-ahead">{esc(look_ahead)} Real publication lags are not documented; details: <a href="evidence.html#ev-limitations">Evidence → Limitations</a>.</div>
 <h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
 <ul>{risk}</ul><p><a href="methods.html">All model limits</a></p></section>
-<section class="action" id="step-7"><h2>7. The ask</h2><p>Now, under the binary rule: <strong>{action}</strong>; under the three-outcome losses: <strong>{EN_ACTION[decision['best_action']]}</strong>.
-The answer changes if the probability of a cut rises above {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></section>
+<section class="action" id="step-7"><h2>7. The ask</h2><p class="answer" id="answer"><strong>{action}.</strong></p>
+<p class="caption">Caveat: this is the binary rule with equal losses from step 2. Under the three-outcome losses the action is: {EN_ACTION[decision['best_action']]}.
+The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></section>
 <script src="assets/app.js"></script>
 """
 
@@ -298,13 +302,18 @@ def evidence_page(L: Ledger, artifact: dict) -> str:
                      + T(f"stress/designs/{i}/table", x["table"]) + "</div>" for i, x in enumerate(designs))
     power = (T("evidence/power", ev["power"]) + f'<p class="caption">At this sample size (N = {esc(ev["power_n"])}), failure to reject a zero slope is not evidence that the factor has no effect.</p>'
              if ev["power"] else "<p>Power table: not available.</p>")
-    return f"""<h1>Evidence</h1><p>Everything the Render app shows on its Evidence tab, in the same order. The numbers come from the
-<code>dashboard</code> block of the artifact; the model is not re-estimated here.</p>
+    ratio = float(L.raw("dashboard:evidence/ratio"))
+    low, high = float(L.raw("n:rmse_ratio_ci_low")), float(L.raw("n:rmse_ratio_ci_high"))
+    criterion = "Meets the pre-specified criterion" if ratio < 1 else "Does not meet the pre-specified criterion"
+    distinct = ("separated from Always Hold by both the bootstrap interval and the Diebold–Mariano test"
+                if not (low <= 1 <= high) and float(L.raw("n:dm_squared_error_p")) < 0.05 else "not distinguishable from Always Hold")
+    return f"""<h1>Evidence</h1><p>Holdout comparison, falsification, diagnostics, robustness, stress tests and history of the model. The numbers
+come from the <code>dashboard</code> block of the artifact; the model is not re-estimated here.</p>
 <div class="box info" id="ev-summary">{esc(ev['summary'])}</div><p>{esc(ev['inference'])}</p><p>{esc(ev['version_change'])}</p>
 <h2 id="ev-holdout">Holdout comparison</h2>{T('evidence/holdout', ev['holdout'])}
 <p class="caption">RPS = ranked probability score (lower is better), exploratory and supplementary; the pre-specified verdict is the RMSE ratio.</p>
 <p class="caption">Always Hold assigns probability zero to Increase and Decrease, so the log score cannot be computed on a holdout that contains them.</p>
-<p class="caption">RMSE ratio (model / Always Hold): {L.num('dashboard:evidence/ratio', 3)} · Winner: {esc(ev['winner'])}</p>
+<p class="caption" id="ev-criterion">{criterion} (RMSE ratio {L.num('dashboard:evidence/ratio', 3)}); {distinct}.</p>
 <p class="caption">{esc(ev['verdict_rule'])}</p><p>{esc(ev['rps_sentence'])}</p>
 <h2 id="ev-falsification">Falsification</h2>{T('evidence/falsification', ev['falsification'])}
 <h2 id="ev-diagnostics">Diagnostics</h2>{T('evidence/diagnostics', ev['diagnostics'])}
@@ -368,7 +377,7 @@ python -m pip install -r requirements-dev.txt
 python run.py update      # data → checks → model → forecasts → ledger → site/
 python run.py acceptance  # acceptance checks
 python run.py trace n:rmse_ratio</code></pre>
-<p>The same as one make command: <code>make update</code>.</p>"""
+<p>The same as one make command: <code>make update</code> (needs make; on Windows run the python commands above).</p>"""
 
 
 def sources_page() -> str:
@@ -407,12 +416,12 @@ def patterns_page(L: Ledger, artifact: dict) -> str:
                    f"<td>{L.num(f'patterns:seasonality/{k}/p_first_half', 3)}</td><td>{L.num(f'patterns:seasonality/{k}/p_second_half', 3)}</td>"
                    f"<td>{esc(tr(v['verdict']))}</td></tr>" for k, v in block["seasonality"].items())
     episodes = "".join(f"<tr><td>{esc(e['series_file'])}</td><td>{esc(e['start'])}–{esc(e['end'])}</td><td>{esc(e['type'])}</td>"
-                       f"<td>{esc(e['calendar_type'] or '—')}</td><td>{esc(tr(e['reason']))}</td><td>{esc(e['known_at'])}</td></tr>"
+                       f"<td>{esc(e['calendar_type'] or '—')}</td><td>{esc(tr(e['reason']))}</td><td class=\"nowrap\">{esc(e['known_at'])}</td></tr>"
                        for e in block["episodes"])
     return (f"<h1>Patterns</h1><p>Transformation: {esc(tr(block['transform']))}. The answer “no” is possible and does occur.</p>"
             f"<div class=\"scroll\"><table><thead><tr><th>Series</th><th>F</th><th>p (permutations)</th><th>p (first half)</th><th>p (second half)</th><th>Seasonality</th></tr></thead><tbody>{rows}</tbody></table></div>"
             + md_to_html((ROOT / "docs" / "DECISIONS.md").read_text(encoding="utf-8"))
-            + f"<h2>Outliers (flagged, not removed)</h2><div class=\"scroll\"><table><thead><tr><th>Series</th><th>Period</th><th>Type (automatic)</th><th>Type (calendar)</th><th>Reason</th><th>Known from</th></tr></thead><tbody>{episodes}</tbody></table></div>")
+            + f"<h2>Outliers (flagged, not removed)</h2><div class=\"scroll\"><table><thead><tr><th>Series</th><th>Period</th><th>Type (automatic)</th><th>Type (calendar)</th><th>Reason</th><th class=\"nowrap\">Known from</th></tr></thead><tbody>{episodes}</tbody></table></div>")
 
 
 def corridor_page(L: Ledger, artifact: dict) -> str:
@@ -427,12 +436,15 @@ def corridor_page(L: Ledger, artifact: dict) -> str:
         return (kz_real, " (illustrative value; no data)") if value is None else (float(value), "")
 
     (ru, ru_note), (cn, cn_note) = partner("Russia"), partner("China")
+    # Without a real rate for every partner the position verdict would rest on invented numbers: the page shows only the
+    # corridor bounds of the user's assumptions (D42).
+    partner_data = "true" if all(v is not None for v in rates.values()) else "false"
     return f"""<h1>Policy-rate corridor and carry trade</h1>
 <p>A scenario tool, not an exchange-rate forecast. Real rate = nominal rate − year-on-year inflation. Now ({esc(block['month'])}): NBK rate {L.num('carry_corridor:nbk_rate', 2)}%,
 inflation {L.num('carry_corridor:kz_inflation', 2)}%, real rate {L.num('carry_corridor:kz_real_rate', 2)}%. Partner real rates: {partners}.</p>
 <p>Credit constraint: slope of credit growth 6 months ahead on the real rate {L.num('carry_corridor:credit_constraint/slope', 3)} ({esc(tr(credit['note']))}).</p>
 <p>Regression of the USD/KZT change on the real differential: {esc(tr(block['fx_regression']['status']))}. Benchmark: {esc(tr(block['benchmark']))}. {esc(tr(block['panel_note']))}</p>
-<form id="corridor" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}">
+<form id="corridor" autocomplete="off" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}" data-partner-data="{partner_data}">
 <label>NBK rate, %: <output id="o-rate"></output><input id="c-rate" type="range" min="5" max="25" step="0.25" value="{float(block['nbk_rate'])!r}"></label>
 <label>Russia real rate, %{ru_note}: <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.25" value="{ru!r}"></label>
 <label>China real rate, %{cn_note}: <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.25" value="{cn!r}"></label>
@@ -461,20 +473,39 @@ def forecasts_page(L: Ledger) -> str:
 
 
 def redteam_page() -> str:
-    return md_to_html((ROOT / "docs" / "redteam_response.md").read_text(encoding="utf-8"))
+    """The template in docs/redteam_response.md stays for the person who fills it; while it still has [FILL IN] cells the
+    review has not happened and the page says so in one sentence instead of showing an empty table (D42)."""
+    text = (ROOT / "docs" / "redteam_response.md").read_text(encoding="utf-8")
+    if "[FILL IN]" in text:
+        return ("<h1>Red-team response</h1><p>The red-team review has not taken place yet. "
+                "Responses will be added here after it.</p>")
+    return md_to_html(text)
 
 
 def asof_page(L: Ledger, artifact: dict) -> str:
+    from src.ingest import FEATURE_RULES
+
     views = artifact["patterns"]["as_of_views"]
+    # Unit of each raw series from docs/facts_to_fill.csv (column unit); a value without a documented unit is not shown (D42).
+    with (ROOT / "docs" / "facts_to_fill.csv").open(encoding="utf-8", newline="") as handle:
+        file_units = {r["series_file"]: (r["unit"] or "").strip() for r in csv.DictReader(handle)}
+    units = {key: file_units.get(filename, "") for key, (filename, _) in FEATURE_RULES.items()}
+    documented = lambda unit: bool(unit) and "UNKNOWN" not in unit  # noqa: E731
     options = "".join(f'<option value="{esc(t)}">{esc(t)}</option>' for t in views)
     blocks = []
     for t, view in views.items():
-        series = "".join(f"<tr><td>{esc(k)}</td><td>{esc(v['last_month'])}</td><td>{L.num(f'patterns:as_of_views/{t}/series/{k}/last_value', 2)}</td></tr>"
+        series = "".join(f"<tr><td>{esc(k)}</td><td>{esc(v['last_month'])}</td>"
+                         + (f"<td>{L.num(f'patterns:as_of_views/{t}/series/{k}/last_value', 2)}</td><td>{esc(tr(units.get(k, '')))}</td></tr>"
+                            if documented(units.get(k, "")) else "<td>units not documented</td><td>units not documented</td></tr>")
                          for k, v in view["series"].items())
         episodes = "".join(f"<li>{esc(e['series_file'])} {esc(e['start'])}: {esc(e['type'])} (known from {esc(e['known_at'])})</li>" for e in view["episodes"][-5:])
-        blocks.append(f'<div class="asof" data-t="{esc(t)}" hidden><div class="scroll"><table><thead><tr><th>Series</th><th>Last known month</th><th>Value</th></tr></thead><tbody>{series}</tbody></table></div>'
+        blocks.append(f'<div class="asof" data-t="{esc(t)}" hidden><div class="scroll"><table><thead><tr><th>Series</th><th>Last known month</th><th>Value</th><th>Unit</th></tr></thead><tbody>{series}</tbody></table></div>'
                       f"<p>Latest episodes known by this date:</p><ul>{episodes}</ul></div>")
-    return (f"<h1>As-of view</h1><p>{esc(tr(next(iter(views.values()))['label']))}.</p><label for=\"asof-t\">Decision date:</label> "
+    label = next(iter(views.values()))["label"]
+    intro = ("What the model could have known on a past decision date. Revised-data backtest: current values, availability "
+             "follows the publication-lag assumption, not real vintages." if label.startswith("revised-data backtest") else
+             f"What the model could have known on a past decision date. {tr(label)}.")
+    return (f"<h1>As-of view</h1><p>{esc(intro)}</p><label for=\"asof-t\">Decision date:</label> "
             f"<select id=\"asof-t\">{options}</select>{''.join(blocks)}<script src=\"assets/app.js\"></script>")
 
 

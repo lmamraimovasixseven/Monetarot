@@ -67,6 +67,8 @@ th { background: #f0f3f7; color: var(--ink); font-weight: 600; }
 td.v-bad { background: var(--bad-bg); color: var(--bad-ink); font-weight: 700; }
 td.v-ok { background: var(--ok-bg); color: var(--ok-ink); font-weight: 700; }
 td.v-bad::before { content: "✗ "; } td.v-ok::before { content: "✓ "; }
+th.nowrap, td.nowrap { white-space: nowrap; }
+.answer { font-size: 1.25rem; margin: 6px 0; color: var(--ink); }
 /* Charts */
 main p, main li, main summary { overflow-wrap: anywhere; }
 figure { margin: 16px 0; max-width: min(100%, 860px); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }

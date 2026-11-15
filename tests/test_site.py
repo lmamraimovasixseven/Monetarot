@@ -241,3 +241,133 @@ def test_round_selection_and_dates_match_render():
 def test_pages_workflow_publishes_the_site_folder():
     workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
     assert "actions/upload-pages-artifact" in workflow and "path: site" in workflow and "actions/deploy-pages" in workflow
+
+
+# ----------------------------------------------------------------------------- D42: wording, signs and honest placeholders
+
+ZERO_WITH_SIGN = re.compile(r"(?<![\w.])[-−+]0\.0+(?![0-9]*[1-9])(?![0-9])")
+
+
+def _artifact() -> dict:
+    import json
+
+    return json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))
+
+
+def _js_lines(body: str, full: bool = False, prefix: str = "") -> list[str]:
+    engine = ["node"] if shutil.which("node") else (["cscript", "//nologo", "//E:JScript"] if shutil.which("cscript") else None)
+    if engine is None:
+        pytest.skip("no JavaScript engine")
+    source = (ROOT / "src" / "site_assets" / "app.js").read_text(encoding="utf-8")
+    if not full:
+        source = source.split("(function () {")[0]
+    script = ROOT / ".pytest-temp" / "site_js_lines.js"
+    script.parent.mkdir(exist_ok=True)
+    script.write_text("var out = (typeof console !== 'undefined') ? function (s) { console.log(s); } : function (s) { WScript.Echo(s); };\n"
+                      + prefix + source + "\n" + body, encoding="utf-8")
+    return subprocess.run([*engine, str(script)], capture_output=True, text=True, check=True).stdout.splitlines()
+
+
+def test_no_signed_zero_on_the_site_or_from_the_formatters():
+    from src import site_dashboard as sd
+
+    assert sd.signed(-0.0001, 3) == "0.000" and sd.signed(0.0004, 3) == "0.000" and sd.signed(-0.04, 1) == "0.0"
+    assert sd.signed(0.002, 3) == "+0.002" and sd.signed(-0.002, 3) == "-0.002" and sd.plain(-0.00004, 4) == "0.0000"
+    for name in PAGES:
+        found = ZERO_WITH_SIGN.search((SITE / name).read_text(encoding="utf-8"))
+        assert not found, (name, found.group(0))
+    lines = [line.strip() for line in _js_lines("out(signed(-0.0001, 3)); out(signed(-0.04, 1)); out(signed(0.0004, 3)); "
+                                                "out(signed(0.002, 3)); out(signed(-0.002, 3)); out(fixed(-0.001, 2));")]
+    assert lines == ["0.000", "0.0", "0.000", "+0.002", "-0.002", "0.00"]
+
+
+def test_home_page_states_one_holdout_sentence_and_one_answer():
+    text = (SITE / "index.html").read_text(encoding="utf-8")
+    plain_text = re.sub(r"<[^>]+>", "", text)
+    ledger = site_build.Ledger()
+    low, high = float(ledger.raw("n:rmse_ratio_ci_low")), float(ledger.raw("n:rmse_ratio_ci_high"))
+    undistinguished = low <= 1 <= high and float(ledger.raw("n:dm_squared_error_p")) >= 0.05
+    box = re.search(r'id="verdict-box">(.*?)</div>', text, re.S).group(1)
+    assert ("cannot be distinguished from Always Hold" in box) == undistinguished
+    assert plain_text.count("Holdout RMSE ratio") == 1 and "Effect of the data update" not in text and "Past performance" not in text
+    assert "option 1" not in text and "((" not in plain_text and ". if " not in plain_text
+    decision = _artifact()["decision"]
+    action = "Extend duration." if decision["p_cut"] > decision["binary_threshold_p_cut"] else "Do not extend duration."
+    step7 = text[text.index('id="step-7"'):]
+    assert re.search(r'id="answer"><strong>([^<]+)</strong>', step7).group(1) == action
+    assert step7.index('id="answer"') < step7.index("three-outcome")
+    assert not re.search(r">0\d [A-Z][a-z]+ \d{4}<", text), "dates without a leading zero"
+
+
+def test_chart_titles_are_conclusions_drawn_from_the_chart_data():
+    d = _artifact()["dashboard"]
+    text = (SITE / "index.html").read_text(encoding="utf-8")
+    titles = re.findall(r"<figcaption><strong>(.*?)</strong>", text)
+    track = d["track_record"]
+    holdout = [i for i, day in enumerate(track["dates"]) if day >= track["holdout_start"]]
+    if all(track["score"][i] < 0 for i in holdout):
+        assert "below zero throughout the holdout" in titles[0]
+    actual = [track["actual"][i] for i in holdout]
+    if actual.count(0) * 2 > len(actual):
+        assert "held the rate at most decisions" in titles[0]
+    values = [row[1] for row in d["contributions"]["rows"]]
+    if all(v < 0 for v in values):
+        assert titles[1].startswith("All ") and "towards a cut" in titles[1]
+    largest = sorted(d["contributions"]["rows"], key=lambda row: abs(row[1]), reverse=True)[:2]
+    assert all(row[0].split()[0].lower() in titles[1] for row in largest)
+
+
+def test_evidence_page_states_the_criterion_not_a_winner():
+    text = (SITE / "evidence.html").read_text(encoding="utf-8")
+    assert "Winner" not in text and "Everything the Render app shows" not in text
+    criterion = re.search(r'id="ev-criterion">(.*?)</p>', text).group(1)
+    ratio = float(site_build.Ledger().raw("dashboard:evidence/ratio"))
+    assert criterion.startswith("Meets the pre-specified criterion" if ratio < 1 else "Does not meet the pre-specified criterion")
+    assert "Effect of the data update" in text, "the full paragraph stays on Evidence"
+
+
+def test_corridor_starts_at_the_current_rate_and_gives_no_verdict_without_partner_data():
+    block = _artifact()["carry_corridor"]
+    text = (SITE / "corridor.html").read_text(encoding="utf-8")
+    form = re.search(r'<form id="corridor"[^>]*>', text).group(0)
+    attrs = dict(re.findall(r'([\w-]+)="([^"]*)"', form))
+    has_data = all(v is not None for v in block["partner_real_rates"].values())
+    assert attrs["data-partner-data"] == str(has_data).lower() and attrs["autocomplete"] == "off"
+    inputs = dict(re.findall(r'<input id="c-(\w+)"[^>]*value="([^"]+)"', text))
+    assert float(inputs["rate"]) == float(block["nbk_rate"])
+    # A browser that restored an old slider position (9) must still start from the value in the page.
+    stubs = ("var els = {};\nfunction el(id, attrs, value) { els[id] = {attrs: attrs, value: value, defaultValue: value, textContent: '', "
+             "getAttribute: function (k) { return this.attrs.hasOwnProperty(k) ? this.attrs[k] : null; }, addEventListener: function () {}}; }\n"
+             "var document = {getElementById: function (id) { return els.hasOwnProperty(id) ? els[id] : null; }, querySelectorAll: function () { return []; }};\n"
+             "if (typeof JSON === 'undefined') { var JSON = {parse: function (s) { return eval('(' + s + ')'); }}; }\n"
+             f"el('corridor', {{'data-inflation': '{attrs['data-inflation']}', 'data-credit': '{attrs['data-credit']}', 'data-partner-data': '{attrs['data-partner-data']}'}}, null);\n"
+             "el('corridor-out', {}, null);\n"
+             + "".join(f"el('c-{k}', {{}}, '{v}'); el('o-{k}', {{}}, null);\n" for k, v in inputs.items())
+             + "els['c-rate'].value = '9';\n"
+             + (ROOT / "src" / "site_assets" / "corridor.js").read_text(encoding="utf-8") + "\n")
+    # ASCII only: cscript writes in the console code page, which is not UTF-8 under PYTHONUTF8=1 (acceptance A10).
+    lines = _js_lines("out(els['o-rate'].textContent); out(els['corridor-out'].textContent.replace(/[^ -~]/g, '-'));",
+                      full=True, prefix=stubs)
+    assert float(lines[0]) == float(block["nbk_rate"])
+    if not has_data:
+        assert lines[1].endswith("Illustration with your assumptions; no partner data.")
+        assert not any(label in lines[1] for label in ("below the corridor", "above the corridor", "inside the corridor", "corridor broken"))
+
+
+def test_redteam_asof_and_run_pages_have_no_bare_placeholders():
+    template = (ROOT / "docs" / "redteam_response.md").read_text(encoding="utf-8")
+    redteam = (SITE / "redteam.html").read_text(encoding="utf-8")
+    if "[FILL IN]" in template:
+        assert "has not taken place yet" in redteam and "[FILL IN]" not in redteam and "<table" not in redteam
+    for name in PAGES:
+        if name != "team.html":
+            assert "[FILL IN]" not in (SITE / name).read_text(encoding="utf-8"), name
+    asof = (SITE / "asof.html").read_text(encoding="utf-8")
+    assert "What the model could have known on a past decision date." in asof
+    rows = re.findall(r"<tr><td>\w+</td><td>[\d-]+</td>(.*?)</tr>", asof)
+    assert rows
+    for row in rows:
+        cells = re.findall(r"<td>(.*?)</td>", row)
+        assert cells[1] == "units not documented" or ('data-ledger="' in cells[0] and cells[1]), row
+    assert "(needs make; on Windows run the python commands above)" in (SITE / "run.html").read_text(encoding="utf-8")
+    assert 'class="nowrap">Known from</th>' in (SITE / "patterns.html").read_text(encoding="utf-8")
