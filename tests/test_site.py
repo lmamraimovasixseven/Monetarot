@@ -371,3 +371,32 @@ def test_redteam_asof_and_run_pages_have_no_bare_placeholders():
         assert cells[1] == "units not documented" or ('data-ledger="' in cells[0] and cells[1]), row
     assert "(needs make; on Windows run the python commands above)" in (SITE / "run.html").read_text(encoding="utf-8")
     assert 'class="nowrap">Known from</th>' in (SITE / "patterns.html").read_text(encoding="utf-8")
+
+
+# ----------------------------------------------------------------------------- D43: one unit fact everywhere, look-ahead sentence
+
+
+def test_data_methods_and_asof_state_the_same_raw_units():
+    units = site_build.raw_units()
+    data = (SITE / "data.html").read_text(encoding="utf-8")
+    methods = (SITE / "methods.html").read_text(encoding="utf-8")
+    asof = (SITE / "asof.html").read_text(encoding="utf-8")
+    model = _artifact()["dashboard"]["model"]
+    for feature, label in zip(model["features"], model["labels"]):
+        if units.get(feature):
+            fact = f"underlying source units: {units[feature]} (docs/facts_to_fill.csv)"
+            stored = next(row[2] for row in _artifact()["dashboard"]["provenance"]["latest"]["rows"] if row[0] == label)
+            if site_build.SOURCE_UNITS_UNKNOWN in stored:
+                assert fact in data and fact in methods, label
+            assert f"<td>{feature}</td>" in asof and units[feature] in asof
+    if any(units.values()):
+        assert site_build.SOURCE_UNITS_UNKNOWN not in data.replace("gives the underlying source units as unknown", "")
+
+
+def test_look_ahead_box_is_one_sentence_with_ledger_total():
+    text = (SITE / "index.html").read_text(encoding="utf-8")
+    box = re.search(r'id="look-ahead">(.*?)</div>', text, re.S).group(1)
+    assert box.startswith("Look-ahead cannot be excluded: real publication lags are not documented")
+    assert "UNKNOWN" not in box and 'data-ledger="n:n_usable"' in box and 'href="evidence.html#ev-limitations"' in box
+    total = site_build.Ledger().raw("n:n_usable")
+    assert re.findall(r'data-ledger="n:n_usable">([^<]+)<', box) and set(re.findall(r'data-ledger="n:n_usable">([^<]+)<', box)) == {total}

@@ -199,6 +199,48 @@ def site_links() -> dict[str, str]:
     return {"render_url": str(links.get("render_url") or "UNKNOWN"), "pages_url": str(links.get("pages_url") or "UNKNOWN")}
 
 
+def raw_units() -> dict[str, str]:
+    """Unit of the raw series behind each model factor, from docs/facts_to_fill.csv (column unit); '' if not documented."""
+    from src.ingest import FEATURE_RULES
+
+    with (ROOT / "docs" / "facts_to_fill.csv").open(encoding="utf-8", newline="") as handle:
+        file_units = {r["series_file"]: (r["unit"] or "").strip() for r in csv.DictReader(handle)}
+    units = {key: file_units.get(filename, "") for key, (filename, _) in FEATURE_RULES.items()}
+    return {key: unit if unit and "UNKNOWN" not in unit else "" for key, unit in units.items()}
+
+
+SOURCE_UNITS_UNKNOWN = "underlying source units UNKNOWN"
+
+
+def unit_text(model: dict, label: str, text: str) -> str:
+    """The artifact's model-input unit with 'underlying source units UNKNOWN' replaced by the unit documented in
+    docs/facts_to_fill.csv, so Data, Methods and As-of state the same fact (D43). The artifact itself is unchanged."""
+    feature = dict(zip(model["labels"], model["features"])).get(label)
+    unit = raw_units().get(feature, "") if feature else ""
+    return text.replace(SOURCE_UNITS_UNKNOWN, f"underlying source units: {unit} (docs/facts_to_fill.csv)") if unit else text
+
+
+def aligned_latest(dashboard: dict) -> dict:
+    """Copy of the 'Factor / Latest value / Model input unit' table with units aligned by unit_text."""
+    table = dashboard["provenance"]["latest"]
+    rows = [[row[0], row[1], unit_text(dashboard["model"], row[0], row[2])] for row in table["rows"]]
+    return {**table, "rows": rows}
+
+
+def look_ahead_box(L: Ledger, sentence: str | None) -> str:
+    """One sentence for step 6 (D43): 'Look-ahead cannot be excluded: real publication lags are not documented (N of M
+    decisions for …)'. The counts per factor are taken from the stored sentence (data/processed/provenance.json via the
+    dashboard block); they have no ledger rows. The total is the ledger value n:n_usable when it matches."""
+    link = 'Details: <a href="evidence.html#ev-limitations">Evidence → Limitations</a>.'
+    parts = re.findall(r"(\d+) of (\d+) decisions for ([a-z ,]+?)(?=[).;]| \()", sentence or "")
+    if not parts or "No upper bound" in (sentence or ""):
+        return f"{esc(sentence or 'Look-ahead status: see Evidence → Limitations.')} {link}"
+    total = L.raw("n:n_usable")
+    counts = "; ".join(f"{esc(n)} of {L.num('n:n_usable') if m == total else esc(m)} decisions for {esc(names)}"
+                       for n, m, names in parts)
+    return f"Look-ahead cannot be excluded: real publication lags are not documented ({counts}). {link}"
+
+
 def index_page(L: Ledger, artifact: dict) -> str:
     decision, rc, d = artifact["decision"], artifact["reality_check"], artifact["dashboard"]
     links = site_links()
@@ -247,7 +289,6 @@ def index_page(L: Ledger, artifact: dict) -> str:
     anomaly = (f'<div class="box warn" id="anomaly-warning">{esc(d["anomaly_warning"])} '
                f'<a href="evidence.html#ev-anomalies">Raw-data anomaly screen</a></div>' if d["anomaly_warning"] else
                '<div class="box info" id="anomaly-warning">No flagged raw-data jump enters the latest score.</div>')
-    look_ahead = d["look_ahead_sentence"] or "Look-ahead status: see Evidence → Limitations."
     target = re.search(r"\d{4}-\d{2}-\d{2}", rc["target"])
     return f"""
 <section class="lead" id="top"><p class="eyebrow">{esc(d['title'])}</p>
@@ -267,7 +308,7 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <section id="step-6"><h2>6. The risk</h2>
 <div class="box warn" id="freshness" hidden></div>{anomaly}
 <div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
-<div class="box warn" id="look-ahead">{esc(look_ahead)} Real publication lags are not documented; details: <a href="evidence.html#ev-limitations">Evidence → Limitations</a>.</div>
+<div class="box warn" id="look-ahead">{look_ahead_box(L, d["look_ahead_sentence"])}</div>
 <h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
 <ul>{risk}</ul><p><a href="methods.html">All model limits</a></p></section>
 <section class="action" id="step-7"><h2>7. The ask</h2><p class="answer" id="answer"><strong>{action}.</strong></p>
@@ -353,7 +394,7 @@ def methods_page(L: Ledger, artifact: dict) -> str:
               "page has none.</li><li><strong>Table sorting.</strong> Streamlit tables sort when you click a column header; here "
               "they are static, in the same row order.</li><li><strong>Scenario slider.</strong> It is recomputed in the browser with the same "
               "formulas (ordered logit and the delta method) as src/app.py; a test checks the match to 1e-6.</li></ul>")
-    units = "".join(f"<li>{esc(row[0])}: {esc(row[2])}</li>" for row in d["provenance"]["latest"]["rows"])
+    units = "".join(f"<li>{esc(row[0])}: {esc(row[2])}</li>" for row in aligned_latest(d)["rows"])
     return (f"<h1>Methods and limits</h1><p>Model: ordered logit on {len(d['model']['features'])} factors, frozen specification; holdout = the last "
             f"{L.num('n:n_holdout')} of {L.num('n:n_usable')} usable decisions. {esc(L.raw('n:verdict_inference_sentence'))}</p>"
             f"<p>{esc(L.raw('n:rps_supplementary_sentence'))}</p>"
@@ -398,7 +439,8 @@ def team_page() -> str:
 
 
 def data_page(L: Ledger, artifact: dict) -> str:
-    d = artifact["dashboard"]["provenance"]
+    dashboard = artifact["dashboard"]
+    d = dashboard["provenance"]
     links = "".join(f'<li><a href="data/{Path(p).name}" download>{esc(p)}</a></li>' for p in DOWNLOADS if (ROOT / p).is_file())
     return (f"<h1>Data</h1><p>Files to download (CSV, as in the repository):</p><ul>{links}</ul>"
             '<h2 id="data-provenance">Data and provenance</h2>'
@@ -407,7 +449,9 @@ def data_page(L: Ledger, artifact: dict) -> str:
             "from the end of the reference month to publication. Source titles, navigation paths and column headers are published in "
             "Russian and are shown here in English translation; the original wording is in docs/facts_to_fill.csv.</p>"
             + sd.render_table(L, "dashboard:provenance/values", d["values"], element_id="data-values")
-            + sd.render_table(L, "dashboard:provenance/latest", d["latest"], element_id="data-latest"))
+            + sd.render_table(L, "dashboard:provenance/latest", aligned_latest(dashboard), element_id="data-latest")
+            + '<p class="caption">Where the stored model-input unit gives the underlying source units as unknown but '
+            "docs/facts_to_fill.csv records the unit of the raw series, the recorded unit is shown (D43).</p>")
 
 
 def patterns_page(L: Ledger, artifact: dict) -> str:
@@ -483,14 +527,10 @@ def redteam_page() -> str:
 
 
 def asof_page(L: Ledger, artifact: dict) -> str:
-    from src.ingest import FEATURE_RULES
-
     views = artifact["patterns"]["as_of_views"]
-    # Unit of each raw series from docs/facts_to_fill.csv (column unit); a value without a documented unit is not shown (D42).
-    with (ROOT / "docs" / "facts_to_fill.csv").open(encoding="utf-8", newline="") as handle:
-        file_units = {r["series_file"]: (r["unit"] or "").strip() for r in csv.DictReader(handle)}
-    units = {key: file_units.get(filename, "") for key, (filename, _) in FEATURE_RULES.items()}
-    documented = lambda unit: bool(unit) and "UNKNOWN" not in unit  # noqa: E731
+    # A value without a documented unit is not shown (D42).
+    units = raw_units()
+    documented = bool
     options = "".join(f'<option value="{esc(t)}">{esc(t)}</option>' for t in views)
     blocks = []
     for t, view in views.items():
