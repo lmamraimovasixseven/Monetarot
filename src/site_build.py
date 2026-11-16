@@ -483,6 +483,10 @@ def corridor_page(L: Ledger, artifact: dict) -> str:
         if v is not None else f"{esc(labels.get(k, k))}: {esc(tr(block['partner_notes'][k]))}" for k, v in rates.items())
     credit = block["credit_constraint"]
     kz_real = float(block["kz_real_rate"])
+    china_series = json.loads((ROOT / "config" / "external_sources.json").read_text(encoding="utf-8"))["series"]["cn_policy_rate"]
+    china_caveat = (f'<p class="caption" id="china-rate">China\'s rate: {esc(tr(china_series["title"]))}. It is a lending benchmark, '
+                    "not the return on a short-term deposit, so the real rate and the corridor for China rest on a lending rate (D47).</p>"
+                    if rates.get("china") is not None else "")
 
     def partner(key: str) -> tuple[float, str]:
         value = rates.get(key)
@@ -513,15 +517,30 @@ def corridor_page(L: Ledger, artifact: dict) -> str:
                       "oil price, global risk appetite and the rouble can bias it.</p>"
                       f"<p>Benchmark: {esc(tr(block['benchmark']))}; mean absolute monthly change of 100·log USD/KZT "
                       f"{L.num(f'{p}/random_walk_mae_of_change', 3)}. {esc(tr(block['panel_note']))}</p>")
+        # D47: the same regression on the differential to each partner separately.
+        parts = []
+        for key, item in fx.get("by_partner", {}).items():
+            name = esc(labels.get(key, key))
+            if item.get("status") == "ok":
+                q = f"{p}/by_partner/{key}/specifications/lag1"
+                parts.append(f"<li>KZ − {name}: coefficient on the differential at t−1 {L.num(f'{q}/coef', 3, signed=True)} "
+                             f"(HC1 s.e. {L.num(f'{q}/se', 3)}, p = {L.num(f'{q}/p', 3)}, R² = {L.num(f'{q}/r2', 3)}, "
+                             f"n = {L.num(f'{q}/n')}); {esc(tr(item['verdict']))}.</li>")
+            else:
+                parts.append(f"<li>KZ − {name}: {esc(tr(item['status']))}.</li>")
+        if parts:
+            regression += f'<p id="fx-by-partner">The same regression on the differential to each partner separately:</p><ul>{"".join(parts)}</ul>'
     else:
         regression = (f"<p>Regression of the USD/KZT change on the real differential: {esc(tr(fx['status']))}. "
                       f"Benchmark: {esc(tr(block['benchmark']))}. {esc(tr(block['panel_note']))}</p>")
     return f"""<h1>Policy-rate corridor and carry trade</h1>
 <p>A scenario tool, not an exchange-rate forecast. Real rate = nominal rate − year-on-year inflation; a partner's monthly rate is the
 average over the calendar days of the month. Now ({esc(block['month'])}): NBK rate {L.num('carry_corridor:nbk_rate', 2)}%,
-inflation {L.num('carry_corridor:kz_inflation', 2)}%, real rate {L.num('carry_corridor:kz_real_rate', 2)}%. Partner real rates: {partners}.</p>
+inflation {L.num('carry_corridor:kz_inflation', 2)}%, real rate {L.num('carry_corridor:kz_real_rate', 2)}%. Partner real rates: {partners}.</p>{china_caveat}
 <p id="corridor-bounds">Corridor bounds: {esc(tr(block['current']['status'])) if block['current']['status'] != 'ok' else
-f"{L.num('carry_corridor:current/lower', 2)}–{L.num('carry_corridor:current/upper', 2)}%"}.</p>
+f"{L.num('carry_corridor:current/lower', 2)}–{L.num('carry_corridor:current/upper', 2)}% with the default risk premium and cap "
+f"(upper bound set by {'the credit constraint' if block['current'].get('binding_upper') == 'credit' else 'the cap on the real differential'}); "
+f"the NBK rate of {L.num('carry_corridor:nbk_rate', 2)}% is {esc(tr(block['current']['position']))}"}.</p>
 <p>Credit constraint: slope of credit growth 6 months ahead on the real rate {L.num('carry_corridor:credit_constraint/slope', 3)} ({esc(tr(credit['note']))}).</p>
 {regression}
 <form id="corridor" autocomplete="off" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}" data-partner-data="{partner_data}" data-missing="{esc(missing)}">

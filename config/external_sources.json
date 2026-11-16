@@ -1,5 +1,5 @@
 {
-  "note": "Источники для блока E (коридор carry trade). Исходные файлы, скачанные 2026-11-15, лежат в data/incoming/external_2026-11-15/ (не в git); значения перенесены в шаблоны data/raw/external/ как опубликованы, без заполнения пропусков (D46). Если ряд взят у агрегатора, издателем записан агрегатор. Даты публикации издатели не указывают: UNKNOWN; числа из памяти не подставляются.",
+  "note": "Источники для блока E (коридор carry trade). Исходные файлы, скачанные 2026-11-15, лежат в data/incoming/external_2026-11-15/ (не в git); значения перенесены в шаблоны data/raw/external/ как опубликованы, без заполнения пропусков (D46, D47). Если ряд взят у агрегатора, издателем записан агрегатор. Даты публикации издатели не указывают: UNKNOWN; числа из памяти не подставляются.",
   "series": {
     "ru_key_rate": {
       "file": "ru_key_rate_daily.csv",
@@ -30,20 +30,19 @@
       "transformation": "уровень y/y, % (колонка «Инфляция, % г/г»); без преобразования"
     },
     "cn_policy_rate": {
-      "file": "cn_7d_reverse_repo_daily.csv",
+      "file": "cn_policy_rate_daily.csv",
       "columns": [
         "date",
         "rate_pct"
       ],
-      "frequency": "daily (дата изменения)",
-      "publisher": "Народный банк Китая",
-      "title": "Ставка 7-дневного обратного РЕПО НБК",
-      "url": "UNKNOWN (pbc.gov.cn)",
-      "retrieved": "UNKNOWN",
-      "release": "UNKNOWN",
-      "transformation": "средневзвешенная по дням месяца ставка",
-      "choice_reason": "Выбрана 7-дневная ставка обратного РЕПО, а не LPR: это краткосрочная ставка операций центрального банка, сопоставимая по сроку с базовой ставкой НБ РК; LPR — ориентир кредитования, который банки устанавливают со спредом и который отражает кредитный риск, а не доходность краткосрочного размещения, важную для carry trade.",
-      "status": "not obtained on 2026-11-15: the PBoC publishes the 7-day reverse repo rate only inside individual open market operation announcements (http://www.pbc.gov.cn/en/3688229/3688335/3730267/5844654/index.html, 192 list pages, pagination by script), not as a downloadable series; no other open source was found. The file stays a template."
+      "frequency": "daily (значение на каждый календарный день, как в наборе BIS; пропуск OBS_STATUS M записан пустым значением)",
+      "publisher": "BIS, Bank for International Settlements (aggregator; dataset Central bank policy rates WS_CBPOL, series D.CN)",
+      "title": "China policy rate (BIS; LPR 1Y / benchmark lending rate)",
+      "url": "https://data.bis.org/topics/CBPOL/data?q=China&filter=FREQ%3DD&selected_ts=BIS%2CWS_CBPOL%2C1.0%5ED.CN",
+      "retrieved": "2026-11-15",
+      "release": "UNKNOWN (the export header gives the last update of the BIS dataset as 2026-11-12, not the publication date of each value)",
+      "transformation": "средняя по календарным дням месяца ставка (external_data.monthly_step_rate); пустое значение (OBS_STATUS M, 2024-07-20 и 2024-07-21) остаётся пропуском, месяц усредняется по остальным дням",
+      "caveat": "Not the 7-day reverse repo rate that the template first named: by its values this is the 1-year loan prime rate (earlier the benchmark lending rate), a lending benchmark that includes a spread over the central bank's short-term operations rate. The real rate and the corridor for China therefore rest on a lending rate, not on the return of a short-term deposit."
     },
     "cn_cpi_yoy": {
       "file": "cn_cpi_yoy.csv",
@@ -52,12 +51,13 @@
         "cpi_yoy_pct"
       ],
       "frequency": "monthly",
-      "publisher": "FRED, Federal Reserve Bank of St. Louis (aggregator; series CPALTT01CNM659N from OECD Main Economic Indicators)",
-      "title": "FRED CPALTT01CNM659N: consumer price index for China, growth rate same period previous year, percent",
-      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPALTT01CNM659N",
-      "retrieved": "2026-11-15",
-      "release": "UNKNOWN",
-      "transformation": "уровень y/y, %; без преобразования; январь и февраль помечаются (сдвиг Нового года по лунному календарю). Ряд в FRED заканчивается 2025-04."
+      "publisher": "two sources: FRED, Federal Reserve Bank of St. Louis (aggregator; OECD Main Economic Indicators, series CPALTT01CNM659N) for 2015-01 to 2025-04; National Bureau of Statistics of China (stats.gov.cn, English monthly CPI releases) for 2025-05 to 2026-09",
+      "title": "China CPI, year on year, percent (OECD via FRED to 2025-04; NBS releases from 2025-05)",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPALTT01CNM659N (to 2025-04); https://www.stats.gov.cn/english/PressRelease/ (monthly releases 'Consumer Price Index for/in <month>', from 2025-05)",
+      "retrieved": "2025-04 and earlier: 2026-11-15 (FRED); 2025-05 to 2026-09: 2026-11-16 (NBS)",
+      "release": "UNKNOWN for the FRED part; NBS: the release date of each month is in the URL of its release (data/incoming/external_2026-11-16/)",
+      "transformation": "уровень y/y, %; без преобразования; январь и февраль помечаются (сдвиг Нового года по лунному календарю)",
+      "check": "The NBS release for April 2025 gives -0.1, equal to the last FRED value (2025-04). NBS gives 0.9 for 2026-09 and 0.7 for 2026-10, as the Trading Economics page states; 2026-10 is not added (the series runs to 2026-09)."
     },
     "usd_kzt": {
       "file": "usd_kzt_daily.csv",
@@ -95,7 +95,7 @@
       ],
       "frequency": "daily (рабочие дни)",
       "publisher": "FRED, Federal Reserve Bank of St. Louis (aggregator; series DEXCHUS from the Federal Reserve Board H.10 release)",
-      "title": "FRED DEXCHUS: Chinese yuan renminbi per U.S. dollar, noon buying rates in New York (not the CFETS central parity)",
+      "title": "FRED DEXCHUS (H.10): Chinese yuan renminbi per U.S. dollar, noon buying rate in New York; not the CFETS central parity",
       "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXCHUS",
       "retrieved": "2026-11-15",
       "release": "UNKNOWN",

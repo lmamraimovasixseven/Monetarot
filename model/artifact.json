@@ -5860,7 +5860,7 @@
     "kz_real_rate": 6.949999999999999,
     "partner_real_rates": {
       "russia": 7.65,
-      "china": null
+      "china": 2.1
     },
     "partner_labels": {
       "russia": "Россия",
@@ -5868,10 +5868,11 @@
     },
     "partner_notes": {
       "russia": "месяц 2026-09",
-      "china": "UNKNOWN: данных нет (шаблон: cn_7d_reverse_repo_daily.csv)"
+      "china": "месяц 2026-09"
     },
     "real_differentials": {
-      "russia": -0.7000000000000011
+      "russia": -0.7000000000000011,
+      "china": 4.85
     },
     "defaults": {
       "premium": 2.0,
@@ -5890,36 +5891,46 @@
     },
     "current": {
       "kz_real_rate": 6.949999999999999,
-      "differentials": {},
-      "lower": null,
-      "upper": null,
-      "status": "UNKNOWN: нет реальной ставки: Китай; по одной стране границы коридора не считаются"
+      "differentials": {
+        "russia": -0.7000000000000011,
+        "china": 4.85
+      },
+      "lower": 18.950000000000003,
+      "upper": 22.950000000000003,
+      "binding_upper": "inflow_cap",
+      "position": "ниже коридора: риск оттока в carry trade",
+      "status": "ok"
     },
     "premium_sensitivity": [
       {
         "premium": 0.0,
-        "lower": null,
-        "upper": null
+        "lower": 16.950000000000003,
+        "upper": 22.950000000000003,
+        "position": "ниже коридора: риск оттока в carry trade"
       },
       {
         "premium": 1.0,
-        "lower": null,
-        "upper": null
+        "lower": 17.950000000000003,
+        "upper": 22.950000000000003,
+        "position": "ниже коридора: риск оттока в carry trade"
       },
       {
         "premium": 2.0,
-        "lower": null,
-        "upper": null
+        "lower": 18.950000000000003,
+        "upper": 22.950000000000003,
+        "position": "ниже коридора: риск оттока в carry trade"
       },
       {
         "premium": 3.0,
-        "lower": null,
-        "upper": null
+        "lower": 19.950000000000003,
+        "upper": 22.950000000000003,
+        "position": "ниже коридора: риск оттока в carry trade"
       },
       {
         "premium": 4.0,
-        "lower": null,
-        "upper": null
+        "lower": 20.950000000000003,
+        "upper": 22.950000000000003,
+        "position": "ниже коридора: риск оттока в carry trade"
       }
     ],
     "fx_regression": {
@@ -5927,22 +5938,22 @@
       "specifications": {
         "lag1": {
           "n": 131,
-          "coef": 0.2854827837328097,
-          "se": 0.10344609317074754,
-          "p": 0.005785001108926782,
-          "r2": 0.09561099112924754
+          "coef": 0.28553703179849077,
+          "se": 0.12970361868329047,
+          "p": 0.02770363715004276,
+          "r2": 0.04940695737671996
         },
         "lag1_lag2": {
           "n": 131,
-          "coef": 0.5222074943821141,
-          "se": 0.34791627284288906,
-          "p": 0.13336658765130993,
-          "r2": 0.10767261479529067
+          "coef": 0.5117279293302434,
+          "se": 0.41739243066024195,
+          "p": 0.2201943390321931,
+          "r2": 0.05720118425444576
         }
       },
       "vif": {
-        "diff": 6.450412717187132,
-        "diff2": 6.450412717187132
+        "diff": 4.977777004692905,
+        "diff2": 4.977777004692908
       },
       "random_walk_mae_of_change": 1.8781706868160477,
       "verdict": "связь значима на 5% (HC1)",
@@ -5966,13 +5977,74 @@
           "bias": "неоднозначно; проверяется добавлением USD/RUB, когда есть данные"
         }
       ],
-      "differential": "КЗ − Россия (нет данных: Китай)",
+      "differential": "КЗ − наибольшая из: Россия, Китай",
       "partners_used": [
+        "china",
         "russia"
       ],
       "differential_months": {
         "first": "2015-09",
         "last": "2026-09"
+      },
+      "by_partner": {
+        "russia": {
+          "status": "ok",
+          "specifications": {
+            "lag1": {
+              "n": 131,
+              "coef": 0.2854827837328097,
+              "se": 0.10344609317074754,
+              "p": 0.005785001108926782,
+              "r2": 0.09561099112924754
+            },
+            "lag1_lag2": {
+              "n": 131,
+              "coef": 0.5222074943821141,
+              "se": 0.34791627284288906,
+              "p": 0.13336658765130993,
+              "r2": 0.10767261479529067
+            }
+          },
+          "vif": {
+            "diff": 6.450412717187132,
+            "diff2": 6.450412717187132
+          },
+          "random_walk_mae_of_change": 1.8781706868160477,
+          "verdict": "связь значима на 5% (HC1)",
+          "differential_months": {
+            "first": "2015-09",
+            "last": "2026-09"
+          }
+        },
+        "china": {
+          "status": "ok",
+          "specifications": {
+            "lag1": {
+              "n": 131,
+              "coef": 0.0918353304021743,
+              "se": 0.0784446822771975,
+              "p": 0.24171866319829738,
+              "r2": 0.007883204039942915
+            },
+            "lag1_lag2": {
+              "n": 131,
+              "coef": 0.31152055003014834,
+              "se": 0.3503678057847088,
+              "p": 0.37393624999064146,
+              "r2": 0.016076532827864587
+            }
+          },
+          "vif": {
+            "diff": 6.505851278954464,
+            "diff2": 6.505851278954464
+          },
+          "random_walk_mae_of_change": 1.8781706868160477,
+          "verdict": "связи не видно (p ≥ 0.05, HC1)",
+          "differential_months": {
+            "first": "2015-09",
+            "last": "2026-09"
+          }
+        }
       }
     },
     "panel_note": "Панель по трём странам с фиксированными эффектами — только иллюстрация: три единицы не дают надёжных стандартных ошибок; строится, когда есть данные.",
@@ -8533,8 +8605,8 @@
   },
   "evidence_ledger": {
     "path": "ledger/evidence_ledger.csv",
-    "rows": 4179,
-    "sha256": "7b11d3599f09fe738261a4a17b782c999b19dcef13ac30a7633b1e981a881c18"
+    "rows": 4221,
+    "sha256": "c53af8198789cbc48a245807f7ac67ee4dc29b4510cd862ccc46121876e7fee4"
   },
   "dashboard": {
     "label": "Render dashboard (src/app.py) values for the static site; computed from the stored model, nothing estimated",

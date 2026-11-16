@@ -25,6 +25,14 @@ def test_partially_covered_first_month_is_not_reported():
     assert pd.Period("2025-01", "M") not in ed.monthly_step_rate(changes, until=pd.Timestamp("2025-02-28")).index
 
 
+def test_a_published_gap_stays_a_gap_while_absent_days_take_the_last_value():
+    """D47: an empty value (BIS OBS_STATUS M) is not filled; a day missing from the file holds the previous rate."""
+    changes = pd.DataFrame({"date": ["2025-01-01", "2025-01-10", "2025-01-11", "2025-01-20"], "rate": [4.0, None, None, 3.0]})
+    monthly = ed.monthly_step_rate(changes, until=pd.Timestamp("2025-01-31"))
+    # 1–9 Jan at 4.0 (2–9 absent → held), 10–11 Jan gaps, 12–19 Jan absent after a gap → the last value 4.0, 20–31 Jan at 3.0
+    assert monthly[pd.Period("2025-01", "M")] == pytest.approx((9 * 4.0 + 8 * 4.0 + 12 * 3.0) / 29)
+
+
 def test_fx_average_uses_published_days_only_and_counts_them():
     daily = pd.DataFrame({"date": ["2025-01-09", "2025-01-10", "2025-01-13"], "usd_kzt": [500.0, 510.0, 520.0]})
     out = ed.monthly_average(daily)

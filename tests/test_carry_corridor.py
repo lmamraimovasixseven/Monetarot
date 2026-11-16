@@ -105,7 +105,10 @@ def test_artifact_block_reports_unknown_partners_honestly():
         assert block["current"]["status"] == "ok" and block["current"]["lower"] is not None
     has_fx = not cc.external_data.read_raw("usd_kzt").empty
     if has_fx and any(v is not None for v in partners.values()):
-        assert block["fx_regression"]["status"] in ("ok",) or block["fx_regression"]["status"].startswith("UNKNOWN: мало")
+        assert block["fx_regression"]["status"] == "ok" or block["fx_regression"]["status"].startswith("не запускалась: выборка")
+        for key, item in block["fx_regression"].get("by_partner", {}).items():  # D47: one regression per partner
+            assert item["status"] == "ok" or item["status"].startswith("не запускалась"), key
+            assert (item["status"] == "ok") == (partners[key] is not None and item.get("specifications", {}).get("lag1", {}).get("n", 0) >= cc.MIN_FX_MONTHS)
     else:
         assert block["fx_regression"]["status"].startswith("UNKNOWN")
     for key, value in partners.items():  # a partner's real rate is reported with its month or with an UNKNOWN note
@@ -139,7 +142,7 @@ def test_partner_real_rates_for_empty_partial_and_full_data(tmp_path):
     _write_external(tmp_path, {"ru_key_rate", "ru_cpi_yoy"})
     series, notes = cc.partner_real_series(tmp_path)
     assert len(series["russia"]) and not len(series["china"]) and notes["russia"] == f"месяц {series['russia'].index[-1]}"
-    assert "cn_7d_reverse_repo_daily.csv" in notes["china"] and "cn_cpi_yoy.csv" in notes["china"]
+    assert "cn_policy_rate_daily.csv" in notes["china"] and "cn_cpi_yoy.csv" in notes["china"]
     # monthly real rate = calendar-day mean of the daily rate minus CPI y/y of the same month
     month = series["russia"].index[-1]
     rate = cc.external_data.monthly_step_rate(cc.external_data.read_raw("ru_key_rate", tmp_path))[month]
@@ -167,3 +170,10 @@ def test_fx_block_without_fx_data_or_partners_is_unknown(monkeypatch):
     assert cc.fx_block(frame, {"russia": pd.Series([1.0], index=pd.period_range("2020-01", periods=1, freq="M"))})["status"].startswith("UNKNOWN")
     monkeypatch.setattr(cc, "usd_kzt_monthly", lambda directory=None: pd.Series([1.0, 2.0], index=pd.period_range("2020-01", periods=2, freq="M")))
     assert cc.fx_block(frame, {"russia": pd.Series(dtype=float), "china": pd.Series(dtype=float)})["status"].startswith("UNKNOWN")
+
+
+def test_fx_regression_on_a_short_sample_is_not_run_and_says_why():
+    index = pd.period_range("2025-01", periods=cc.MIN_FX_MONTHS, freq="M")
+    result = cc.fx_regression(pd.Series(np.arange(len(index), dtype=float), index=index), pd.Series(1.0, index=index))
+    assert result["status"].startswith("не запускалась: выборка слишком короткая") and result["n"] < cc.MIN_FX_MONTHS
+    assert site_i18n.tr(result["status"]).startswith("not run: sample too short")

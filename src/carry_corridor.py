@@ -31,6 +31,7 @@ from src.ingest import read_monthly_series
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 CREDIT_LEAD_MONTHS = 6
+MIN_FX_MONTHS = 24  # меньше двух лет месячных изменений: регрессия курса не запускается
 DEFAULTS = {"premium": 2.0, "cap": 6.0}  # пункты; параметры ползунков, допущение пользователя (TODO_HUMAN.md)
 
 
@@ -93,8 +94,8 @@ def fx_regression(fx: pd.Series, differential: pd.Series) -> dict[str, Any]:
     from statsmodels.stats.outliers_influence import variance_inflation_factor
 
     data = pd.concat({"dfx": fx.diff(), "diff": differential.shift(1), "diff2": differential.shift(2)}, axis=1).dropna()
-    if len(data) < 24:
-        return {"status": f"UNKNOWN: мало наблюдений ({len(data)})"}
+    if len(data) < MIN_FX_MONTHS:
+        return {"status": f"не запускалась: выборка слишком короткая ({len(data)} мес. < {MIN_FX_MONTHS})", "n": int(len(data))}
     specs = {"lag1": ["diff"], "lag1_lag2": ["diff", "diff2"]}  # дифференциал t-1; t-1 и t-2 (ASCII-ключи для id журнала)
     table = {}
     for label, columns in specs.items():
@@ -179,6 +180,18 @@ def fx_block(frame: pd.DataFrame, series: dict[str, pd.Series]) -> dict[str, Any
     result["partners_used"] = sorted(available)
     if len(differential):
         result["differential_months"] = {"first": str(differential.index.min()), "last": str(differential.index.max())}
+    # D47: the same regression on the differential to each partner separately (Russia, China), when its sample suffices.
+    by_partner = {}
+    for key in series:
+        if key not in available:
+            by_partner[key] = {"status": f"не запускалась: нет реальной ставки ({PARTNER_LABELS[key]})"}
+            continue
+        own = (frame["real_rate"] - available[key]).dropna()
+        by_partner[key] = fx_regression(fx, own)
+        by_partner[key].pop("ovb_compass", None)  # the same table as in the main regression
+        if len(own):
+            by_partner[key]["differential_months"] = {"first": str(own.index.min()), "last": str(own.index.max())}
+    result["by_partner"] = by_partner
     return result
 
 

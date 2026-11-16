@@ -170,6 +170,14 @@ PHRASES: dict[str, str] = {
     "курс Банка России публикуется по рабочим дням РФ → среднее по опубликованным дням; дни не выравниваются с USD/KZT":
         "the Bank of Russia rate is published on Russian working days → mean over the published days; days are not aligned "
         "with USD/KZT",
+    "BIS даёт значение на каждый календарный день; пропуск (OBS_STATUS M) записан пустым и остаётся пропуском → средняя по "
+    "календарным дням с значением (external_data.monthly_step_rate)":
+        "BIS gives a value for every calendar day; a gap (OBS_STATUS M) is written empty and stays a gap → mean over the calendar "
+        "days with a value (external_data.monthly_step_rate)",
+    "y/y в процентах: OECD через FRED до 2025-04, релизы NBS с 2025-05; январь/февраль смещаются Новым годом по лунному "
+    "календарю → флаг lunar_new_year_month":
+        "y/y in percent: OECD via FRED to 2025-04, NBS releases from 2025-05; January and February shift with the lunar New Year "
+        "→ flag lunar_new_year_month",
     "FRED DEXCHUS публикуется по рабочим дням США, дни без значения пропущены → среднее по опубликованным дням (колонка days)":
         "FRED DEXCHUS is published on US working days, days without a value are skipped → mean over the published days "
         "(column days)",
@@ -193,7 +201,6 @@ PHRASES: dict[str, str] = {
     "Ключевая ставка Банка России": "Bank of Russia key rate",
     "Индекс потребительских цен, % к соответствующему месяцу прошлого года":
         "Consumer price index, % of the same month of the previous year",
-    "Ставка 7-дневного обратного РЕПО НБК": "People's Bank of China 7-day reverse repo rate",
     "Официальный курс тенге к доллару США": "Official tenge rate to the US dollar",
     "Официальный курс рубля к доллару США": "Official rouble rate to the US dollar",
     # config/external_sources.json
@@ -254,6 +261,8 @@ _PATTERNS: list[tuple[str, str]] = [
     # carry_corridor
     (r"месяц (\S+)", "month {0}"),
     (r"UNKNOWN: мало наблюдений \((\d+)\)", "UNKNOWN: too few observations ({0})"),
+    (r"не запускалась: выборка слишком короткая \((\d+) мес\. < (\d+)\)", "not run: sample too short ({0} months, fewer than {1})"),
+    (r"не запускалась: нет реальной ставки \((Россия|Китай)\)", "not run: no real rate for {0}"),
     (r"данные есть \((\d+) строк\)", "data present ({0} rows)"),
     # carry_corridor with partial partner data (D46); groups are file names or the partner labels Россия / Китай
     (r"UNKNOWN: данных нет \(шаблон: ([\w.]+(?:, [\w.]+)*)\)", "UNKNOWN: no data (template file only: {0})"),
@@ -265,11 +274,11 @@ _PATTERNS: list[tuple[str, str]] = [
     (r"UNKNOWN: нет данных USD/KZT \(data/raw/external/usd_kzt_daily\.csv — шаблон\)",
      "UNKNOWN: no USD/KZT data (data/raw/external/usd_kzt_daily.csv is a template)"),
     (r"UNKNOWN: ряды ставки и инфляции не пересекаются", "UNKNOWN: the rate and inflation series do not overlap"),
-    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46\)\. "
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47\)\. "
      r"Только шаблон: ([\w.]+(?:, [\w.]+)*)\.",
-     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46). Template only: {0}."),
-    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46\)\. Все файлы заполнены\.",
-     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46). All files are filled."),
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47). Template only: {0}."),
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47\)\. Все файлы заполнены\.",
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47). All files are filled."),
     # patterns: outlier reasons (src/patterns.py)
     (r"в следующих (\d+) мес\. \(предварительно: меньше (\d+) мес\.\)", "over the next {0} months (provisional: fewer than {1} months),"),
     (r"в следующих (\d+) мес\.", "over the next {0} months,"),

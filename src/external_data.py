@@ -53,7 +53,12 @@ def monthly_step_rate(changes: pd.DataFrame, date_column: str = "date", value_co
     start = table[date_column].iloc[0]
     end = until or (table[date_column].iloc[-1] + pd.offsets.MonthEnd(0))
     days = pd.date_range(start, end, freq="D")
-    daily = table.set_index(date_column)[value_column].reindex(days).ffill()
+    series = table.set_index(date_column)[value_column]
+    # A day absent from the file takes the last value (the rate holds until the next change); a day present with an
+    # empty value is a published gap (e.g. BIS OBS_STATUS M) and stays a gap: the month mean uses the other days (D47).
+    gaps = series.index[series.isna()]
+    daily = series.reindex(days).ffill()
+    daily[daily.index.isin(gaps)] = np.nan
     monthly = daily.groupby(daily.index.to_period("M")).mean()
     first = start.to_period("M")
     if start.day != 1:  # первый месяц покрыт не полностью: значение не публикуется как месячное
