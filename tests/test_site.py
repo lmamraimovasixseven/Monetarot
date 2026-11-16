@@ -361,8 +361,8 @@ def test_redteam_asof_and_run_pages_have_no_bare_placeholders():
     if "[FILL IN]" in template:
         assert "has not taken place yet" in redteam and "[FILL IN]" not in redteam and "<table" not in redteam
     for name in PAGES:
-        if name != "team.html":
-            assert "[FILL IN]" not in (SITE / name).read_text(encoding="utf-8"), name
+        assert "[FILL IN]" not in (SITE / name).read_text(encoding="utf-8"), name
+    assert "UNKNOWN" not in (SITE / "team.html").read_text(encoding="utf-8")
     asof = (SITE / "asof.html").read_text(encoding="utf-8")
     assert "What the model could have known on a past decision date." in asof
     rows = re.findall(r"<tr><td>\w+</td><td>[\d-]+</td>(.*?)</tr>", asof)

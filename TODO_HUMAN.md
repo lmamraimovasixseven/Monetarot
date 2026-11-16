@@ -26,9 +26,9 @@ Only facts that are still `UNKNOWN` or unconfirmed are listed. Do not infer or i
 - **Ответ красной команде.** Заполните `docs/redteam_response.md` после ревью другой команды.
 
 - **Включить GitHub Pages.** GitHub → Settings → Pages → Build and deployment → Source: «GitHub Actions». После следующего push workflow `pages` опубликует `site/`; ссылку на сайт впишите в README.
-- **Заполнить `docs/declaration.md`** (поля [FILL IN]; корневой `DECLARATION.md` обновится командой `python run.py update`).
+- **Подписать `docs/declaration.md`.** Зоны светофора заполнены (D48); открыты только подпись и дата каждой участницы (таблица в конце, [FILL IN]). Корневой `DECLARATION.md` обновится командой `python -m src.root_docs` (или `python run.py update`).
 
-- **Поля [FILL IN] для защиты и светофора.** `docs/ai_use.md` (раздел «Claude Code sessions recorded by the assistant», колонка «Kept by the team»), `docs/contributions.md` (раздел «Traffic-light zones»: кто делал красную, жёлтую и зелёную зоны), `docs/declaration.md` (подписи и даты). После заполнения `python run.py update` обновит корневые копии.
+- **Что ещё не записано для светофора (D48).** (1) Как Дарина использовала ИИ в жёлтой зоне: в `docs/contributions.md`, `docs/ai_use.md` и `docs/declaration.md` стоит «Darina: not yet recorded»; ответ Дарины заменит эти слова во всех трёх файлах. (2) `docs/ai_use.md`: колонка «Kept by the team» и фраза «What the team kept, rejected or verified is [FILL IN] by the team» в разделе «Claude Code sessions recorded by the assistant». (3) `docs/declaration.md`: подписи и даты. (4) Зелёная зона называет только Claude Code, а таблица инструментов в `docs/ai_use.md` называет ещё Codex и GitHub Copilot; решите, оставить ли формулировку. После заполнения `python -m src.root_docs` обновит корневые копии, `python run.py site` — страницу Team.
 - **Подготовка к защите.** `docs/DEFENCE_QA.md` (40 вопросов, ответы своими словами) и `docs/quiz2_sheet.md` (лист нужно понять самой; Quiz 2 без ИИ).
 
 ## Series provenance still UNKNOWN
@@ -74,7 +74,7 @@ The assistant did not write or change either file. Both already contain your ear
 5. **What you checked.** For each AI-produced part you rely on, who checked it, how (re-ran, compared with the source, read the code), and on which date. In particular: the 2026-08 trade values against the Excel files; the NBK dates in `docs/nbk_announcement_dates.csv` against the NBK pages; the OLD vs NEW comparison table.
 6. **What you rejected or rewrote.** AI suggestions you did not accept or changed substantially, with the reason.
 7. **What you understand.** For each component (data pipeline, ordered logit and its diagnostics, Holm adjustment, bootstrap and Diebold–Mariano, RPS, the robustness checks, the dashboard), can each of you explain it without help? Name anything you cannot yet explain.
-8. **Contributions.** Each person's role and contributions after 2026-10-18, the approximate share, signature and date. The team table in `docs/contributions.md` has six column headers but five cells per row; the "Approximate share" value is missing. Fill it in or remove the column.
+8. **Contributions.** Each person's role and contributions after 2026-10-18. The approximate share is filled (Linara Mamraimova 60%, Darina Baikazakova 40%; D48).
 9. **Signed statement.** Date and sign the statement in `docs/ai_use.md` once the answers above are in.
 
 ## Found in the review of 2026-11-06

@@ -13,6 +13,16 @@ We used AI tools to build this project. Below we list every tool, what it did an
 | Claude, chat interface | Wrote and reviewed the prompts we sent to the coding assistants, explained the assignment, compared the project with the grading rubric, and helped organise the provenance and the documents. It suggested the wording of the mechanisms in `docs/model_spec.md`, the "new element" sentence, the planned claims for the references and additions to the demo questions, and it looked up the abstracts of the five references on RePEc (it did not read the full texts). In the chat session it also unpacked a copy of the project in its own sandbox, installed the requirements and ran the checks and the website there to verify them; it did not change the repository. | 2026-10-16 to 2026-10-19 | Version UNKNOWN |
 Persons responsible for checking AI output: Linara Mamraimova and Darina Baikazakova
 
+## Traffic-light zones (course rule)
+
+The same table as in `CONTRIBUTIONS.md`.
+
+| Zone | Parts | Who did it | AI use |
+|---|---|---|---|
+| Red (no AI) | Quiz 2, individual defence, live checks on Update Drill day | Each member individually (Linara Mamraimova, Darina Baikazakova) | none allowed |
+| Yellow (AI with checking and disclosure) | analysis, model, report and technical note | Darina Baikazakova: model specification, diagnostics, sections 3 and 4 of the note; Linara Mamraimova: sections 1, 2, 5 and 6 | Linara: Claude (chat) for analysis checks, drafting and prompt writing; all numbers checked against the evidence ledger. Darina: not yet recorded. Details in `AI_USE.md`. |
+| Green (AI allowed, disclosed) | implementation, site, demo | Linara Mamraimova: prompted and reviewed the AI-written code (implementation, site, demo) | coding assistants (Claude Code), see `AI_USE.md` |
+
 ## What we did ourselves
 
 - We chose the topic: NBK base-rate decisions. The course instructor suggested this idea at a lecture on 2026-10-07; there is no written proof of this suggestion.

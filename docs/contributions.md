@@ -6,8 +6,8 @@ This statement lists what each team member actually did. Each person has read an
 
 | Name | Role | Main contributions (files, analyses, writing) | Approximate share | Signature | Date |
 |---|---|---|---|---|---|
-| Linara Mamraimova | Data, pipeline and product | Collected the data series and extracted the CSV files in `data/raw/`; recorded the sources, dates and units; prompted and reviewed the coding assistants for the data pipeline, the website, the tests and the checks; wrote the README run instructions; sections 1, 2, 5 and 6 of the note | UNKNOWN | SixSeven | 2026-10-18 |
-| Darina Baikazakova | Econometrics and literature | Literature review and references; model specification and the expected signs and mechanisms; reading the diagnostics, the out-of-sample comparison and the robustness checks; sections 3 and 4 of the note | UNKNOWN | SixSeven | 2026-10-18 |
+| Linara Mamraimova | Data, pipeline and product | Collected the data series and extracted the CSV files in `data/raw/`; recorded the sources, dates and units; prompted and reviewed the coding assistants for the data pipeline, the website, the tests and the checks; wrote the README run instructions; sections 1, 2, 5 and 6 of the note | 60% | SixSeven | 2026-10-18 |
+| Darina Baikazakova | Econometrics and literature | Literature review and references; model specification and the expected signs and mechanisms; reading the diagnostics, the out-of-sample comparison and the robustness checks; sections 3 and 4 of the note | 40% | SixSeven | 2026-10-18 |
 
 Every team member must be able to answer questions about any part of the system, including the parts she did not write.
 
@@ -28,7 +28,7 @@ Every team member must be able to answer questions about any part of the system,
 
 | Zone | Parts | Who did it | AI use |
 |---|---|---|---|
-| Red (no AI) | Quiz 2, individual defence, live checks on Update Drill day | [FILL IN] | none allowed |
-| Yellow (AI with checking and disclosure) | analysis, model, report and technical note | [FILL IN] | [FILL IN] (see `AI_USE.md`) |
-| Green (AI allowed, disclosed) | implementation, site, demo | [FILL IN] | coding assistants (see `AI_USE.md`) |
+| Red (no AI) | Quiz 2, individual defence, live checks on Update Drill day | Each member individually (Linara Mamraimova, Darina Baikazakova) | none allowed |
+| Yellow (AI with checking and disclosure) | analysis, model, report and technical note | Darina Baikazakova: model specification, diagnostics, sections 3 and 4 of the note; Linara Mamraimova: sections 1, 2, 5 and 6 | Linara: Claude (chat) for analysis checks, drafting and prompt writing; all numbers checked against the evidence ledger. Darina: not yet recorded. Details in `AI_USE.md`. |
+| Green (AI allowed, disclosed) | implementation, site, demo | Linara Mamraimova: prompted and reviewed the AI-written code (implementation, site, demo) | coding assistants (Claude Code), see `AI_USE.md` |
 
