@@ -20,8 +20,8 @@ The same table as in `CONTRIBUTIONS.md`.
 | Zone | Parts | Who did it | AI use |
 |---|---|---|---|
 | Red (no AI) | Quiz 2, individual defence, live checks on Update Drill day | Each member individually (Linara Mamraimova, Darina Baikazakova) | none allowed |
-| Yellow (AI with checking and disclosure) | analysis, model, report and technical note | Darina Baikazakova: model specification, diagnostics, sections 3 and 4 of the note; Linara Mamraimova: sections 1, 2, 5 and 6 | Linara: Claude (chat) for analysis checks, drafting and prompt writing; all numbers checked against the evidence ledger. Darina: not yet recorded. Details in `AI_USE.md`. |
-| Green (AI allowed, disclosed) | implementation, site, demo | Linara Mamraimova: prompted and reviewed the AI-written code (implementation, site, demo) | coding assistants (Claude Code), see `AI_USE.md` |
+| Yellow (AI with checking and disclosure) | analysis, model, report and technical note | Darina Baikazakova: model specification, diagnostics, sections 3 and 4 of the note; Linara Mamraimova: sections 1, 2, 5 and 6 | Linara: Claude (chat) for analysis checks, drafting and prompt writing; all numbers checked against the evidence ledger. Darina: used AI to help find valid sources and to write code; model specification written in her own words; the tests and regression chosen and reviewed by her (as recorded in `CONTRIBUTIONS.md`). Details in `AI_USE.md`. |
+| Green (AI allowed, disclosed) | implementation, site, demo | Linara Mamraimova: prompted and reviewed the AI-written code (implementation, site, demo) | Claude Code, Codex, GitHub Copilot (see `AI_USE.md`) |
 
 ## What we did ourselves
 
