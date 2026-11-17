@@ -1,0 +1,112 @@
+{
+  "note": "Factors named in the NBK base-rate statement of September 2026, compared with the frozen model (D53). Paraphrases are short and contain no numbers; each quote is at most 8 words, copied from the statement. China is not mentioned in the statement and is listed only because it was tested as a control (D50). Nothing here is a causal claim.",
+  "source": {
+    "title": "National Bank of Kazakhstan, Statement - base rate (decision of September 2026); statement by the Governor, Astana, 4 September 2026, posted on the BIS website (date delivered 22 September 2026)",
+    "url": "https://www.bis.org/speeches/20260922-statement-base-rate-national-bank-kazakhstan",
+    "retrieved": "2026-11-17"
+  },
+  "overall_quote": "the scope for further rate cuts is limited",
+  "rows": [
+    {
+      "factor": "Inflation",
+      "statement": "Annual inflation kept declining and moved into single digits; the balance of risks is still described as pro-inflationary.",
+      "quote": "moving into single digits",
+      "in_model": "inflation (year-on-year rate, level)",
+      "control": null,
+      "status": "in_model"
+    },
+    {
+      "factor": "Inflation expectations",
+      "statement": "Household one-year-ahead expectations fell; unanchored expectations are named as a domestic risk.",
+      "quote": "one-year-ahead expectations fell markedly",
+      "in_model": "not included",
+      "control": null,
+      "status": "not_modelled",
+      "limit_name": "inflation expectations"
+    },
+    {
+      "factor": "GDP and domestic demand",
+      "statement": "GDP kept growing, driven by the non-oil sector; domestic demand is described as resilient.",
+      "quote": "Domestic demand remains resilient",
+      "in_model": "no GDP factor; demand enters only through consumption and lending",
+      "control": null,
+      "status": "not_modelled",
+      "limit_name": "GDP as a separate factor"
+    },
+    {
+      "factor": "Retail trade",
+      "statement": "Retail trade and demand for services keep growing.",
+      "quote": "continuous growth in retail trade",
+      "in_model": "consumption: BNS retail trade physical volume index, year-on-year",
+      "control": null,
+      "status": "in_model"
+    },
+    {
+      "factor": "Consumer lending",
+      "statement": "Consumer lending growth, including unsecured loans, is described as balanced.",
+      "quote": "Consumer lending growth remains balanced",
+      "in_model": "household lending (12-month log growth of loans to individuals); close to, not the same as, consumer lending",
+      "control": null,
+      "status": "in_model"
+    },
+    {
+      "factor": "Import prices",
+      "statement": "Lower import prices and the stronger tenge reduce import costs.",
+      "quote": "a decline in import prices",
+      "in_model": "imports (12-month log growth of import value); import prices themselves are not in the model",
+      "control": null,
+      "status": "in_model"
+    },
+    {
+      "factor": "Tenge exchange rate",
+      "statement": "A stable and appreciating tenge is described as disinflationary.",
+      "quote": "the stable tenge exchange rate",
+      "in_model": "not included",
+      "control": null,
+      "status": "not_modelled",
+      "limit_name": "the tenge exchange rate"
+    },
+    {
+      "factor": "Russia",
+      "statement": "Inflation in Russia accelerated and the Bank of Russia cut its key rate; Russia is called the key trading partner.",
+      "quote": "our key trading partner",
+      "in_model": "not in the frozen model",
+      "control": "ru_key_rate",
+      "status": "control"
+    },
+    {
+      "factor": "ECB and euro area",
+      "statement": "Inflation in the EU accelerated; the ECB kept its rates unchanged.",
+      "quote": "The ECB kept rates unchanged",
+      "in_model": "not in the frozen model",
+      "control": "ecb_deposit_rate",
+      "status": "control"
+    },
+    {
+      "factor": "United States",
+      "statement": "US inflation is slowing; the Federal Reserve keeps a restrictive tone.",
+      "quote": "continues to maintain a restrictive tone",
+      "in_model": "not included",
+      "control": null,
+      "status": "not_modelled",
+      "limit_name": "US monetary policy"
+    },
+    {
+      "factor": "Oil price assumption",
+      "statement": "The baseline oil price assumptions are broadly unchanged.",
+      "quote": "the oil price assumptions remain broadly unchanged",
+      "in_model": "not included",
+      "control": null,
+      "status": "not_modelled",
+      "limit_name": "the oil price"
+    },
+    {
+      "factor": "China",
+      "statement": "Not mentioned in the statement; tested as a control.",
+      "quote": "",
+      "in_model": "not in the frozen model",
+      "control": "cn_policy_rate",
+      "status": "control"
+    }
+  ]
+}

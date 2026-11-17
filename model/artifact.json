@@ -8605,8 +8605,8 @@
   },
   "evidence_ledger": {
     "path": "ledger/evidence_ledger.csv",
-    "rows": 4665,
-    "sha256": "e19d2a0d66ab8bcefa880651e1510444ed530639688b51adceb69652dccfb781"
+    "rows": 4717,
+    "sha256": "add3149348dcfb08a19083d985e1ddbab9176976400c56b09737155a0027f41b"
   },
   "dashboard": {
     "label": "Render dashboard (src/app.py) values for the static site; computed from the stored model, nothing estimated",

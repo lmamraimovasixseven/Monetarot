@@ -1,0 +1,103 @@
+{
+  "label": "Exploratory and supplementary: added on 2026-11-17 after the holdout had been seen. The pre-specified verdict (holdout RMSE ratio) does not change.",
+  "holdout": {
+    "n": 18,
+    "start": "2024-09-02",
+    "end": "2026-10-27"
+  },
+  "class_order": [
+    "Decrease",
+    "Hold",
+    "Increase"
+  ],
+  "forecasters": {
+    "frozen_model": {
+      "classes": {
+        "Decrease": {
+          "n": 4,
+          "mean_probability_of_realised_class": 0.40161565090621837,
+          "recall": 0.25,
+          "correct": 1
+        },
+        "Hold": {
+          "n": 11,
+          "mean_probability_of_realised_class": 0.5634142792862501,
+          "recall": 1.0,
+          "correct": 11
+        },
+        "Increase": {
+          "n": 3,
+          "mean_probability_of_realised_class": 0.10598001298767344,
+          "recall": 0.0,
+          "correct": 0
+        }
+      },
+      "classes_present": 3,
+      "mean_class_recall": 0.4166666666666667,
+      "merton_cp": 0.125,
+      "mean_probability_of_realised_class": 0.45121998415203585
+    },
+    "class_frequencies": {
+      "classes": {
+        "Decrease": {
+          "n": 4,
+          "mean_probability_of_realised_class": 0.29577464788732394,
+          "recall": 0.0,
+          "correct": 0
+        },
+        "Hold": {
+          "n": 11,
+          "mean_probability_of_realised_class": 0.5352112676056339,
+          "recall": 1.0,
+          "correct": 11
+        },
+        "Increase": {
+          "n": 3,
+          "mean_probability_of_realised_class": 0.16901408450704225,
+          "recall": 0.0,
+          "correct": 0
+        }
+      },
+      "classes_present": 3,
+      "mean_class_recall": 0.3333333333333333,
+      "merton_cp": 0.0,
+      "mean_probability_of_realised_class": 0.42097026604068855
+    },
+    "always_hold": {
+      "classes": {
+        "Decrease": {
+          "n": 4,
+          "mean_probability_of_realised_class": 0.0,
+          "recall": 0.0,
+          "correct": 0
+        },
+        "Hold": {
+          "n": 11,
+          "mean_probability_of_realised_class": 1.0,
+          "recall": 1.0,
+          "correct": 11
+        },
+        "Increase": {
+          "n": 3,
+          "mean_probability_of_realised_class": 0.0,
+          "recall": 0.0,
+          "correct": 0
+        }
+      },
+      "classes_present": 3,
+      "mean_class_recall": 0.3333333333333333,
+      "merton_cp": 0.0,
+      "mean_probability_of_realised_class": 0.6111111111111112
+    }
+  },
+  "summary": {
+    "frozen_minus_always_hold_cp": 0.125,
+    "frozen_correct_non_hold": 1,
+    "non_hold_decisions": 7
+  },
+  "definitions": {
+    "recall": "share of the decisions of class k whose argmax forecast is k",
+    "mean_class_recall": "average recall over the classes with n_k > 0",
+    "merton_cp": "(sum of recalls over the J classes with n_k > 0 - 1) / (J - 1); 0 for a stopped clock, 1 for a perfect forecast (Kim, Mizen and Thanaset 2006)"
+  }
+}

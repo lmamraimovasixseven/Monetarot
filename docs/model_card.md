@@ -30,3 +30,11 @@ Holdout частично просматривался в ранних запус
 ### Названный прошлый провал
 
 Первые классификаторы проекта (логистическая регрессия и случайный лес на уровнях факторов) на тесте из 16 решений (2024-10-14 – 2026-09-07) предсказали один и тот же класс для всех решений; точность 0.188 против 0.625 у Always Hold (outputs/legacy/). Урок: модель без бенчмарка и без проверки на трендовых уровнях факторов выглядит рабочей, пока её не сравнить с «ничего не меняется».
+
+### Where the frozen model fails
+
+The 95% bootstrap interval of the holdout RMSE ratio, 0.780–1.335, includes 1. The LR test of equal slopes in 2015–2019 and 2020+ gives p = 0.013. 18 of 18 holdout policy pressure scores are below zero (the model gives a cut a higher probability than a hike at those decisions).
+
+### Factors the NBK names but the model does not contain
+
+The NBK statement of September 2026 names inflation expectations, GDP as a separate factor, the tenge exchange rate, US monetary policy and the oil price; none of these is a factor of the frozen model or a tested control (Methods and limits, table of NBK-stated drivers).

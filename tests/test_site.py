@@ -429,7 +429,9 @@ def test_step_one_states_cost_of_error_without_this_note_and_who_benefits():
         assert f"<strong>{label}</strong>" in step1
     assert 'data-ledger="decision:binary_losses/lengthen_but_no_cut"' in step1
     assert 'data-ledger="decision:binary_losses/not_lengthen_but_cut"' in step1
-    assert "Equal losses is an assumption" in step1 and "not a finding from interviews" in step1
+    assert "Equal losses is an assumption" in step1 and "This is our assumption." in step1
+    # D53: "Without this note" follows docs/decision_memo.md (current rate and NBK statements, Always Hold), no analysts.
+    assert "the current rate and the NBK's statements" in step1 and "Always Hold" in step1 and "analyst" not in step1
 
 
 def test_history_chart_title_states_a_conclusion_computed_from_the_data():
@@ -440,3 +442,22 @@ def test_history_chart_title_states_a_conclusion_computed_from_the_data():
     assert title.startswith(f"The NBK held the rate at {holds} of {len(history['score'])} decisions")
     if history["base_rate"]:
         assert f"to {max(history['base_rate']):g}%" in title
+
+
+def test_methods_page_has_related_work_and_the_nbk_drivers_table():
+    """D53: three sources only; one row per factor in config/nbk_statement_drivers.json; quotes of at most 8 words."""
+    methods = (SITE / "methods.html").read_text(encoding="utf-8")
+    config = json.loads((ROOT / "config" / "nbk_statement_drivers.json").read_text(encoding="utf-8"))
+    related = methods.split('id="related-work"', 1)[1].split("<h2", 1)[0]
+    assert related.count("<li>") == 3 and "Future work, not done here" in related
+    table = methods.split('<table id="drivers-table">', 1)[1].split("</table>", 1)[0]
+    assert table.count("<tr>") == len(config["rows"]) + 1
+    assert len(config["overall_quote"].split()) <= 8
+    for row in config["rows"]:
+        assert len(row["quote"].split()) <= 8
+        assert (row["status"] == "control") == bool(row["control"])
+        if row["control"]:
+            assert f'data-ledger="ovb:specifications/plus_{row["control"]}/wald_hc0/p_value_holm"' in table
+    china = next(r for r in config["rows"] if r["factor"] == "China")
+    assert china["status"] == "control" and "Not mentioned in the statement" in china["statement"]
+    assert not re.search(r"80\s*%[^.<]{0,80}export|export[^.<]{0,80}80\s*%", methods.lower())

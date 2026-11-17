@@ -104,9 +104,11 @@ OPTIMIZER_INTERNALS_NOTE = "platform-sensitive (optimizer internals)"
 CONVERGED_COUNTS = re.compile(r"Robustness checks converged: \d+; nonconverged or failed: \d+")
 CONVERGED_COUNTS_NOTE = "platform-sensitive (depends on RB02 convergence)"
 # (3) Rounding-level differences from the optimizer's convergence tolerance, allowed only in these files
-# (ovb_check.md: ordered-logit fits of the exploratory omitted-variable check, D51).
+# (ovb_check.md: ordered-logit fits of the exploratory omitted-variable check, D51; class_metrics.md: holdout
+# probabilities of the frozen model, D53).
 CROSS_PLATFORM_TOLERANCE = 1e-4
-CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md", "robust_evaluation.md", "ovb_check.md"}
+CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md", "robust_evaluation.md", "ovb_check.md",
+                        "class_metrics.md"}
 
 
 def _short(values: list[float], limit: int = 8) -> str:
@@ -356,6 +358,9 @@ def run(workdir: Path, verbose: bool = False) -> Report:
     from src import ovb_check
     ovb_result = ovb_check._clean(ovb_check.run(model_panel_path=model_panel, decisions_path=decisions, artifact_path=artifact_path))
     (outputs / "ovb_check.md").write_text(ovb_check.report(ovb_result), encoding="utf-8", newline="\n")
+    from src import class_metrics  # D53: per-class holdout metrics from the rebuilt annex_predictions.csv
+    class_result = class_metrics._clean(class_metrics.run(predictions_path=outputs / "annex_predictions.csv", artifact_path=artifact_path))
+    (outputs / "class_metrics.md").write_text(class_metrics.report(class_result), encoding="utf-8", newline="\n")
 
     report = Report()
     compare_panel(report, "data/processed/nbk_decisions_clean.csv", COMMITTED_DECISIONS, decisions, number_tol)

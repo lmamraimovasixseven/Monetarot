@@ -40,6 +40,7 @@ TASKS = {
     "patterns": [[sys.executable, "-m", "src.patterns"]],
     "corridor": [[sys.executable, "-m", "src.carry_corridor"]],
     "ovb": [[sys.executable, "-m", "src.ovb_check"]],  # D50: exploratory, writes model/extensions/, not the artifact
+    "class-metrics": [[sys.executable, "-m", "src.class_metrics"]],  # D53: exploratory, writes model/extensions/
     "traps": [[sys.executable, "-m", "src.traps"]],
     "forecast": [[sys.executable, "-m", "src.forecast_desk", "forecast"]],
     "model-card": [[sys.executable, "-m", "src.model_card"]],
@@ -58,8 +59,10 @@ TASKS["acceptance"] = [[sys.executable, "-m", "src.acceptance"]]
 TASKS["root-docs"] = [[sys.executable, "-m", "src.root_docs"]]
 # Одна команда (бриф, блок G): данные → проверки → модель → прогнозы → журнал → site/. Офлайн, из закоммиченных данных.
 TASKS["update"] = (TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["decision"]
-                   + TASKS["prereg"] + TASKS["desk"] + TASKS["corridor"] + TASKS["ovb"] + TASKS["patterns"] + TASKS["model-card"]
-                   + TASKS["forecast-score"] + TASKS["dashboard"] + TASKS["ledger"] + TASKS["site"] + TASKS["defence"] + TASKS["root-docs"]
+                   + TASKS["prereg"] + TASKS["desk"] + TASKS["corridor"] + TASKS["ovb"] + TASKS["class-metrics"] + TASKS["patterns"]
+                   # model-card after dashboard: it reads the dashboard block's holdout scores (D53)
+                   + TASKS["forecast-score"] + TASKS["dashboard"] + TASKS["model-card"] + TASKS["ledger"] + TASKS["site"]
+                   + TASKS["defence"] + TASKS["root-docs"]
                    + TASKS["prereg-check"] + TASKS["traps"])
 TASKS["all"] = TASKS["data"] + TASKS["model"] + TASKS["robust"] + TASKS["report"] + TASKS["facts"] + TASKS["test"]
 

@@ -16,6 +16,7 @@ NUMBERS = ROOT / "outputs" / "numbers_for_note.json"
 LEGACY = ROOT / "outputs" / "legacy" / "mvp_backtest_results.json"
 VERSION = ROOT / "model" / "version_comparison.json"
 CARD = ROOT / "docs" / "model_card.md"
+DRIVERS = ROOT / "config" / "nbk_statement_drivers.json"
 
 
 def _load(path: Path) -> dict:
@@ -64,7 +65,39 @@ def limits(artifact: dict | None = None, numbers: dict | None = None, version: d
         {"title": "Задержки публикации не проверены",
          "text": "Реальные лаги публикации UNKNOWN; принято «месяц решения минус 2». Винтажей нет: бэктесты рядов — revised-data."},
         {"title": "Названный прошлый провал", "text": past_failure(_load(LEGACY))},
+        {"title": "Where the frozen model fails", "text": frozen_failures(artifact, n)},
+        {"title": "Factors the NBK names but the model does not contain", "text": unmodelled_factors()},
     ]
+
+
+def frozen_failures(artifact: dict, numbers: dict) -> str:
+    """D53: three facts from the ledger sources (numbers_for_note.json, the dashboard block); no causal reading."""
+    d = lambda key: numbers.get(key, {}).get("display", "UNKNOWN")  # noqa: E731
+    track = artifact.get("dashboard", {}).get("track_record", {})
+    start = track.get("holdout_start")
+    scores = [s for day, s in zip(track.get("dates", []), track.get("score", [])) if start and day >= start]
+    below = sum(1 for s in scores if float(s) < 0)
+    if not scores:  # run.py update writes the dashboard block before the model card (D53)
+        return "UNKNOWN: the dashboard block with the holdout scores is missing; run python run.py dashboard first."
+    try:
+        covers = float(numbers["rmse_ratio_ci_low"]["value"]) <= 1 <= float(numbers["rmse_ratio_ci_high"]["value"])
+    except (KeyError, TypeError, ValueError):
+        covers = None
+    relation = {True: "includes", False: "excludes", None: "UNKNOWN relation to"}[covers]
+    return (f"The 95% bootstrap interval of the holdout RMSE ratio, {d('rmse_ratio_ci_low')}–{d('rmse_ratio_ci_high')}, {relation} 1. "
+            f"The LR test of equal slopes in 2015–2019 and 2020+ gives p = {d('stability_lr_p')}. "
+            f"{below} of {len(scores)} holdout policy pressure scores are below zero (the model gives a cut a higher probability "
+            "than a hike at those decisions).")
+
+
+def unmodelled_factors() -> str:
+    """D53: factors named in the NBK statement of September 2026 that the frozen model does not contain (config file)."""
+    config = _load(DRIVERS)
+    names = [row["limit_name"] for row in config.get("rows", []) if row["status"] == "not_modelled"]
+    if not names:
+        return "UNKNOWN (config/nbk_statement_drivers.json is missing)"
+    return (f"The NBK statement of September 2026 names {', '.join(names[:-1])} and {names[-1]}; none of these is a factor "
+            "of the frozen model or a tested control (Methods and limits, table of NBK-stated drivers).")
 
 
 def card(items: list[dict[str, str]]) -> str:

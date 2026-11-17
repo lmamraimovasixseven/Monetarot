@@ -302,7 +302,7 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <section id="step-1"><h2>1. The decision</h2><p>{esc(tr(decision['decision']))}</p>
 <ul id="usefulness">
 <li><strong>Cost of error:</strong> lengthening duration when no cut follows costs {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} unit; not lengthening before a cut costs {L.num('decision:binary_losses/not_lengthen_but_cut', 1)} unit (relative units, not tenge; <code>config/decision_losses.json</code>). Equal losses is an assumption: the values are not confirmed by a person yet.</li>
-<li><strong>Without this note:</strong> the holder relies on analysts' comments and the NBK's communication, which state no probabilities and have no track record, and by default expects the rate to stay unchanged (Always Hold, the benchmark). This is our assumption, not a finding from interviews.</li>
+<li><strong>Without this note:</strong> the holder looks at the current rate and the NBK's statements and by default assumes that the rate will not change (Always Hold), which is our benchmark. This is our assumption.</li>
 <li><strong>Who benefits:</strong> holders of tenge government bonds (bank treasuries, portfolio managers), who see the probability and the threshold at which to act. Who can lose: a holder who lengthens duration and no cut follows, or who does not lengthen before a cut.</li>
 </ul></section>
 <section id="step-2"><h2>2. The tension</h2><p>{obvious}</p><p>{complication}</p>
@@ -450,6 +450,88 @@ holdout decisions as the frozen model; the frozen fit reproduces the artifact co
 without controls and {L.num('ovb:summary/ols_same_signs_with_controls')} of {len(OVB_FACTORS)} with them. None of the robustness checks RB01–RB09 uses this dependent variable.</p>"""
 
 
+DRIVERS_PATH = ROOT / "config" / "nbk_statement_drivers.json"
+CLASS_METRICS_PATH = ROOT / "model" / "extensions" / "class_metrics.json"
+CLASS_FORECASTERS = [("frozen_model", "Frozen model"), ("class_frequencies", "Class frequencies"), ("always_hold", "Always Hold")]
+STATUS_TEXT = {"in_model": "in model", "not_modelled": "not modelled — a limit"}
+
+
+def related_work_section() -> str:
+    path = ROOT / "docs" / "related_work.md"
+    if not path.is_file():
+        return ""
+    body = md_to_html(path.read_text(encoding="utf-8").split("\n", 1)[1])  # the file's own title becomes the h2 below
+    return f'<h2 id="related-work">Related work</h2>{body}'
+
+
+def drivers_section(L: Ledger) -> str:
+    """D53: factors named in the NBK statement of September 2026 against the frozen model; control results from the OVB ledger."""
+    if not DRIVERS_PATH.is_file():
+        return ""
+    config = json.loads(DRIVERS_PATH.read_text(encoding="utf-8"))
+    base = "ovb:specifications"
+    rows = []
+    for row in config["rows"]:
+        said = esc(row["statement"]) + (f" “{esc(row['quote'])}”" if row["quote"] else "")
+        if row["status"] == "control" and f"{base}/plus_{row['control']}/wald_hc0/p_value_holm" in L.values:
+            spec = f"{base}/plus_{row['control']}"
+            status = (f"tested as control: added alone, Holm p {_ovb_p(L, f'{spec}/wald_hc0/p_value_holm')}; holdout RMSE ratio "
+                      f"{L.num(f'{spec}/holdout/rmse_ratio_to_always_hold', 3)} (frozen model {L.num(f'{base}/frozen/holdout/rmse_ratio_to_always_hold', 3)})")
+        elif row["status"] == "control":
+            status = "tested as control: results file missing (python run.py ovb)"
+        else:
+            status = STATUS_TEXT[row["status"]]
+        rows.append(f"<tr><td>{esc(row['factor'])}</td><td>{said}</td><td>{esc(row['in_model'])}</td>"
+                    f"<td>{'yes' if row['control'] else 'no'}</td><td>{status}</td></tr>")
+    source = config["source"]
+    return (f'<h2 id="nbk-drivers">NBK-stated drivers vs our model</h2><p>Factors named in the NBK statement on the base rate of '
+            f'September 2026 (<a href="{esc(source["url"])}">statement on the BIS website</a>, read on {esc(source["retrieved"])}), which '
+            f'concludes that “{esc(config["overall_quote"])}”, compared with the frozen model. China is not mentioned in the statement; it '
+            "is listed because it was tested as a control. The table compares lists of factors; it makes no causal claim.</p>"
+            '<div class="scroll"><table id="drivers-table"><thead><tr><th>Factor</th><th>What the NBK statement says</th><th>In our model</th>'
+            f'<th>Tested as control (D50)</th><th>Status</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+            '<p class="caption">Control results come from the exploratory omitted-variable check (Evidence page): Holm-adjusted HC0 Wald '
+            "test of the added rate and the holdout RMSE ratio to Always Hold with that rate added.</p>")
+
+
+def class_metrics_headline(L: Ledger) -> str:
+    """Computed from the ledger: two branches (the frozen model picks no cut or hike by argmax, or some)."""
+    k = "classm:summary"
+    correct = int(float(L.raw(f"{k}/frozen_correct_non_hold")))
+    cp = f"Merton measure {L.num('classm:forecasters/frozen_model/merton_cp', 3, signed=True)} against {L.num('classm:forecasters/always_hold/merton_cp', 3)} for Always Hold"
+    if correct == 0:
+        return (f"By argmax the frozen model, like Always Hold, picks none of the {L.num(f'{k}/non_hold_decisions')} cuts and hikes "
+                f"in the holdout ({cp}).")
+    return (f"By argmax the frozen model picks {L.num(f'{k}/frozen_correct_non_hold')} of the {L.num(f'{k}/non_hold_decisions')} cuts and "
+            f"hikes in the holdout correctly; Always Hold picks none ({cp}).")
+
+
+def class_metrics_section(L: Ledger) -> str:
+    if not CLASS_METRICS_PATH.is_file():
+        return '<h2 id="ev-classes">Per-class holdout metrics</h2><p>Not run: model/extensions/class_metrics.json is missing (python run.py class-metrics).</p>'
+    result = json.loads(CLASS_METRICS_PATH.read_text(encoding="utf-8"))
+    classes = result["class_order"]
+    head = "".join(f"<th>{esc(c)}: n / mean P(realised) / recall</th>" for c in classes)
+    rows = []
+    for key, name in CLASS_FORECASTERS:
+        base = f"classm:forecasters/{key}"
+        cells = []
+        for c in classes:
+            n = L.num(f"{base}/classes/{c}/n")
+            cells.append(f"<td>{n} / {L.num(f'{base}/classes/{c}/mean_probability_of_realised_class', 3)} / {L.num(f'{base}/classes/{c}/recall', 3)}</td>"
+                         if f"{base}/classes/{c}/recall" in L.values else f"<td>{n} / — / —</td>")
+        rows.append(f"<tr><td>{esc(name)}</td>{''.join(cells)}<td>{L.num(f'{base}/mean_class_recall', 3)}</td>"
+                    f"<td>{L.num(f'{base}/merton_cp', 3, signed=True)}</td></tr>")
+    return (f'<h2 id="ev-classes">Per-class holdout metrics</h2><div class="box warn">{esc(result["label"])}</div>'
+            f'<p class="box info" id="classes-headline">{class_metrics_headline(L)}</p>'
+            f'<div class="scroll"><table id="classes-table"><thead><tr><th>Forecaster</th>{head}<th>Mean class recall</th><th>Merton CP</th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table></div>'
+            f'<p class="caption">Same {L.num("classm:holdout/n")} holdout decisions as the frozen model. Recall: share of the decisions of a '
+            "class whose highest-probability forecast is that class. Mean class recall: average recall over the classes that occur in "
+            "the holdout. Merton CP = (sum of those recalls − 1) / (number of those classes − 1), as in Kim, Mizen and Thanaset (2006): "
+            "0 for a forecast that always names one class, 1 for a perfect one. Definitions: Methods and limits.</p>")
+
+
 def evidence_page(L: Ledger, artifact: dict) -> str:
     d = artifact["dashboard"]
     ev, full, stress = d["evidence"], d["full_results"], d["stress"]
@@ -494,6 +576,7 @@ come from the <code>dashboard</code> block of the artifact; the model is not re-
 <h2 id="ev-robustness">Robustness specifications</h2>{T('evidence/robustness', ev['robustness'])}<p class="caption">{esc(robustness_caption)}</p>
 <details id="ev-full"><summary>Full results stored in artifact</summary>{full_parts}</details>
 {ovb_section(L)}
+{class_metrics_section(L)}
 <h2 id="ev-power">Power: minimum detectable effects</h2>{power}
 <h2 id="ev-limitations">Limitations</h2>{''.join(f'<p>{esc(s)}</p>' for s in ev['limitations'])}
 <p class="caption">Generated from config/release_lag.json, docs/facts_to_fill.csv and the raw files by <code>python run.py facts</code>.</p>
@@ -539,7 +622,14 @@ def methods_page(L: Ledger, artifact: dict) -> str:
             "“DATE NOT CONFIRMED” with the same probabilities.</li></ul><h3>Units of the model factors</h3><ul>" + units + "</ul>"
             f'<h2 id="render-app">Interactive version (Render)</h2>{render}'
             f'<h2 id="static-limits">What the static page does differently</h2>{static}'
-            f"<h2>Limits</h2>{limits}"
+            + related_work_section() + drivers_section(L)
+            + "<h2 id=\"class-metric-definitions\">Per-class holdout metrics: definitions</h2><p>Exploratory and supplementary "
+              "(Evidence page). For each class k: n<sub>k</sub> realised decisions; the mean probability assigned to the realised "
+              "class; recall, the share of the decisions of class k whose highest-probability forecast is k. Mean class recall "
+              "averages the recalls over the classes with n<sub>k</sub> &gt; 0; Merton CP = (sum of those recalls − 1) / (J − 1) "
+              "for the J classes that occur (Kim, Mizen and Thanaset 2006). Always Hold has recall 0 for cuts and hikes and CP 0 by "
+              "construction. The pre-specified verdict (RMSE ratio) does not change.</p>"
+            + f"<h2>Limits</h2>{limits}"
             + md_to_html((ROOT / "docs" / "decision_memo.md").read_text(encoding="utf-8")))
 
 

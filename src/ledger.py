@@ -107,7 +107,8 @@ def series_rows(root: Path = ROOT) -> list[dict[str, str]]:
 
 
 EXTENSIONS_DIR = ROOT / "model" / "extensions"
-EXTENSION_PREFIXES = {"ovb_check.json": ("ovb", "src/ovb_check.py", "tests/test_ovb_check.py")}
+EXTENSION_PREFIXES = {"ovb_check.json": ("ovb", "src/ovb_check.py", "tests/test_ovb_check.py"),
+                      "class_metrics.json": ("classm", "src/class_metrics.py", "tests/test_class_metrics.py")}
 
 
 def extension_rows(directory: Path = EXTENSIONS_DIR) -> list[dict[str, str]]:
