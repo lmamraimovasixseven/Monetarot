@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from _tolerance import same_within_float_tolerance
 
 from src import external_data, ovb_check, site_build
 from src.artifact_extensions import EXTENSION_KEYS
@@ -64,12 +65,74 @@ def test_frozen_fit_reproduces_the_artifact(stored):
                - ARTIFACT["benchmark_comparison"]["rmse_ratio_model_to_hold"]) <= tolerance
 
 
+# Numbers that depend on where the ordered-logit optimizer stops differ across platforms by about 1e-6 (CI, D51; as D32):
+# they are compared within 1e-4 relative and absolute. Other floats (VIF, OLS, Always Hold) within 1e-9 relative (D38);
+# counts, sample sizes, names, signs and significance flags exactly.
+OPTIMIZER_PATH = re.compile(r"^/specifications/[^/]+/(coefficients|wald_hc0|lr|log_likelihood|holdout/(?!rps_always_hold))"
+                            r"|^/coefficient_changes/[^/]+/[^/]+/(estimate_change|relative_change)$"
+                            r"|^/frozen_reproduction/|^/summary/max_abs_relative_change$")
+
+
+def _leaves_all(value, path=""):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield from _leaves_all(item, f"{path}/{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from _leaves_all(item, f"{path}/{index}")
+    else:
+        yield path, value
+
+
 def test_committed_results_equal_a_fresh_run(stored, fresh):
-    tolerance = ARTIFACT["replication_tolerance"]["coefficients_absolute"]
-    committed, rebuilt = dict(_numbers(stored)), dict(_numbers(fresh))
+    committed, rebuilt = dict(_leaves_all(stored)), dict(_leaves_all(fresh))
     assert committed.keys() == rebuilt.keys()
     for key, value in committed.items():
-        assert abs(value - rebuilt[key]) <= tolerance * max(1.0, abs(value)), key
+        if isinstance(value, float) or isinstance(rebuilt[key], float):
+            rel, abs_ = (1e-4, 1e-4) if OPTIMIZER_PATH.search(key) else (1e-9, 1e-12)
+            assert same_within_float_tolerance(value, rebuilt[key], rel=rel, abs_=abs_), (key, value, rebuilt[key])
+        else:
+            assert value == rebuilt[key], (key, value, rebuilt[key])
+
+
+def _verdicts(result: dict) -> dict:
+    """Signs and 5% significance flags (raw, Holm, LR, DM) and the holdout verdict: equal across platforms."""
+    alpha, out = result["alpha"], {}
+    for spec, entry in result["specifications"].items():
+        for name, c in entry["coefficients"].items():
+            out[f"{spec}/{name}"] = (c["estimate"] > 0, c["p_value"] < alpha)
+        if "wald_hc0" in entry:
+            out[f"{spec}/tests"] = (entry["wald_hc0"]["p_value"] < alpha, entry["wald_hc0"]["p_value_holm"] < alpha,
+                                    entry["lr"]["p_value"] < alpha)
+        holdout = entry["holdout"]
+        out[f"{spec}/holdout"] = (holdout["rmse_ratio_to_always_hold"] < 1,
+                                  *(holdout[k]["p_value"] < alpha for k in ("dm_squared_error_vs_frozen", "dm_rps_vs_frozen") if k in holdout))
+    for key, ols in result["ols_cross_check"].items():
+        for name, c in ols["coefficients"].items():
+            out[f"ols/{key}/{name}"] = (c["estimate"] > 0, c["p_value"] < alpha)
+    return out
+
+
+def test_signs_and_significance_verdicts_equal_a_fresh_run(stored, fresh):
+    assert _verdicts(stored) == _verdicts(fresh)
+
+
+def test_no_verdict_lies_within_the_cross_platform_tolerance_of_its_threshold(stored):
+    """A value closer than 1e-4 to 0 (sign), 0.05 (significance) or 1 (RMSE ratio) could flip on another platform (D51)."""
+    near = []
+    for spec, entry in stored["specifications"].items():
+        for name, c in entry["coefficients"].items():
+            near += [(f"{spec}/{name}/estimate", abs(c["estimate"])), (f"{spec}/{name}/p", abs(c["p_value"] - 0.05))]
+        for test in ("wald_hc0", "lr"):
+            if test in entry:
+                near.append((f"{spec}/{test}", abs(entry[test]["p_value"] - 0.05)))
+        if "wald_hc0" in entry:
+            near.append((f"{spec}/holm", abs(entry["wald_hc0"]["p_value_holm"] - 0.05)))
+        near.append((f"{spec}/ratio", abs(entry["holdout"]["rmse_ratio_to_always_hold"] - 1)))
+        for k in ("dm_squared_error_vs_frozen", "dm_rps_vs_frozen"):
+            if k in entry["holdout"]:
+                near.append((f"{spec}/{k}", abs(entry["holdout"][k]["p_value"] - 0.05)))
+    assert not [item for item in near if item[1] < 1e-4]
 
 
 def test_summary_counts_follow_from_the_tables(stored):

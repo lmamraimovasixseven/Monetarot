@@ -103,9 +103,10 @@ OPTIMIZER_INTERNALS_NOTE = "platform-sensitive (optimizer internals)"
 # (2) The robustness count line depends on whether RB02 converges.
 CONVERGED_COUNTS = re.compile(r"Robustness checks converged: \d+; nonconverged or failed: \d+")
 CONVERGED_COUNTS_NOTE = "platform-sensitive (depends on RB02 convergence)"
-# (3) Rounding-level differences from the optimizer's convergence tolerance, allowed only in these two files.
+# (3) Rounding-level differences from the optimizer's convergence tolerance, allowed only in these files
+# (ovb_check.md: ordered-logit fits of the exploratory omitted-variable check, D51).
 CROSS_PLATFORM_TOLERANCE = 1e-4
-CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md", "robust_evaluation.md"}
+CROSS_PLATFORM_FILES = {"annex_diagnostics.md", "robustness_table.md", "robust_evaluation.md", "ovb_check.md"}
 
 
 def _short(values: list[float], limit: int = 8) -> str:
