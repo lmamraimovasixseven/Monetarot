@@ -84,5 +84,6 @@
 | Официальный курс тенге к доллару США | `data/raw/external/usd_kzt_daily.csv` | данные есть (4305 строк) | отчёт НБ РК даёт значение на каждый календарный день (в выходные повторяется последний курс) → среднее по опубликованным дням, без заполнения пропусков |
 | Официальный курс рубля к доллару США | `data/raw/external/usd_rub_daily.csv` | данные есть (2929 строк) | курс Банка России публикуется по рабочим дням РФ → среднее по опубликованным дням; дни не выравниваются с USD/KZT |
 | FRED DEXCHUS (H.10): Chinese yuan renminbi per U.S. dollar, noon buying rate in New York; not the CFETS central parity | `data/raw/external/usd_cny_daily.csv` | данные есть (2962 строк) | FRED DEXCHUS публикуется по рабочим дням США, дни без значения пропущены → среднее по опубликованным дням (колонка days) |
+| ECB deposit facility rate, level, percent per annum (Deposit facility - date of changes (raw data) - Level) | `data/raw/external/ecb_deposit_rate_daily.csv` | данные есть (4338 строк) | ECB Data Portal даёт значение на каждый календарный день → средняя по календарным дням (external_data.monthly_step_rate); только контроль в исследовательской проверке пропущенных переменных (D50), не в коридоре |
 
-Источник, URL и дата получения каждого заполненного файла — в config/external_sources.json (D46, D47). Все файлы заполнены.
+Источник, URL и дата получения каждого заполненного файла — в config/external_sources.json (D46, D47, D50). Все файлы заполнены.

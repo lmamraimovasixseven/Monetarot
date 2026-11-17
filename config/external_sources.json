@@ -1,5 +1,5 @@
 {
-  "note": "Источники для блока E (коридор carry trade). Исходные файлы, скачанные 2026-11-15, лежат в data/incoming/external_2026-11-15/ (не в git); значения перенесены в шаблоны data/raw/external/ как опубликованы, без заполнения пропусков (D46, D47). Если ряд взят у агрегатора, издателем записан агрегатор. Даты публикации издатели не указывают: UNKNOWN; числа из памяти не подставляются.",
+  "note": "Источники для блока E (коридор carry trade). Исходные файлы, скачанные 2026-11-15, лежат в data/incoming/external_2026-11-15/ (не в git); значения перенесены в шаблоны data/raw/external/ как опубликованы, без заполнения пропусков (D46, D47, D50). Если ряд взят у агрегатора, издателем записан агрегатор. Даты публикации издатели не указывают: UNKNOWN; числа из памяти не подставляются.",
   "series": {
     "ru_key_rate": {
       "file": "ru_key_rate_daily.csv",
@@ -13,7 +13,8 @@
       "url": "http://www.cbr.ru/hd_base/KeyRate/?UniDbQuery.Posted=True&UniDbQuery.From=01.01.2015&UniDbQuery.To=15.11.2026",
       "retrieved": "2026-11-15",
       "release": "UNKNOWN",
-      "transformation": "средняя по календарным дням месяца ставка; на выходные переносится значение последнего рабочего дня (external_data.monthly_step_rate)"
+      "transformation": "средняя по календарным дням месяца ставка; на выходные переносится значение последнего рабочего дня (external_data.monthly_step_rate)",
+      "used_in": "carry corridor; omitted-variable check (exploratory, model/extensions/ovb_check.json)"
     },
     "ru_cpi_yoy": {
       "file": "ru_cpi_yoy.csv",
@@ -42,7 +43,8 @@
       "retrieved": "2026-11-15",
       "release": "UNKNOWN (the export header gives the last update of the BIS dataset as 2026-11-12, not the publication date of each value)",
       "transformation": "средняя по календарным дням месяца ставка (external_data.monthly_step_rate); пустое значение (OBS_STATUS M, 2024-07-20 и 2024-07-21) остаётся пропуском, месяц усредняется по остальным дням",
-      "caveat": "Not the 7-day reverse repo rate that the template first named: by its values this is the 1-year loan prime rate (earlier the benchmark lending rate), a lending benchmark that includes a spread over the central bank's short-term operations rate. The real rate and the corridor for China therefore rest on a lending rate, not on the return of a short-term deposit."
+      "caveat": "Not the 7-day reverse repo rate that the template first named: by its values this is the 1-year loan prime rate (earlier the benchmark lending rate), a lending benchmark that includes a spread over the central bank's short-term operations rate. The real rate and the corridor for China therefore rest on a lending rate, not on the return of a short-term deposit.",
+      "used_in": "carry corridor; omitted-variable check (exploratory, model/extensions/ovb_check.json)"
     },
     "cn_cpi_yoy": {
       "file": "cn_cpi_yoy.csv",
@@ -100,6 +102,23 @@
       "retrieved": "2026-11-15",
       "release": "UNKNOWN",
       "transformation": "среднее за месяц по дням с опубликованным значением; дни без значения в FRED пропущены"
+    },
+    "ecb_deposit_rate": {
+      "file": "ecb_deposit_rate_daily.csv",
+      "columns": [
+        "date",
+        "rate_pct"
+      ],
+      "frequency": "daily (an observation for every calendar day, as in the ECB Data Portal series)",
+      "publisher": "European Central Bank (ECB Data Portal, dataset FM, series FM.D.U2.EUR.4F.KR.DFR.LEV)",
+      "title": "ECB deposit facility rate, level, percent per annum (Deposit facility - date of changes (raw data) - Level)",
+      "url": "https://data-api.ecb.europa.eu/service/data/FM/D.U2.EUR.4F.KR.DFR.LEV?format=csvdata&startPeriod=2014-01-01",
+      "retrieved": "2026-11-16",
+      "release": "UNKNOWN",
+      "transformation": "calendar-day mean of the month (external_data.monthly_step_rate), level in percent; used only as a control in the exploratory omitted-variable check (src/ovb_check.py, D50), not in the corridor",
+      "note": "FRED ECBDFR was tried first on 2026-11-16 and the connection was reset; the ECB Data Portal is the original publisher. Rows from 2015-01-01 are copied as published; the original file is in data/incoming/external_2026-11-16/ (not in git).",
+      "used_in": "omitted-variable check (exploratory)",
+      "artifact_field": "model/extensions/ovb_check.json"
     }
   }
 }

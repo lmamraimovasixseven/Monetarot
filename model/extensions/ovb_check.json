@@ -1,0 +1,738 @@
+{
+  "label": "Exploratory: added on 2026-11-16 after the holdout had been seen, at the instructor's request. The frozen specification, its holdout verdict and the pre-registration do not change.",
+  "seed": 42,
+  "alpha": 0.05,
+  "sample": {
+    "usable_n": 89,
+    "estimation_n": 71,
+    "holdout_n": 18,
+    "estimation_start": "2016-03-15",
+    "estimation_end": "2024-07-15",
+    "holdout_start": "2024-09-02",
+    "holdout_end": "2026-10-27",
+    "release_lag_months": 2
+  },
+  "controls": {
+    "ru_key_rate": "Bank of Russia key rate",
+    "cn_policy_rate": "China policy rate (BIS; LPR 1Y / benchmark lending rate)",
+    "ecb_deposit_rate": "ECB deposit facility rate"
+  },
+  "control_transformation": "calendar-day mean of the month (external_data.monthly_step_rate), level in percent, aligned to decision month minus the assumed release lag like the six factors",
+  "frozen_reproduction": {
+    "max_abs_coefficient_difference": 6.903210364450629e-10,
+    "tolerance": 1e-06,
+    "holdout_ratio_difference": 4.394560271236969e-10
+  },
+  "specifications": {
+    "frozen": {
+      "controls": [],
+      "converged": true,
+      "optimizer": "bfgs",
+      "log_likelihood": -63.49265678556916,
+      "coefficients": {
+        "inflation": {
+          "estimate": 0.03848743463088384,
+          "hc0_se": 0.07058725965243376,
+          "z": 0.5452461934404736,
+          "p_value": 0.585584205026825
+        },
+        "exports": {
+          "estimate": 0.013128283411928182,
+          "hc0_se": 0.010394266238737536,
+          "z": 1.2630312819005407,
+          "p_value": 0.2065779378589524
+        },
+        "imports": {
+          "estimate": -0.0044347659252434906,
+          "hc0_se": 0.018068020431658765,
+          "z": -0.24544835678140473,
+          "p_value": 0.8061092905478966
+        },
+        "corporate_lending": {
+          "estimate": -0.05216821648350389,
+          "hc0_se": 0.049499202978619955,
+          "z": -1.0539203329402447,
+          "p_value": 0.29191939292660585
+        },
+        "household_lending": {
+          "estimate": 0.06959885172818181,
+          "hc0_se": 0.02620327776331616,
+          "z": 2.6561124282557587,
+          "p_value": 0.00790472558613775
+        },
+        "consumption": {
+          "estimate": -0.005054063427850913,
+          "hc0_se": 0.020117480714001917,
+          "z": -0.25122745236848903,
+          "p_value": 0.8016382611083293
+        }
+      },
+      "holdout": {
+        "rmse": 0.6204310655123022,
+        "rmse_ratio_to_always_hold": 0.9949030625391998,
+        "rps": 0.15420069356036914,
+        "rps_always_hold": 0.19444444444444445
+      }
+    },
+    "plus_ru_key_rate": {
+      "controls": [
+        "ru_key_rate"
+      ],
+      "converged": true,
+      "optimizer": "bfgs",
+      "log_likelihood": -56.846442397684356,
+      "coefficients": {
+        "inflation": {
+          "estimate": 0.05967048157554521,
+          "hc0_se": 0.07299907408753034,
+          "z": 0.8174142250625901,
+          "p_value": 0.41369174914729
+        },
+        "exports": {
+          "estimate": 0.027748667114355967,
+          "hc0_se": 0.012893968314657875,
+          "z": 2.1520657129901006,
+          "p_value": 0.03139217914061496
+        },
+        "imports": {
+          "estimate": -0.028421715378131256,
+          "hc0_se": 0.02304120008660276,
+          "z": -1.2335171462990324,
+          "p_value": 0.2173828836170134
+        },
+        "corporate_lending": {
+          "estimate": -0.004065720554779316,
+          "hc0_se": 0.05118973094653651,
+          "z": -0.07942453456193448,
+          "p_value": 0.9366949545229841
+        },
+        "household_lending": {
+          "estimate": 0.07995525447919963,
+          "hc0_se": 0.028396425385952054,
+          "z": 2.8156802623035135,
+          "p_value": 0.004867408202852788
+        },
+        "consumption": {
+          "estimate": 0.02380076778604115,
+          "hc0_se": 0.02357830476653922,
+          "z": 1.0094350726952022,
+          "p_value": 0.3127660251703288
+        },
+        "ru_key_rate": {
+          "estimate": -0.36608965194482285,
+          "hc0_se": 0.10490859639136738,
+          "z": -3.4896058524994937,
+          "p_value": 0.00048373343702293664
+        }
+      },
+      "wald_hc0": {
+        "statistic": 12.177349005798716,
+        "df": 1,
+        "p_value": 0.00048373343702293805,
+        "p_value_holm": 0.001451200311068814
+      },
+      "vif": {
+        "inflation": 2.2925735038660298,
+        "exports": 1.6558459766364089,
+        "imports": 2.1228086431526467,
+        "corporate_lending": 2.7657234566659756,
+        "household_lending": 1.4324327950314935,
+        "consumption": 1.2787804636593736,
+        "ru_key_rate": 1.4799515831907017
+      },
+      "lr": {
+        "statistic": 13.292428775769608,
+        "df": 1,
+        "p_value": 0.00026648004779756396
+      },
+      "holdout": {
+        "rmse": 1.0441158087037208,
+        "rmse_ratio_to_always_hold": 1.6743101264073106,
+        "rps": 0.3959722308047624,
+        "rps_always_hold": 0.19444444444444445,
+        "rmse_ratio_to_frozen": 1.6828876997665707,
+        "dm_squared_error_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.7052431149322943,
+          "statistic": 3.759562975487352,
+          "p_value": 0.001562148136754737
+        },
+        "dm_rps_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.24177153724439324,
+          "statistic": 4.765754741145833,
+          "p_value": 0.0001793886437212633
+        }
+      }
+    },
+    "plus_cn_policy_rate": {
+      "controls": [
+        "cn_policy_rate"
+      ],
+      "converged": true,
+      "optimizer": "bfgs",
+      "log_likelihood": -62.11561918111346,
+      "coefficients": {
+        "inflation": {
+          "estimate": 0.01586834986877847,
+          "hc0_se": 0.06837577158302638,
+          "z": 0.2320756241779308,
+          "p_value": 0.8164792771503651
+        },
+        "exports": {
+          "estimate": 0.005375355239821585,
+          "hc0_se": 0.012773581959996137,
+          "z": 0.42081815865400457,
+          "p_value": 0.6738878708085707
+        },
+        "imports": {
+          "estimate": -0.002792244025916003,
+          "hc0_se": 0.018699204045217403,
+          "z": -0.14932421824821793,
+          "p_value": 0.8812978061090904
+        },
+        "corporate_lending": {
+          "estimate": 0.00477221165308138,
+          "hc0_se": 0.05309755951904597,
+          "z": 0.08987628991440932,
+          "p_value": 0.9283855227916246
+        },
+        "household_lending": {
+          "estimate": 0.12729672883343657,
+          "hc0_se": 0.042945344641986835,
+          "z": 2.964156648285016,
+          "p_value": 0.0030351373931542785
+        },
+        "consumption": {
+          "estimate": 0.002361485870286728,
+          "hc0_se": 0.019745985600292632,
+          "z": 0.11959321343026459,
+          "p_value": 0.9048053960364437
+        },
+        "cn_policy_rate": {
+          "estimate": 2.6653473596424297,
+          "hc0_se": 1.6617419666571775,
+          "z": 1.6039477928117458,
+          "p_value": 0.10872556083513792
+        }
+      },
+      "wald_hc0": {
+        "statistic": 2.572648522065671,
+        "df": 1,
+        "p_value": 0.10872556083513783,
+        "p_value_holm": 0.10872556083513783
+      },
+      "vif": {
+        "inflation": 2.38067771025018,
+        "exports": 1.8487863413961925,
+        "imports": 1.958980224533495,
+        "corporate_lending": 3.9491791277177226,
+        "household_lending": 3.9517722087704796,
+        "consumption": 1.217219941391471,
+        "cn_policy_rate": 4.737424848262503
+      },
+      "lr": {
+        "statistic": 2.7540752089114022,
+        "df": 1,
+        "p_value": 0.09700689404684447
+      },
+      "holdout": {
+        "rmse": 0.8479020668057786,
+        "rmse_ratio_to_always_hold": 1.359668156367743,
+        "rps": 0.2632500823103029,
+        "rps_always_hold": 0.19444444444444445,
+        "rmse_ratio_to_frozen": 1.3666338033954653,
+        "dm_squared_error_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.3340032078407803,
+          "statistic": 2.598195668139167,
+          "p_value": 0.018749893537972684
+        },
+        "dm_rps_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.10904938874993374,
+          "statistic": 2.7064661403997374,
+          "p_value": 0.014971530095367683
+        }
+      }
+    },
+    "plus_ecb_deposit_rate": {
+      "controls": [
+        "ecb_deposit_rate"
+      ],
+      "converged": true,
+      "optimizer": "bfgs",
+      "log_likelihood": -51.705099102490344,
+      "coefficients": {
+        "inflation": {
+          "estimate": 0.06395802650976763,
+          "hc0_se": 0.07151110749254062,
+          "z": 0.8943789119255234,
+          "p_value": 0.3711191915645484
+        },
+        "exports": {
+          "estimate": -0.003813571597222419,
+          "hc0_se": 0.012382334811691561,
+          "z": -0.3079848554588909,
+          "p_value": 0.7580938561924147
+        },
+        "imports": {
+          "estimate": 0.006063963371201364,
+          "hc0_se": 0.02179929687312932,
+          "z": 0.2781724294362928,
+          "p_value": 0.7808799980540932
+        },
+        "corporate_lending": {
+          "estimate": 0.013918788365746872,
+          "hc0_se": 0.04937732808388906,
+          "z": 0.2818862199692074,
+          "p_value": 0.7780307561269775
+        },
+        "household_lending": {
+          "estimate": 0.14127559137170104,
+          "hc0_se": 0.03821557670431357,
+          "z": 3.696806474092922,
+          "p_value": 0.00021832864823905833
+        },
+        "consumption": {
+          "estimate": 0.02931516006641954,
+          "hc0_se": 0.025568845991088746,
+          "z": 1.146518700008458,
+          "p_value": 0.2515805942739501
+        },
+        "ecb_deposit_rate": {
+          "estimate": -1.1460255860040902,
+          "hc0_se": 0.2648096920188593,
+          "z": -4.3277327852579965,
+          "p_value": 1.5065208604185507e-05
+        }
+      },
+      "wald_hc0": {
+        "statistic": 18.72927106059694,
+        "df": 1,
+        "p_value": 1.5065208604185469e-05,
+        "p_value_holm": 6.0260834416741874e-05
+      },
+      "vif": {
+        "inflation": 2.2904803706270953,
+        "exports": 1.7508017066723494,
+        "imports": 1.974698680528356,
+        "corporate_lending": 2.7931264062504906,
+        "household_lending": 1.6429221364881845,
+        "consumption": 1.252227927634194,
+        "ecb_deposit_rate": 1.6284251079275105
+      },
+      "lr": {
+        "statistic": 23.575115366157632,
+        "df": 1,
+        "p_value": 1.2013109861411043e-06
+      },
+      "holdout": {
+        "rmse": 0.8074439810490177,
+        "rmse_ratio_to_always_hold": 1.2947908868992353,
+        "rps": 0.23183315227759393,
+        "rps_always_hold": 0.19444444444444445,
+        "rmse_ratio_to_frozen": 1.3014241644755413,
+        "dm_squared_error_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.26703107547955574,
+          "statistic": 2.08603944748679,
+          "p_value": 0.05235398628566931
+        },
+        "dm_rps_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.0776324587172248,
+          "statistic": 2.072737004496555,
+          "p_value": 0.05371463321143635
+        }
+      }
+    },
+    "plus_all_three": {
+      "controls": [
+        "ru_key_rate",
+        "cn_policy_rate",
+        "ecb_deposit_rate"
+      ],
+      "converged": true,
+      "optimizer": "bfgs",
+      "log_likelihood": -50.491437342429045,
+      "coefficients": {
+        "inflation": {
+          "estimate": 0.08215401783295564,
+          "hc0_se": 0.0796069984054253,
+          "z": 1.0319949185190829,
+          "p_value": 0.3020744979827301
+        },
+        "exports": {
+          "estimate": 0.005689055590699752,
+          "hc0_se": 0.014847998234678516,
+          "z": 0.38315303522952837,
+          "p_value": 0.7016062981045532
+        },
+        "imports": {
+          "estimate": -0.004736198481036963,
+          "hc0_se": 0.024321784573748093,
+          "z": -0.19473071421531363,
+          "p_value": 0.8456037657058465
+        },
+        "corporate_lending": {
+          "estimate": 0.011838771898737539,
+          "hc0_se": 0.05995868289766724,
+          "z": 0.1974488318721581,
+          "p_value": 0.8434763193752829
+        },
+        "household_lending": {
+          "estimate": 0.12134639261868199,
+          "hc0_se": 0.05153323853199618,
+          "z": 2.354720876766554,
+          "p_value": 0.01853662363035043
+        },
+        "consumption": {
+          "estimate": 0.03567690020900096,
+          "hc0_se": 0.028321489126422458,
+          "z": 1.25971131142664,
+          "p_value": 0.2077735233717607
+        },
+        "ru_key_rate": {
+          "estimate": -0.16514712742971585,
+          "hc0_se": 0.13457749164641947,
+          "z": -1.2271526643074397,
+          "p_value": 0.2197652168789842
+        },
+        "cn_policy_rate": {
+          "estimate": -0.747093120120379,
+          "hc0_se": 2.0195765675854287,
+          "z": -0.3699256230792927,
+          "p_value": 0.7114379091550146
+        },
+        "ecb_deposit_rate": {
+          "estimate": -1.0517835267732851,
+          "hc0_se": 0.333913382588703,
+          "z": -3.1498693422204553,
+          "p_value": 0.0016334349591370673
+        }
+      },
+      "wald_hc0": {
+        "statistic": 17.402612542042906,
+        "df": 3,
+        "p_value": 0.0005839964204678067,
+        "p_value_holm": 0.001451200311068814
+      },
+      "vif": {
+        "inflation": 2.4325964391113004,
+        "exports": 2.1826922598833587,
+        "imports": 2.3864349181640914,
+        "corporate_lending": 4.558068835091846,
+        "household_lending": 4.37654212928481,
+        "consumption": 1.318263111902971,
+        "ru_key_rate": 2.511563663669009,
+        "cn_policy_rate": 8.149266742826658,
+        "ecb_deposit_rate": 3.9414547899240566
+      },
+      "lr": {
+        "statistic": 26.00243888628023,
+        "df": 3,
+        "p_value": 9.5261995280716e-06
+      },
+      "holdout": {
+        "rmse": 0.9400133838149428,
+        "rmse_ratio_to_always_hold": 1.5073748662360924,
+        "rps": 0.3162563827707459,
+        "rps_always_hold": 0.19444444444444445,
+        "rmse_ratio_to_frozen": 1.5150972220237797,
+        "dm_squared_error_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.4986904546984885,
+          "statistic": 2.9283407864244646,
+          "p_value": 0.009381309753854029
+        },
+        "dm_rps_vs_frozen": {
+          "n": 18,
+          "mean_loss_difference": 0.1620556892103768,
+          "statistic": 3.3737498243763775,
+          "p_value": 0.003606924856059533
+        }
+      }
+    }
+  },
+  "coefficient_changes": {
+    "plus_ru_key_rate": {
+      "inflation": {
+        "estimate_change": 0.021183046944661374,
+        "relative_change": 0.5503886436656201,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "exports": {
+        "estimate_change": 0.014620383702427785,
+        "relative_change": 1.1136553990862126,
+        "sign_flip": 0,
+        "significance_change": 1
+      },
+      "imports": {
+        "estimate_change": -0.023986949452887766,
+        "relative_change": -5.408842283275811,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "corporate_lending": {
+        "estimate_change": 0.04810249592872458,
+        "relative_change": 0.9220651801261993,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "household_lending": {
+        "estimate_change": 0.010356402751017818,
+        "relative_change": 0.14880134504897768,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "consumption": {
+        "estimate_change": 0.02885483121389206,
+        "relative_change": 5.709234089719706,
+        "sign_flip": 1,
+        "significance_change": 0
+      }
+    },
+    "plus_cn_policy_rate": {
+      "inflation": {
+        "estimate_change": -0.02261908476210537,
+        "relative_change": -0.5877005048280075,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "exports": {
+        "estimate_change": -0.007752928172106596,
+        "relative_change": -0.5905515541401544,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "imports": {
+        "estimate_change": 0.0016425218993274876,
+        "relative_change": 0.37037397847267556,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "corporate_lending": {
+        "estimate_change": 0.05694042813658527,
+        "relative_change": 1.0914773778894742,
+        "sign_flip": 1,
+        "significance_change": 0
+      },
+      "household_lending": {
+        "estimate_change": 0.05769787710525476,
+        "relative_change": 0.8290061642194,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "consumption": {
+        "estimate_change": 0.007415549298137641,
+        "relative_change": 1.4672450007796753,
+        "sign_flip": 1,
+        "significance_change": 0
+      }
+    },
+    "plus_ecb_deposit_rate": {
+      "inflation": {
+        "estimate_change": 0.025470591878883793,
+        "relative_change": 0.661789805508242,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "exports": {
+        "estimate_change": -0.016941855009150603,
+        "relative_change": -1.2904851668389077,
+        "sign_flip": 1,
+        "significance_change": 0
+      },
+      "imports": {
+        "estimate_change": 0.010498729296444855,
+        "relative_change": 2.3673694335667608,
+        "sign_flip": 1,
+        "significance_change": 0
+      },
+      "corporate_lending": {
+        "estimate_change": 0.06608700484925076,
+        "relative_change": 1.2668059079640595,
+        "sign_flip": 1,
+        "significance_change": 0
+      },
+      "household_lending": {
+        "estimate_change": 0.07167673964351923,
+        "relative_change": 1.0298552039831435,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "consumption": {
+        "estimate_change": 0.034369223494270455,
+        "relative_change": 6.800315030649491,
+        "sign_flip": 1,
+        "significance_change": 0
+      }
+    },
+    "plus_all_three": {
+      "inflation": {
+        "estimate_change": 0.043666583202071806,
+        "relative_change": 1.1345672586614026,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "exports": {
+        "estimate_change": -0.0074392278212284295,
+        "relative_change": -0.5666565527119294,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "imports": {
+        "estimate_change": -0.0003014325557934728,
+        "relative_change": -0.06797034181165326,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "corporate_lending": {
+        "estimate_change": 0.06400698838224143,
+        "relative_change": 1.2269345723651695,
+        "sign_flip": 1,
+        "significance_change": 0
+      },
+      "household_lending": {
+        "estimate_change": 0.05174754089050018,
+        "relative_change": 0.7435114172946432,
+        "sign_flip": 0,
+        "significance_change": 0
+      },
+      "consumption": {
+        "estimate_change": 0.04073096363685187,
+        "relative_change": 8.059052724269327,
+        "sign_flip": 1,
+        "significance_change": 0
+      }
+    }
+  },
+  "tests": {
+    "wald": "HC0 Wald test that the added control slopes are zero; Holm over the four extended specifications",
+    "lr": "likelihood ratio against the frozen fit (classical, not robust)",
+    "dm": "HLN-corrected Diebold-Mariano, extended model minus frozen model; a negative mean difference favours the extended model"
+  },
+  "ols_cross_check": {
+    "six_factors": {
+      "n": 71,
+      "r2": 0.18636218376303115,
+      "coefficients": {
+        "inflation": {
+          "estimate": -0.03215355078141461,
+          "hc1_se": 0.031079899450335468,
+          "p_value": 0.30088150799909863
+        },
+        "exports": {
+          "estimate": 0.0012207985310867602,
+          "hc1_se": 0.0031161024150388084,
+          "p_value": 0.6952274309830503
+        },
+        "imports": {
+          "estimate": 0.006559149393767364,
+          "hc1_se": 0.005141770592531817,
+          "p_value": 0.20207584983043692
+        },
+        "corporate_lending": {
+          "estimate": 0.014109317547913669,
+          "hc1_se": 0.015064546142886001,
+          "p_value": 0.34896901019366666
+        },
+        "household_lending": {
+          "estimate": 0.01995683638851229,
+          "hc1_se": 0.007512595619291075,
+          "p_value": 0.007896810555818302
+        },
+        "consumption": {
+          "estimate": -0.0014732090377541042,
+          "hc1_se": 0.0048995905692990225,
+          "p_value": 0.7636584985076252
+        }
+      },
+      "same_sign_as_ordered_logit": {
+        "inflation": 0,
+        "exports": 1,
+        "imports": 0,
+        "corporate_lending": 0,
+        "household_lending": 1,
+        "consumption": 1
+      }
+    },
+    "six_factors_plus_all_three": {
+      "n": 71,
+      "r2": 0.2653037480608157,
+      "coefficients": {
+        "inflation": {
+          "estimate": -0.03634655969787997,
+          "hc1_se": 0.03613814669204183,
+          "p_value": 0.3145276075783707
+        },
+        "exports": {
+          "estimate": -0.0006060305296563289,
+          "hc1_se": 0.0037843780507546506,
+          "p_value": 0.8727707447265156
+        },
+        "imports": {
+          "estimate": 0.004936878852210288,
+          "hc1_se": 0.005035769183758191,
+          "p_value": 0.3269072541452448
+        },
+        "corporate_lending": {
+          "estimate": 0.038218940848499604,
+          "hc1_se": 0.029562934000736292,
+          "p_value": 0.1960804771228467
+        },
+        "household_lending": {
+          "estimate": 0.035383278682019896,
+          "hc1_se": 0.02250867139761919,
+          "p_value": 0.11595418582789986
+        },
+        "consumption": {
+          "estimate": 0.006264374428298363,
+          "hc1_se": 0.006801099300422365,
+          "p_value": 0.35700728839029783
+        },
+        "ru_key_rate": {
+          "estimate": -0.042038564066658034,
+          "hc1_se": 0.03548948075321333,
+          "p_value": 0.2362009935085353
+        },
+        "cn_policy_rate": {
+          "estimate": 0.5363455081416487,
+          "hc1_se": 0.8394906205375937,
+          "p_value": 0.5228919011002637
+        },
+        "ecb_deposit_rate": {
+          "estimate": -0.0785502468824526,
+          "hc1_se": 0.07028844335757718,
+          "p_value": 0.2637628994052793
+        }
+      },
+      "same_sign_as_ordered_logit": {
+        "inflation": 0,
+        "exports": 0,
+        "imports": 0,
+        "corporate_lending": 1,
+        "household_lending": 1,
+        "consumption": 1
+      }
+    }
+  },
+  "summary": {
+    "sign_flips": 9,
+    "sign_flips_of_frozen_significant": 0,
+    "frozen_significant_factors": 1,
+    "significance_changes": 1,
+    "controls_significant_after_holm": 3,
+    "extended_specifications": 4,
+    "factor_comparisons": 24,
+    "max_abs_relative_change": 8.059052724269327,
+    "holdout_conclusion_changes": 4,
+    "dm_squared_error_p_below_alpha": 3,
+    "max_vif_all_three": 8.149266742826658,
+    "ols_same_signs_six_factors": 3,
+    "ols_same_signs_with_controls": 3,
+    "ols_significant_six_factors": 1
+  }
+}

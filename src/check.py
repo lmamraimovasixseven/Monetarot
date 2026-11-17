@@ -351,6 +351,10 @@ def run(workdir: Path, verbose: bool = False) -> Report:
     report_module.run(output_dir=outputs, artifact_path=artifact_path, robust_path=workdir / "model" / "robust_eval.json",
                       decisions_path=decisions, model_panel_path=model_panel,
                       version_path=workdir / "model" / "version_comparison.json")
+    print("Re-running exploratory omitted-variable check (D50) ...\n", flush=True)
+    from src import ovb_check
+    ovb_result = ovb_check._clean(ovb_check.run(model_panel_path=model_panel, decisions_path=decisions, artifact_path=artifact_path))
+    (outputs / "ovb_check.md").write_text(ovb_check.report(ovb_result), encoding="utf-8", newline="\n")
 
     report = Report()
     compare_panel(report, "data/processed/nbk_decisions_clean.csv", COMMITTED_DECISIONS, decisions, number_tol)

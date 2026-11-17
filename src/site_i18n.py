@@ -170,6 +170,8 @@ PHRASES: dict[str, str] = {
     "курс Банка России публикуется по рабочим дням РФ → среднее по опубликованным дням; дни не выравниваются с USD/KZT":
         "the Bank of Russia rate is published on Russian working days → mean over the published days; days are not aligned "
         "with USD/KZT",
+    "ECB Data Portal даёт значение на каждый календарный день → средняя по календарным дням (external_data.monthly_step_rate); только контроль в исследовательской проверке пропущенных переменных (D50), не в коридоре":
+        "the ECB Data Portal gives a value for every calendar day → mean over the calendar days (external_data.monthly_step_rate); used only as a control in the exploratory omitted-variable check (D50), not in the corridor",
     "BIS даёт значение на каждый календарный день; пропуск (OBS_STATUS M) записан пустым и остаётся пропуском → средняя по "
     "календарным дням с значением (external_data.monthly_step_rate)":
         "BIS gives a value for every calendar day; a gap (OBS_STATUS M) is written empty and stays a gap → mean over the calendar "
@@ -274,11 +276,11 @@ _PATTERNS: list[tuple[str, str]] = [
     (r"UNKNOWN: нет данных USD/KZT \(data/raw/external/usd_kzt_daily\.csv — шаблон\)",
      "UNKNOWN: no USD/KZT data (data/raw/external/usd_kzt_daily.csv is a template)"),
     (r"UNKNOWN: ряды ставки и инфляции не пересекаются", "UNKNOWN: the rate and inflation series do not overlap"),
-    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47\)\. "
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47, D50\)\. "
      r"Только шаблон: ([\w.]+(?:, [\w.]+)*)\.",
-     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47). Template only: {0}."),
-    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47\)\. Все файлы заполнены\.",
-     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47). All files are filled."),
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47, D50). Template only: {0}."),
+    (r"Источник, URL и дата получения каждого заполненного файла — в config/external_sources\.json \(D46, D47, D50\)\. Все файлы заполнены\.",
+     "The source, URL and retrieval date of every filled file are in config/external_sources.json (D46, D47, D50). All files are filled."),
     # patterns: outlier reasons (src/patterns.py)
     (r"в следующих (\d+) мес\. \(предварительно: меньше (\d+) мес\.\)", "over the next {0} months (provisional: fewer than {1} months),"),
     (r"в следующих (\d+) мес\.", "over the next {0} months,"),

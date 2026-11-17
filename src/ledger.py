@@ -5,7 +5,8 @@
 * каждое скалярное значение блоков продукта в model/artifact.json (decision, forecast_desk, patterns,
   carry_corridor, prereg, reality_check, dashboard);
 * каждый сырой ряд data/raw/*.csv и data/raw/external/*.csv (источник, URL, даты, преобразование);
-* хеши файлов преререгистрации (prereg/).
+* хеши файлов преререгистрации (prereg/);
+* каждое скалярное значение исследовательских расширений model/extensions/*.json (D50), вне артефакта.
 Колонки: id, value, source, series, url, retrieved, release_or_vintage, transformation, script, artifact_field,
 used_in, test. Неизвестное — UNKNOWN. Ничего не оценивает.
 """
@@ -100,8 +101,29 @@ def series_rows(root: Path = ROOT) -> list[dict[str, str]]:
                              source=spec["publisher"], series=spec["title"], url=spec["url"],
                              retrieved=spec.get("retrieved", UNKNOWN), release_or_vintage=spec.get("release", UNKNOWN),
                              transformation=spec.get("transformation", UNKNOWN), script="src/external_data.py",
-                             artifact_field="model/artifact.json#/carry_corridor", used_in="carry corridor",
-                             test="tests/test_external_data.py"))
+                             artifact_field=spec.get("artifact_field", "model/artifact.json#/carry_corridor"),
+                             used_in=spec.get("used_in", "carry corridor"), test="tests/test_external_data.py"))
+    return rows
+
+
+EXTENSIONS_DIR = ROOT / "model" / "extensions"
+EXTENSION_PREFIXES = {"ovb_check.json": ("ovb", "src/ovb_check.py", "tests/test_ovb_check.py")}
+
+
+def extension_rows(directory: Path = EXTENSIONS_DIR) -> list[dict[str, str]]:
+    """Exploratory results kept outside the artifact (D50), so that the artifact hash does not change."""
+    rows = []
+    for name, (prefix, script, test) in EXTENSION_PREFIXES.items():
+        path = Path(directory) / name
+        if not path.is_file():
+            continue
+        for leaf, value in _leaves(json.loads(path.read_text(encoding="utf-8")), ""):
+            rows.append(_row(id=f"{prefix}:{leaf.lstrip('/')}", value=repr(value) if isinstance(value, float) else value,
+                             source=f"model/extensions/{name}", series="exploratory extension (after the holdout was seen)",
+                             url="not applicable (computed)", retrieved="not applicable",
+                             release_or_vintage="current data (no vintages)", transformation="see script", script=script,
+                             artifact_field=f"model/extensions/{name}#{leaf}", used_in="site/evidence.html; site/index.html",
+                             test=test))
     return rows
 
 
@@ -172,7 +194,8 @@ def look_ahead_rows(provenance_path: Path = PROVENANCE_PATH) -> list[dict[str, s
 
 
 def build() -> list[dict[str, str]]:
-    return number_rows() + artifact_rows() + series_rows() + prereg_rows() + log_rows() + look_ahead_rows()
+    return (number_rows() + artifact_rows() + series_rows() + extension_rows() + prereg_rows() + log_rows()
+            + look_ahead_rows())
 
 
 def render(rows: list[dict[str, str]]) -> str:

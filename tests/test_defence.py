@@ -8,12 +8,14 @@ from src import defence_doc
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_defence_doc_is_a_fresh_render_with_40_questions():
+def test_defence_doc_is_a_fresh_render_with_at_least_40_questions():
     text = (ROOT / "docs" / "DEFENCE_QA.md").read_text(encoding="utf-8")
     assert text == defence_doc.render()
     import re
 
-    assert len(re.findall(r"(?m)^\d+\. \*\*", text)) == 40
+    numbers = [int(n) for n in re.findall(r"(?m)^(\d+)\. \*\*", text)]
+    assert len(numbers) >= 40 and numbers == list(range(1, len(numbers) + 1))  # the brief asks for 40; D50 added one
+    assert "**Did you check omitted-variable bias?**" in text
     assert "## Про часть, которую не писала" in text and "{{" not in text
 
 

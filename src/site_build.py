@@ -313,12 +313,136 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
 <div class="box warn" id="look-ahead">{look_ahead_box(L, d["model"], d["look_ahead_sentence"])}</div>
 <h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
-<ul>{risk}</ul><p><a href="methods.html">All model limits</a></p></section>
+<ul>{risk}</ul>{ovb_home_sentence(L)}<p><a href="methods.html">All model limits</a></p></section>
 <section class="action" id="step-7"><h2>7. The ask</h2><p class="answer" id="answer"><strong>{action}.</strong></p>
 <p class="caption">Caveat: this is the binary rule with equal losses from step 2. Under the three-outcome losses the action is: {EN_ACTION[decision['best_action']]}.
 The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></section>
 <script src="assets/app.js"></script>
 """
+
+
+OVB_PATH = ROOT / "model" / "extensions" / "ovb_check.json"
+OVB_SPECS = [("frozen", "Frozen model"), ("plus_ru_key_rate", "+ Russia key rate"), ("plus_cn_policy_rate", "+ China policy rate"),
+             ("plus_ecb_deposit_rate", "+ ECB deposit rate"), ("plus_all_three", "+ all three")]
+OVB_FACTORS = [("inflation", "Inflation"), ("exports", "Exports"), ("imports", "Imports"),
+               ("corporate_lending", "Corporate lending"), ("household_lending", "Household lending"), ("consumption", "Consumption")]
+OVB_CONTROLS = {"ru_key_rate": "Russia key rate", "cn_policy_rate": "China policy rate", "ecb_deposit_rate": "ECB deposit rate"}
+
+
+def _ovb_p(L: Ledger, key: str) -> str:
+    """A p-value from the ledger; below 0.001 it is shown as <0.001 (the ledger keeps the full value)."""
+    value = float(L.raw(key))
+    shown = "&lt;0.001" if value < 0.001 else sd.plain(value, 3)
+    return f'<span class="num" data-ledger="{html.escape(key)}">{shown}</span>'
+
+
+def _ovb_facts(L: Ledger) -> dict[str, Any]:
+    s = lambda name: int(float(L.raw(f"ovb:summary/{name}")))  # noqa: E731
+    frozen_meets = float(L.raw("ovb:specifications/frozen/holdout/rmse_ratio_to_always_hold")) < 1
+    return {"flips": s("sign_flips"), "sig": s("significance_changes"), "controls": s("controls_significant_after_holm"),
+            "specs": s("extended_specifications"), "comparisons": s("factor_comparisons"),
+            "holdout_changes": s("holdout_conclusion_changes"), "frozen_meets": frozen_meets}
+
+
+def ovb_headline(L: Ledger) -> str:
+    """Section heading computed from the results: it says "changes" or "does not change" from the counts in the ledger."""
+    f = _ovb_facts(L)
+    n = lambda name: L.num(f"ovb:summary/{name}")  # noqa: E731
+    if f["flips"] == 0 and f["sig"] == 0:
+        coefficients = "Adding foreign policy rates changes neither the sign nor the 5% significance of any of the six factors"
+    else:
+        coefficients = (f"Adding foreign policy rates changes the sign in {n('sign_flips')} and the 5% significance in "
+                        f"{n('significance_changes')} of {n('factor_comparisons')} factor coefficients "
+                        f"(six factors in {n('extended_specifications')} extended specifications); "
+                        f"{n('sign_flips_of_frozen_significant')} of the sign changes concern the "
+                        f"{n('frozen_significant_factors')} factor(s) significant at 5% in the frozen model")
+    controls = (f"the added rates are significant after Holm in {n('controls_significant_after_holm')} of "
+                f"{n('extended_specifications')} specifications")
+    if f["holdout_changes"] == 0:
+        holdout = "the holdout conclusion against Always Hold is the same in every extended specification"
+    else:
+        state = ("no longer meets the pre-specified criterion (RMSE ratio below 1), which the frozen model meets" if f["frozen_meets"]
+                 else "meets the pre-specified criterion (RMSE ratio below 1), which the frozen model does not meet")
+        holdout = (f"on the holdout, in {n('holdout_conclusion_changes')} of {n('extended_specifications')} specifications "
+                   f"the extended model {state}")
+    return f"{coefficients}; {controls}; {holdout}."
+
+
+def ovb_home_sentence(L: Ledger) -> str:
+    if not OVB_PATH.is_file():
+        return ""
+    return (f'<p id="ovb-risk">Omitted-variable check (exploratory, after the holdout was seen): {ovb_headline(L)} '
+            '<a href="evidence.html#ev-ovb">Details</a></p>')
+
+
+def ovb_section(L: Ledger) -> str:
+    if not OVB_PATH.is_file():
+        return '<h2 id="ev-ovb">Omitted-variable check</h2><p>Not run: model/extensions/ovb_check.json is missing (python run.py ovb).</p>'
+    base = "ovb:specifications"
+    label = json.loads(OVB_PATH.read_text(encoding="utf-8"))["label"]
+    head = "".join(f"<th>{esc(name)}</th>" for _, name in OVB_SPECS)
+    coef_rows = "".join(
+        f"<tr><td>{esc(name)}</td>" + "".join(
+            f"<td>{L.num(f'{base}/{spec}/coefficients/{key}/estimate', 3, signed=True)} "
+            f"(p {_ovb_p(L, f'{base}/{spec}/coefficients/{key}/p_value')})</td>" for spec, _ in OVB_SPECS) + "</tr>"
+        for key, name in OVB_FACTORS)
+    control_rows = "".join(
+        f"<tr><td>{esc(name)}</td><td>" + "; ".join(
+            f"{esc(OVB_CONTROLS[c])} {L.num(f'{base}/{spec}/coefficients/{c}/estimate', 3, signed=True)}"
+            for c in OVB_CONTROLS if f"{base}/{spec}/coefficients/{c}/estimate" in L.values) + "</td>"
+        f"<td>{L.num(f'{base}/{spec}/wald_hc0/statistic', 2)} ({L.num(f'{base}/{spec}/wald_hc0/df')})</td>"
+        f"<td>{_ovb_p(L, f'{base}/{spec}/wald_hc0/p_value_holm')}</td><td>{L.num(f'{base}/{spec}/lr/statistic', 2)}</td>"
+        f"<td>{_ovb_p(L, f'{base}/{spec}/lr/p_value')}</td></tr>"
+        for spec, name in OVB_SPECS[1:])
+    vif_rows = "".join(f"<tr><td>{esc(name)}</td><td>{L.num(f'{base}/plus_all_three/vif/{key}', 2)}</td></tr>"
+                       for key, name in [*OVB_FACTORS, *OVB_CONTROLS.items()])
+
+    def dm(spec: str, name: str) -> str:
+        key = f"{base}/{spec}/holdout/{name}"
+        if f"{key}/statistic" not in L.values:
+            return "—"
+        return f"{L.num(f'{key}/statistic', 2, signed=True)} (p {_ovb_p(L, f'{key}/p_value')})"
+    holdout_rows = "".join(
+        f"<tr><td>{esc(name)}</td><td>{L.num(f'{base}/{spec}/holdout/rmse_ratio_to_always_hold', 3)}</td>"
+        f"<td>{L.num(f'{base}/{spec}/holdout/rps', 3)}</td><td>{dm(spec, 'dm_squared_error_vs_frozen')}</td>"
+        f"<td>{dm(spec, 'dm_rps_vs_frozen')}</td></tr>" for spec, name in OVB_SPECS)
+    ols = "ovb:ols_cross_check"
+    ols_rows = "".join(
+        f"<tr><td>{esc(name)}</td>"
+        f"<td>{L.num(f'{ols}/six_factors/coefficients/{key}/estimate', 3, signed=True)} (p {_ovb_p(L, f'{ols}/six_factors/coefficients/{key}/p_value')})</td>"
+        f"<td>{'yes' if L.raw(f'{ols}/six_factors/same_sign_as_ordered_logit/{key}') == '1' else 'no'}</td>"
+        f"<td>{L.num(f'{ols}/six_factors_plus_all_three/coefficients/{key}/estimate', 3, signed=True)} (p {_ovb_p(L, f'{ols}/six_factors_plus_all_three/coefficients/{key}/p_value')})</td>"
+        f"<td>{'yes' if L.raw(f'{ols}/six_factors_plus_all_three/same_sign_as_ordered_logit/{key}') == '1' else 'no'}</td></tr>"
+        for key, name in OVB_FACTORS)
+    ratios = [(name, float(L.raw(f"{base}/{spec}/holdout/rmse_ratio_to_always_hold")),
+               PALETTE["blue"] if spec == "frozen" else PALETTE["orange"]) for spec, name in OVB_SPECS]
+    frozen_ratio = ratios[0][1]
+    above = sum(r >= 1 for _, r, _ in ratios[1:])
+    lower = sum(r < frozen_ratio for _, r, _ in ratios[1:])
+    chart_title = (f"Holdout RMSE ratio to Always Hold: {above} of {len(ratios) - 1} extended models are at 1 or above, "
+                   f"{lower} of {len(ratios) - 1} are below the frozen model (lower is better)")
+    chart = svg_bars(chart_title, "Bars: holdout RMSE ratio to Always Hold for the frozen model and each extended model.", ratios, height=230)
+    return f"""<h2 id="ev-ovb">Omitted-variable check</h2><div class="box warn">{esc(label)}</div>
+<p class="box info" id="ovb-headline">{ovb_headline(L)}</p>
+<p>Controls: the Bank of Russia key rate, the China policy rate (BIS; LPR 1Y / benchmark lending rate) and the ECB deposit facility
+rate, each as the calendar-day mean of the month in percent, aligned like the six factors to decision month minus
+{L.num('ovb:sample/release_lag_months')}. Same {L.num('ovb:sample/estimation_n')} estimation and {L.num('ovb:sample/holdout_n')}
+holdout decisions as the frozen model; the frozen fit reproduces the artifact coefficients (largest difference
+{L.num('ovb:frozen_reproduction/max_abs_coefficient_difference')}).</p>
+<h3>Six coefficients with each control (estimate, HC0 p-value)</h3>
+<div class="scroll"><table id="ovb-coefficients"><thead><tr><th>Factor</th>{head}</tr></thead><tbody>{coef_rows}</tbody></table></div>
+<h3>Are the added rates significant?</h3>
+<div class="scroll"><table id="ovb-controls"><thead><tr><th>Specification</th><th>Control estimates</th><th>HC0 Wald (df)</th><th>Holm p</th><th>LR</th><th>LR p</th></tr></thead><tbody>{control_rows}</tbody></table></div>
+<p class="caption">Holm adjustment over the four Wald tests. The LR test is classical (not robust).</p>
+<h3>VIF with all three controls</h3>
+<div class="scroll"><table id="ovb-vif"><thead><tr><th>Regressor</th><th>VIF</th></tr></thead><tbody>{vif_rows}</tbody></table></div>
+<h3>Holdout</h3>{chart}
+<div class="scroll"><table id="ovb-holdout"><thead><tr><th>Specification</th><th>RMSE ratio to Always Hold</th><th>RPS</th><th>DM squared error vs frozen</th><th>DM RPS vs frozen</th></tr></thead><tbody>{holdout_rows}</tbody></table></div>
+<p class="caption">DM = Harvey–Leybourne–Newbold-corrected Diebold–Mariano test of the extended model against the frozen model; a positive statistic means a higher loss for the extended model.</p>
+<h3>Cross-check: change of the base rate in percentage points (OLS, HC1)</h3>
+<div class="scroll"><table id="ovb-ols"><thead><tr><th>Factor</th><th>OLS, six factors</th><th>Same sign as ordered logit</th><th>OLS with all three controls</th><th>Same sign as ordered logit</th></tr></thead><tbody>{ols_rows}</tbody></table></div>
+<p class="caption">Same {L.num('ovb:ols_cross_check/six_factors/n')} estimation decisions. Signs agree with the ordered logit for {L.num('ovb:summary/ols_same_signs_six_factors')} of {len(OVB_FACTORS)} factors
+without controls and {L.num('ovb:summary/ols_same_signs_with_controls')} of {len(OVB_FACTORS)} with them. None of the robustness checks RB01–RB09 uses this dependent variable.</p>"""
 
 
 def evidence_page(L: Ledger, artifact: dict) -> str:
@@ -364,6 +488,7 @@ come from the <code>dashboard</code> block of the artifact; the model is not re-
 <p class="caption" id="ev-na">Tests that do not apply to the ordinal model</p>{T('evidence/diagnostics_na', ev['diagnostics_na'])}
 <h2 id="ev-robustness">Robustness specifications</h2>{T('evidence/robustness', ev['robustness'])}<p class="caption">{esc(robustness_caption)}</p>
 <details id="ev-full"><summary>Full results stored in artifact</summary>{full_parts}</details>
+{ovb_section(L)}
 <h2 id="ev-power">Power: minimum detectable effects</h2>{power}
 <h2 id="ev-limitations">Limitations</h2>{''.join(f'<p>{esc(s)}</p>' for s in ev['limitations'])}
 <p class="caption">Generated from config/release_lag.json, docs/facts_to_fill.csv and the raw files by <code>python run.py facts</code>.</p>
