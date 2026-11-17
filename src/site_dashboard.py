@@ -369,7 +369,14 @@ def svg_history(L, d: dict, palette: dict[str, str]) -> str:
     charts.append(step_chart(h["dates"], "dashboard:history/score", len(h["dates"]), -1.2, 1.2,
                              [(-1, "Decrease (-1)"), (0, "Hold (0)"), (1, "Increase (+1)")],
                              "Step line: direction of each NBK decision (−1 decrease, 0 hold, +1 increase).", palette["black"], 230))
-    return (f'<section id="ev-history"><h2>History</h2><figure><figcaption><strong>Base rate, % and decision direction score</strong></figcaption>'
+    # Conclusion title from the plotted series (audit D52): how often the NBK held and the range of the base rate.
+    scores = [int(float(L.raw(f"dashboard:history/score/{i}"))) for i in range(len(h["dates"]))]
+    title = f"The NBK held the rate at {scores.count(0)} of {len(scores)} decisions"
+    if h["base_rate"]:
+        peak = max(range(len(rates)), key=lambda i: rates[i])
+        title += (f"; the base rate ranged from {min(rates):g}% to {max(rates):g}%, "
+                  f"highest from {h['rate_dates'][peak]}")
+    return (f'<section id="ev-history"><h2>History</h2><figure><figcaption><strong>{esc(title)}</strong></figcaption>'
             f'{"".join(charts)}</figure><p class="caption">{esc(h["source"])}</p></section>')
 
 

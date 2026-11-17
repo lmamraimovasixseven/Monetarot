@@ -1692,6 +1692,8 @@
   "dashboard:track_record/score/87",
   "dashboard:track_record/score/88",
   "dashboard:track_record/score/9",
+  "decision:binary_losses/lengthen_but_no_cut",
+  "decision:binary_losses/not_lengthen_but_cut",
   "decision:binary_threshold_p_cut",
   "decision:p_cut",
   "decision:switch_ratio_miss_to_false",
@@ -2016,5 +2018,5 @@
   "reality_check:interval_80/0",
   "reality_check:interval_80/1"
  ],
- "index_bytes_with_assets": 68536
+ "index_bytes_with_assets": 69599
 }

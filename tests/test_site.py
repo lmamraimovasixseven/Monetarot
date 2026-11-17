@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import functools
 import http.server
+import json
 import re
 import shutil
 import subprocess
@@ -418,3 +419,24 @@ def test_look_ahead_counts_on_the_home_page_come_from_ledger_rows():
                 if s["decisions_where_bound_exceeds_window"]}
     assert shown == expected
     assert all(ledger_values[f"lookahead:{feature}"] == value for feature, value in shown.items())
+
+
+def test_step_one_states_cost_of_error_without_this_note_and_who_benefits():
+    """D52: the three Usefulness Test lines of the decision memo on the home page; losses come from the ledger."""
+    home = (SITE / "index.html").read_text(encoding="utf-8")
+    step1 = home.split('id="step-1"', 1)[1].split("</section>", 1)[0]
+    for label in ("Cost of error:", "Without this note:", "Who benefits:"):
+        assert f"<strong>{label}</strong>" in step1
+    assert 'data-ledger="decision:binary_losses/lengthen_but_no_cut"' in step1
+    assert 'data-ledger="decision:binary_losses/not_lengthen_but_cut"' in step1
+    assert "Equal losses is an assumption" in step1 and "not a finding from interviews" in step1
+
+
+def test_history_chart_title_states_a_conclusion_computed_from_the_data():
+    history = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))["dashboard"]["history"]
+    evidence = (SITE / "evidence.html").read_text(encoding="utf-8")
+    title = re.search(r'id="ev-history"><h2>History</h2><figure><figcaption><strong>(.*?)</strong>', evidence).group(1)
+    holds = sum(1 for v in history["score"] if int(v) == 0)
+    assert title.startswith(f"The NBK held the rate at {holds} of {len(history['score'])} decisions")
+    if history["base_rate"]:
+        assert f"to {max(history['base_rate']):g}%" in title

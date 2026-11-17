@@ -299,7 +299,12 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <p class="summary">{esc(d['intro'])} The forecast is turned into a duration decision with an explicit loss function, and the holdout comparison with Always Hold is shown as prominently as the forecast.</p>
 <p class="links">This page is static and fast; there is also an {render_link}. Detailed tables are on the <a href="evidence.html">Evidence</a> page.</p>
 {sd.context_strip(d)}</section>
-<section id="step-1"><h2>1. The decision</h2><p>{esc(tr(decision['decision']))}</p></section>
+<section id="step-1"><h2>1. The decision</h2><p>{esc(tr(decision['decision']))}</p>
+<ul id="usefulness">
+<li><strong>Cost of error:</strong> lengthening duration when no cut follows costs {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} unit; not lengthening before a cut costs {L.num('decision:binary_losses/not_lengthen_but_cut', 1)} unit (relative units, not tenge; <code>config/decision_losses.json</code>). Equal losses is an assumption: the values are not confirmed by a person yet.</li>
+<li><strong>Without this note:</strong> the holder relies on analysts' comments and the NBK's communication, which state no probabilities and have no track record, and by default expects the rate to stay unchanged (Always Hold, the benchmark). This is our assumption, not a finding from interviews.</li>
+<li><strong>Who benefits:</strong> holders of tenge government bonds (bank treasuries, portfolio managers), who see the probability and the threshold at which to act. Who can lose: a holder who lengthens duration and no cut follows, or who does not lengthen before a cut.</li>
+</ul></section>
 <section id="step-2"><h2>2. The tension</h2><p>{obvious}</p><p>{complication}</p>
 <p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}</section>
 <section id="step-3"><h2>3. The evidence</h2>{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
