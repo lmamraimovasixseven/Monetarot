@@ -98,3 +98,12 @@ The assistant did not write or change either file. Both already contain your ear
 - **Calendar.** `config/forecast_rounds.json` still lists 2026-10-23, which has passed (the dashboard ignores past dates, so 2026-12-04 is shown as the next decision). The NBK schedule page checked on 2026-11-09 lists no 2027 dates, so the second next decision date is UNKNOWN; add it once the NBK publishes the 2027 schedule.
 
 - **Render address of the interactive version: done (2026-11-14).** The owner gave https://monetarot.onrender.com/; it is recorded in `config/site_links.json` (`render_url`), the home page link "интерактивная версия" and README point to it.
+
+## Site design (D57)
+
+- **Source of the Muted Steel colour `#8FA3B8`: UNKNOWN.** The D57 brief says it was read from a PDF; no PDF with the palette is in the repository, so the hex was used as given (it passes WCAG AA: 6.72:1 on `#101A2B`, 5.73:1 on `#19283D`). If you have the source, check the hex against it and, if it differs, change `--steel` in `src/site_assets/style.css` and `PALETTE["black"]` in `src/site_dashboard.py` as described in `docs/site_design.md`, then run `python run.py site` and the tests.
+
+## Site design (D58)
+
+- **Muted Steel `#8FA3B8` (the D57 item above) is no longer used on the site.** D58 replaced the D57 palette with the Hallmark Editorial theme. The question of its source only matters if the dark theme comes back.
+- **Bricolage Grotesque has no release tag.** The font was downloaded from the repository `ateliertriay/bricolage` at commit `8070cdb6a383aafd10792111cd94e4d472aa0f0c` (URL and sha256 in `docs/site_design.md`). If a tagged release appears, decide whether to switch to it.

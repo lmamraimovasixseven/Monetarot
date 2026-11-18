@@ -28,8 +28,8 @@ Render; **иначе** — статичная страница не может �
 | Статус проверки календаря («CACHED DATA» / «Calendar source responded») | `methods.html#static-limits` | HTML | иначе | NBK calendar check |
 | Вкладки Overview / Drivers and scenario / Evidence / Data and provenance | `methods.html#static-limits` | HTML | иначе | Tabs. |
 | Заголовок «Next scheduled NBK decisions» | `index.html#round-cards` | HTML | перенесено | Next scheduled NBK decisions |
-| Карточка Round 1: дата, полоски Increase / Hold / Decrease, проценты, 95% CI | `index.html#round-1` | число + JS | перенесено | ROUND 1 |
-| Карточка Round 2 (дата не подтверждена, те же вероятности) | `index.html#round-2` | число + JS | перенесено | SECOND NEXT DECISION |
+| Карточка Round 1: дата, полоски Increase / Hold / Decrease, проценты, 95% CI | `index.html#round-1` | число + JS | перенесено | Round 1 |
+| Карточка Round 2 (дата не подтверждена, те же вероятности) | `index.html#round-2` | число + JS | перенесено | Second next decision |
 | Подпись карточки «Latest factor data as of … calibration is unverified» | `index.html#round-1` | число | перенесено | Conditional model estimates; calibration is unverified. |
 | Подпись «Both rounds use the latest available factor values …» | `index.html#rounds-caption` | число | перенесено | the probabilities are identical and only the date differs |
 | Сообщение календаря («Fewer than two confirmed future decision dates …») | `index.html#rounds-message` | JS | перенесено | Fewer than two confirmed future decision dates are available. |

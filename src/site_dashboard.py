@@ -19,7 +19,20 @@ from src.site_i18n import tr as english
 # единственный признак — у каждой полосы подпись и значок (▲ ■ ▼).
 CLASS_TONE = {"Increase": "tone-increase", "Hold": "tone-hold", "Decrease": "tone-decrease"}
 CLASS_MARK = {"Increase": "▲", "Hold": "■", "Decrease": "▼"}
-CLASS_COLOUR = {"Increase": "#009E73", "Hold": "#6E6E6E", "Decrease": "#D55E00"}
+# D57/D58: one chart palette for the whole site (site_build and site_interactive import it). D58 sets it on the editorial
+# paper (#F7F5F0): "blue" is the model series in ink-2, "ink" the actual series and cursor in ink, "black" the axis labels
+# (muted), "shade" the holdout band, light enough that every class mark keeps 3:1 on it. Increase, Hold grey and Decrease
+# keep their values; orange and sky keep their OKLCH hue and are darkened to 3:1 (docs/site_design.md has the ratios).
+PALETTE = {"blue": "#2A2B31", "orange": "#B87F06", "vermillion": "#D55E00", "green": "#009E73", "sky": "#3293C6",
+           "grey": "#6E6E6E", "black": "#615D57", "shade": "#F3F0E9", "ink": "#0C0D12", "grid": "#D0CDC7"}
+CLASS_COLOUR = {"Increase": PALETTE["green"], "Hold": PALETTE["grey"], "Decrease": PALETTE["vermillion"]}
+
+
+def key_colour(colour: str) -> str:
+    """Legend swatch colour as the stylesheet token of the same palette entry (--chart-<key> in style.css), so no colour
+    literal sits in an HTML style attribute (D57). A colour outside the palette is returned unchanged."""
+    name = next((k for k, v in PALETTE.items() if v.lower() == colour.lower()), None)
+    return f"var(--chart-{name})" if name else colour
 DISPLAY = ["Increase", "Hold", "Decrease"]
 
 
@@ -118,7 +131,7 @@ def headline(L, d: dict) -> str:
 <p class="m-cap">95% band: {L.num('dashboard:band/0', 3, signed=True)} to {L.num('dashboard:band/1', 3, signed=True)}</p><p class="m-cap">{esc(d['direction_flag'])}</p></div>
 <div class="metric"><p class="m-label">Change versus previous decision</p><p class="m-value">{L.num('dashboard:score_change', 3, signed=True)}</p>
 <p class="m-cap">Versus the decision of {esc(d['previous_decision'])}</p></div>
-<div class="metric"><p class="m-label">Most likely next outcome</p><p class="m-value">{esc(most)} · {L.num(f'dashboard:probabilities/{most}', 1, pct=True)}</p>
+<div class="metric"><p class="m-label">Most likely next outcome</p><p class="m-value"><span>{esc(most)}</span> <span>{L.num(f'dashboard:probabilities/{most}', 1, pct=True)}</span></p>
 <p class="m-cap">Most likely at the next decision: {esc(most)} ({L.num(f'dashboard:probabilities/{most}', 1, pct=True)}); conditional model estimate, calibration unverified</p></div>
 <div class="metric"><p class="m-label">Next scheduled decision</p><p class="m-value" id="next-decision">{esc(short_date(first))}</p>
 <p class="m-cap">Announcement date from the NBK calendar in config/forecast_rounds.json</p></div></div>"""
@@ -142,8 +155,8 @@ def round_card(L, number: int, day: date | None, d: dict) -> str:
             f'<span class="probability-fill {CLASS_TONE[label]}" style="width:{max(0.0, min(100.0, value * 100)):.1f}%"></span></span>'
             f'<span class="probability-value">{L.num(f"dashboard:probabilities/{label}", 1, pct=True)}</span>'
             f'<span class="probability-interval">95% CI {L.num(f"dashboard:intervals/{label}/0", 1, pct=True)}–{L.num(f"dashboard:intervals/{label}/1", 1, pct=True)}</span></div>')
-    head = "NEXT DECISION" if number == 1 else "SECOND NEXT DECISION"
-    return (f'<section class="forecast-card" id="round-{number}"><div class="forecast-card-head">ROUND {number} &nbsp;·&nbsp; {head}</div>'
+    head = "Next decision" if number == 1 else "Second next decision"
+    return (f'<section class="forecast-card" id="round-{number}"><div class="forecast-card-head"><span>Round {number}</span> <span>{head}</span></div>'
             f'<h3 class="forecast-date" data-round="{number}">{esc(long_date(day))}</h3>{"".join(rows)}'
             f'<div class="forecast-card-foot">{esc(d["card_foot"])}</div></section>')
 
@@ -286,14 +299,15 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
             parts.append(f'<rect x="{cx - 3:.1f}" y="{cy - 3:.1f}" width="6" height="6" fill="{colour}">{tip}</rect>')
         parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {signed(score, 3)}</title></circle>')
     # Date slider (D54): a cursor line that app.js moves; hidden until the script runs, so the static chart is unchanged.
-    parts.append(f'<line id="tr-cursor" x1="0" y1="{top}" x2="0" y2="{height - bottom}" stroke="{palette["black"]}" '
+    parts.append(f'<line id="tr-cursor" x1="0" y1="{top}" x2="0" y2="{height - bottom}" stroke="{palette["ink"]}" '
                  'stroke-width="1.5" stroke-dasharray="3 3" visibility="hidden" pointer-events="none" aria-hidden="true"/>')
     parts.append("</svg>")
     title = track_record_title(L, tr)
-    legend = ('<p class="legend"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
+    legend = (f'<p class="legend"><span class="key" style="border-color:{key_colour(palette["blue"])}">Model score, prediction (−1 cut … +1 hike)</span>'
+              '<span class="legend-group">Actual NBK decision:</span>'
               '<span><span class="mark tone-increase">▲</span> Increase</span><span><span class="mark tone-hold-grey">■</span> Hold</span>'
-              '<span><span class="mark tone-decrease">▼</span> Decrease</span><span class="key" style="border-color:#FFF4D6">Holdout</span></p>')
-    caption = (f"Blue line: the policy pressure score implied by the stored model at each decision. Dots: what the NBK actually "
+              f'<span><span class="mark tone-decrease">▼</span> Decrease</span><span class="key" style="border-color:{key_colour(palette["shade"])}">Holdout</span></p>')
+    caption = (f"Dark line: the policy pressure score implied by the stored model at each decision. Dots: what the NBK actually "
                f"decided (−1 cut, 0 hold, +1 hike). Shaded: holdout from {tr['holdout_start']}, where the frozen model is "
                "forecasting out of sample; earlier values are in-sample fits and flatter the model. A useful score would sit "
                "above zero before hikes and below zero before cuts.")
@@ -314,7 +328,8 @@ def track_slider(L, d: dict) -> str:
                        "p": {c: float(L.raw(f"dashboard:probabilities/{c}")) for c in ("Decrease", "Hold", "Increase")},
                        "band": [float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))]},
             # D56: colours of the redrawn chart (the same palette as the static SVG).
-            "colors": {"line": "#0072B2", "shade": "#FFF4D6", "axis": "#6E6E6E", "ink": "#000000", **CLASS_COLOUR}}
+            "colors": {"line": PALETTE["blue"], "shade": PALETTE["shade"], "axis": PALETTE["grey"], "ink": PALETTE["ink"],
+                       "label": PALETTE["black"], **CLASS_COLOUR}}
     ranges = "".join(f'<button type="button" class="pill" data-range="{k}" aria-pressed="{"true" if k == "all" else "false"}">{label}</button>'
                      for k, label in (("all", "All"), ("3y", "Last 3 years"), ("12m", "Last 12 months")))
     toggles = "".join(f'<button type="button" class="pill" data-class="{c}" aria-pressed="true"><span aria-hidden="true" class="mark {CLASS_TONE[c] if c != "Hold" else "tone-hold-grey"}">{CLASS_MARK[c]}</span> {c}</button>'

@@ -377,18 +377,18 @@ function sourceRow(index, id) {
         if (hs <= x1) { g.appendChild(mk("rect", {x: xOf(hs), y: TOP, width: xOf(x1) - xOf(hs), height: H - TOP - BOTTOM, fill: C.shade})); }
         g.appendChild(mk("line", {x1: LEFT, y1: yOf(0), x2: W - RIGHT, y2: yOf(0), stroke: C.axis, "stroke-dasharray": "4 4"}));
         g.appendChild(mk("line", {x1: LEFT, y1: TOP, x2: LEFT, y2: H - BOTTOM, stroke: C.axis}));
-        for (v = -1; v <= 1; v += 0.5) { g.appendChild(mk("text", {x: LEFT - 4, y: yOf(v) + 4, "text-anchor": "end", "font-size": 11, fill: C.ink}, signed(v, 1))); }
+        for (v = -1; v <= 1; v += 0.5) { g.appendChild(mk("text", {x: LEFT - 4, y: yOf(v) + 4, "text-anchor": "end", "font-size": 11, fill: C.label}, signed(v, 1))); }
         var y0 = new Date(x0 * 864e5).getUTCFullYear(), y1 = new Date(x1 * 864e5).getUTCFullYear(), years = [];
         for (k = y0 + 1; k <= y1; k++) { years.push(k); }
         if (years.length >= 2) {
           var step = years.length > 5 ? 2 : 1;
           for (k = step - 1; k < years.length; k += step) {
-            g.appendChild(mk("text", {x: xOf(Date.UTC(years[k], 0, 1) / 864e5), y: H - 12, "text-anchor": "middle", "font-size": 11, fill: C.ink}, String(years[k])));
+            g.appendChild(mk("text", {x: xOf(Date.UTC(years[k], 0, 1) / 864e5), y: H - 12, "text-anchor": "middle", "font-size": 11, fill: C.label}, String(years[k])));
           }
         } else {
           for (k = 0; k < 2; k++) {
             var d = tdata.dates[shown[k === 0 ? 0 : shown.length - 1]];
-            g.appendChild(mk("text", {x: xOf(dayOf(d)), y: H - 12, "text-anchor": k === 0 ? "start" : "end", "font-size": 11, fill: C.ink}, shortDate(d)));
+            g.appendChild(mk("text", {x: xOf(dayOf(d)), y: H - 12, "text-anchor": k === 0 ? "start" : "end", "font-size": 11, fill: C.label}, shortDate(d)));
           }
         }
         var path = shown.map(function (j, n) { return (n ? "L" : "M") + xOf(days[j]).toFixed(1) + "," + yOf(tdata.score[j]).toFixed(1); }).join(" ");
@@ -410,20 +410,10 @@ function sourceRow(index, id) {
         g.appendChild(mk("line", {id: "tr-hover", y1: TOP, y2: H - BOTTOM, stroke: C.axis, "stroke-width": 1, visibility: "hidden", "pointer-events": "none"}));
         g.appendChild(mk("line", {id: "tr-cursor", x1: 0, y1: TOP, x2: 0, y2: H - BOTTOM, stroke: C.ink, "stroke-width": 1.5, "stroke-dasharray": "3 3", visibility: "hidden", "pointer-events": "none"}));
         svg.appendChild(g);
-        if (!reduced) {
-          if (firstDraw && curve.getTotalLength) {
-            var len = curve.getTotalLength();
-            curve.style.strokeDasharray = len;
-            curve.style.strokeDashoffset = len;
-            var start = function () { curve.style.transition = "stroke-dashoffset 1.2s ease-out"; curve.style.strokeDashoffset = "0"; };
-            if (window.IntersectionObserver) {
-              var seen = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); seen.disconnect(); } }, {threshold: 0.3});
-              seen.observe(fig);
-            } else { start(); }
-          } else if (!firstDraw) {
-            g.style.opacity = "0";
-            window.requestAnimationFrame(function () { g.style.opacity = "1"; });
-          }
+        // D57: no draw-in of the line on first view; a redraw after a range change fades in over 120 ms (CSS .tr-plot).
+        if (!reduced && !firstDraw) {
+          g.style.opacity = "0";
+          window.requestAnimationFrame(function () { g.style.opacity = "1"; });
         }
         firstDraw = false;
         showTrack();
@@ -459,7 +449,7 @@ function sourceRow(index, id) {
     }
   }
 
-  /* B. Probability bars of the next decisions (D56): grow into view; overlay of round 2 on round 1. */
+  /* B. Probability bars of the next decisions (D56): overlay of round 2 on round 1 (D57: the bars no longer grow into view). */
   var roundBox = byId("round-cards");
   if (roundBox) {
     var fills = all(".probability-fill", roundBox);
@@ -468,13 +458,6 @@ function sourceRow(index, id) {
       var label = row.querySelector(".probability-label"), value = row.querySelector(".probability-value"), ci = row.querySelector(".probability-interval");
       row.setAttribute("data-tip", (label ? label.textContent.replace(/^\W+/, "") : "") + ": " + (value ? value.textContent : "") + (ci ? " (" + ci.textContent + ")" : ""));
     });
-    if (!reduced && window.IntersectionObserver) {
-      fills.forEach(function (f) { f.style.width = "0%"; });
-      var grow = new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { fills.forEach(function (f) { f.style.width = f.getAttribute("data-w"); }); grow.disconnect(); }
-      }, {threshold: 0.2});
-      grow.observe(roundBox);
-    }
     var layout = byId("round-layout");
     if (layout && byId("round-2")) {
       layout.hidden = false;

@@ -2,3 +2,4 @@
 *.md text eol=lf
 site/** text eol=lf
 src/site_assets/** text eol=lf
+*.woff2 binary

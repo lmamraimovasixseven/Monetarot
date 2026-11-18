@@ -15,8 +15,7 @@ from typing import Any
 
 from src import site_dashboard as sd
 
-PALETTE = {"blue": "#0072B2", "orange": "#E69F00", "vermillion": "#D55E00", "green": "#009E73", "sky": "#56B4E9",
-           "grey": "#6E6E6E", "black": "#000000", "shade": "#FFF4D6"}  # same as site_build.PALETTE (Okabe-Ito)
+PALETTE = sd.PALETTE  # D57: one palette for the site (Okabe–Ito hues tuned for the dark panels)
 Z95 = 1.96  # whiskers drawn as estimate +/- 1.96 x stored HC0 standard error; the interval itself is not stored
 
 
@@ -162,6 +161,8 @@ def onpage_nav(body: str) -> str:
         return body
     links = "".join(f'<li><a href="#{esc(t)}">{esc(label)}</a></li>' for t, label in targets)
     nav = f'<nav class="onpage" aria-label="On this page"><p class="onpage-title">On this page</p><ul>{links}</ul></nav>'
+    if "<!-- onpage -->" in body:  # D57: the home page places the list after its answer panels and research links
+        return body.replace("<!-- onpage -->", nav, 1)
     match = re.search(r"</h1>", body)
     if match:
         return body[:match.end()] + nav + body[match.end():]
@@ -364,15 +365,15 @@ def corridor_band(L, block: dict, hist: dict) -> str:
         if m.endswith("-01") and int(m[:4]) % 2 == 1:
             parts.append(f'<text x="{x(i):.1f}" y="{height - 10}" text-anchor="middle" font-size="11" fill="{PALETTE["black"]}">{m[:4]}</text>')
     parts.append(f'<path id="cb-band" d="{band}" fill="{PALETTE["sky"]}" fill-opacity="0.35" stroke="{PALETTE["blue"]}" stroke-width="1"/>')
-    parts.append(f'<path d="{rate}" fill="none" stroke="{PALETTE["black"]}" stroke-width="2"/></svg>')
+    parts.append(f'<path d="{rate}" fill="none" stroke="{PALETTE["ink"]}" stroke-width="2"/></svg>')
     data = {"months": months, "base": [round(b, 6) for b in base], "rate": hist["rate"], "lo": lo, "hi": hi,
             "geom": [width, height, left, right, top, bottom]}
     inside = len(months) - below - above
     title = (f"At the default premium and cap the NBK rate was below the corridor in {below} of {len(months)} months, "
              f"inside in {inside} and above in {above}")
     return (f'<figure id="corridor-band" class="ichart"><figcaption><strong>{esc(title)}</strong></figcaption>{"".join(parts)}'
-            '<p class="legend"><span class="key" style="border-color:#56B4E9">Corridor (your premium and cap)</span>'
-            '<span class="key" style="border-color:#000000">NBK base rate</span></p>'
+            f'<p class="legend"><span class="key" style="border-color:{sd.key_colour(PALETTE["sky"])}">Computed corridor, scenario (your premium and cap)</span>'
+            f'<span class="key" style="border-color:{sd.key_colour(PALETTE["ink"])}">Actual NBK base rate</span></p>'
             f'<p id="cb-out" class="caption" aria-live="polite">Static view: premium {sd.plain(premium, 2)} pp and cap {sd.plain(cap, 2)} pp '
             "(the defaults, user assumptions). With JavaScript the band follows the premium and cap sliders below.</p>"
             "<p class=\"caption\">What-if on stated assumptions, not a model estimate: monthly band = KZ inflation + the higher of the "
@@ -411,8 +412,7 @@ def limit_cards(items: list[tuple[str, str]]) -> str:
     for title, text in items:
         kind = "caution" if any(w in title.lower() for w in CAUTION_WORDS) else "note"
         card = read_card(text, 120) or f"<p>{text}</p>"
-        icon = "⚠" if kind == "caution" else "ℹ"
-        groups[kind].append(f'<article class="limit-card limit-{kind}"><h3><span class="sev" aria-hidden="true">{icon}</span> '
+        groups[kind].append(f'<article class="limit-card limit-{kind}"><h3><span class="sev sev-{kind}" aria-hidden="true"></span> '
                             f'<span class="sev-word">{"Caution" if kind == "caution" else "Note"}:</span> {esc(title)}</h3>{card}</article>')
     out = []
     for kind, label in (("caution", "Cautions"), ("note", "Notes")):
