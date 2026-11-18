@@ -71,6 +71,7 @@ def test_frozen_fit_reproduces_the_artifact(stored):
 OPTIMIZER_PATH = re.compile(r"^/specifications/[^/]+/(coefficients|wald_hc0|lr|log_likelihood|holdout/(?!rps_always_hold))"
                             r"|^/coefficient_changes/[^/]+/[^/]+/(estimate_change|relative_change)$"
                             r"|^/frozen_reproduction/|^/summary/max_abs_relative_change$")
+OPTIMIZER_LABEL_PATH = re.compile(r"^/specifications/[^/]+/optimizer$")
 
 
 def _leaves_all(value, path=""):
@@ -88,11 +89,24 @@ def test_committed_results_equal_a_fresh_run(stored, fresh):
     committed, rebuilt = dict(_leaves_all(stored)), dict(_leaves_all(fresh))
     assert committed.keys() == rebuilt.keys()
     for key, value in committed.items():
-        if isinstance(value, float) or isinstance(rebuilt[key], float):
+        if OPTIMIZER_LABEL_PATH.search(key):
+            # D55: the optimizer label depends on the platform (BFGS may stop early and Newton finish the fit);
+            # any of the module's labels is accepted, the numbers are checked within the tolerance below.
+            assert value in ovb_check.OPTIMIZER_LABELS and rebuilt[key] in ovb_check.OPTIMIZER_LABELS, (key, value, rebuilt[key])
+        elif isinstance(value, float) or isinstance(rebuilt[key], float):
             rel, abs_ = (1e-4, 1e-4) if OPTIMIZER_PATH.search(key) else (1e-9, 1e-12)
             assert same_within_float_tolerance(value, rebuilt[key], rel=rel, abs_=abs_), (key, value, rebuilt[key])
         else:
             assert value == rebuilt[key], (key, value, rebuilt[key])
+
+
+def test_optimizer_label_is_the_only_platform_dependent_text_field(stored):
+    """D55: every text field other than the optimizer label must match exactly; the label takes one of the known values."""
+    texts = {k: v for k, v in _leaves_all(stored) if isinstance(v, str) and OPTIMIZER_LABEL_PATH.search(k)}
+    assert set(texts) == {f"/specifications/{s}/optimizer" for s in stored["specifications"]}
+    assert set(texts.values()) <= set(ovb_check.OPTIMIZER_LABELS)
+    assert "optimizer" not in (ROOT / "outputs" / "ovb_check.md").read_text(encoding="utf-8").lower()
+    assert all(stored["specifications"][s]["converged"] for s in stored["specifications"])
 
 
 def _verdicts(result: dict) -> dict:

@@ -51,6 +51,9 @@ CONTROLS = {"ru_key_rate": "Bank of Russia key rate",
             "ecb_deposit_rate": "ECB deposit facility rate"}
 SPECIFICATIONS = {"frozen": [], "plus_ru_key_rate": ["ru_key_rate"], "plus_cn_policy_rate": ["cn_policy_rate"],
                   "plus_ecb_deposit_rate": ["ecb_deposit_rate"], "plus_all_three": list(CONTROLS)}
+# Which optimizer produced a fit depends on the platform and the library versions (D33/D34): BFGS may stop early on one
+# platform and be finished by Newton there, with estimates equal within the cross-platform tolerance (D55).
+OPTIMIZER_LABELS = ("bfgs", "newton (after BFGS did not converge)")
 LABEL = ("Exploratory: added on 2026-11-16 after the holdout had been seen, at the instructor's request. "
          "The frozen specification, its holdout verdict and the pre-registration do not change.")
 
@@ -112,8 +115,7 @@ def fit_specification(train: pd.DataFrame, holdout: pd.DataFrame, controls: list
     actual = holdout.y.to_numpy(dtype=int)
     expected = probabilities[:, 2] - probabilities[:, 0]
     result = {"controls": controls, "converged": converged,
-              "optimizer": ("newton (after BFGS did not converge)" if fitted.mle_settings.get("optimizer") == "newton"
-                            else "bfgs"),
+              "optimizer": OPTIMIZER_LABELS[1] if fitted.mle_settings.get("optimizer") == "newton" else OPTIMIZER_LABELS[0],
               "log_likelihood": float(fitted.llf), "coefficients": coefficients,
               "_squared_error": (expected - actual) ** 2, "_rps": ordinal_rps(probabilities, actual)}
     if controls:
