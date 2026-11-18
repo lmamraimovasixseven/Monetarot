@@ -195,6 +195,21 @@ def fx_block(frame: pd.DataFrame, series: dict[str, pd.Series]) -> dict[str, Any
     return result
 
 
+def history() -> dict[str, Any]:
+    """Monthly inputs of the corridor for the site's band chart (D56): NBK rate, KZ inflation and the higher partner real
+    rate, for the months where Kazakhstan and both partners have data. Only the series that build() already uses, joined
+    by month; nothing is estimated and the artifact block is not changed."""
+    frame = monthly_inputs()
+    series, _ = partner_real_series()
+    if any(not len(s) for s in series.values()):
+        return {"months": [], "rate": [], "inflation": [], "max_partner_real": []}
+    joined = pd.concat([frame["rate"], frame["inflation"], *[s.rename(key) for key, s in series.items()]], axis=1,
+                       join="inner").dropna()
+    return {"months": [str(m) for m in joined.index], "rate": [float(v) for v in joined["rate"]],
+            "inflation": [float(v) for v in joined["inflation"]],
+            "max_partner_real": [float(v) for v in joined[list(series)].max(axis=1)]}
+
+
 def build() -> dict[str, Any]:
     frame = monthly_inputs()
     last = frame.dropna(subset=["rate", "inflation"]).iloc[-1]

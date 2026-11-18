@@ -1853,6 +1853,7 @@
   "ovb:specifications/frozen/coefficients/exports/estimate",
   "ovb:specifications/frozen/coefficients/exports/p_value",
   "ovb:specifications/frozen/coefficients/household_lending/estimate",
+  "ovb:specifications/frozen/coefficients/household_lending/hc0_se",
   "ovb:specifications/frozen/coefficients/household_lending/p_value",
   "ovb:specifications/frozen/coefficients/imports/estimate",
   "ovb:specifications/frozen/coefficients/imports/p_value",
@@ -1869,6 +1870,7 @@
   "ovb:specifications/plus_all_three/coefficients/exports/estimate",
   "ovb:specifications/plus_all_three/coefficients/exports/p_value",
   "ovb:specifications/plus_all_three/coefficients/household_lending/estimate",
+  "ovb:specifications/plus_all_three/coefficients/household_lending/hc0_se",
   "ovb:specifications/plus_all_three/coefficients/household_lending/p_value",
   "ovb:specifications/plus_all_three/coefficients/imports/estimate",
   "ovb:specifications/plus_all_three/coefficients/imports/p_value",
@@ -1903,6 +1905,7 @@
   "ovb:specifications/plus_cn_policy_rate/coefficients/exports/estimate",
   "ovb:specifications/plus_cn_policy_rate/coefficients/exports/p_value",
   "ovb:specifications/plus_cn_policy_rate/coefficients/household_lending/estimate",
+  "ovb:specifications/plus_cn_policy_rate/coefficients/household_lending/hc0_se",
   "ovb:specifications/plus_cn_policy_rate/coefficients/household_lending/p_value",
   "ovb:specifications/plus_cn_policy_rate/coefficients/imports/estimate",
   "ovb:specifications/plus_cn_policy_rate/coefficients/imports/p_value",
@@ -1927,6 +1930,7 @@
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/exports/estimate",
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/exports/p_value",
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/household_lending/estimate",
+  "ovb:specifications/plus_ecb_deposit_rate/coefficients/household_lending/hc0_se",
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/household_lending/p_value",
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/imports/estimate",
   "ovb:specifications/plus_ecb_deposit_rate/coefficients/imports/p_value",
@@ -1950,6 +1954,7 @@
   "ovb:specifications/plus_ru_key_rate/coefficients/exports/estimate",
   "ovb:specifications/plus_ru_key_rate/coefficients/exports/p_value",
   "ovb:specifications/plus_ru_key_rate/coefficients/household_lending/estimate",
+  "ovb:specifications/plus_ru_key_rate/coefficients/household_lending/hc0_se",
   "ovb:specifications/plus_ru_key_rate/coefficients/household_lending/p_value",
   "ovb:specifications/plus_ru_key_rate/coefficients/imports/estimate",
   "ovb:specifications/plus_ru_key_rate/coefficients/imports/p_value",
@@ -2054,5 +2059,5 @@
   "reality_check:interval_80/0",
   "reality_check:interval_80/1"
  ],
- "index_bytes_with_assets": 82675
+ "index_bytes_with_assets": 110720
 }

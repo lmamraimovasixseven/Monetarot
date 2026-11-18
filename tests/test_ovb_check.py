@@ -216,11 +216,15 @@ def test_site_shows_the_section_and_one_home_sentence():
     evidence = (ROOT / "site" / "evidence.html").read_text(encoding="utf-8")
     home = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
     assert 'id="ev-ovb">Omitted-variable check</h2>' in evidence and evidence.count('id="ovb-headline"') == 1
-    assert evidence.count("<svg", evidence.index('id="ev-ovb"')) - evidence.count("<svg", evidence.index("ev-power")) == 1
+    # One chart in the section: from its heading to the next h2 (D56: the page now has an "On this page" list of links).
+    section = evidence.split('id="ev-ovb">', 1)[1].split("<h2", 1)[0]
+    assert section.count("<svg") == 1
     step6 = home.split('id="step-6"', 1)[1].split("</section>", 1)[0]
     sentence = re.findall(r'<p id="ovb-risk">(.*?)</p>', step6, re.S)
     assert len(sentence) == 1 and home.count('id="ovb-risk"') == 1
-    assert re.sub(r"<[^>]+>", "", sentence[0]).count(". ") <= 1
+    # D56: a glossary tip (its own sentence, shown on hover) is not part of the home-page sentence.
+    plain = re.sub(r'<span class="gloss-tip"[^>]*>.*?</span>', "", sentence[0])
+    assert re.sub(r"<[^>]+>", "", plain).count(". ") <= 1
     for page in (ROOT / "site").glob("*.html"):
         text = page.read_text(encoding="utf-8").lower()
         assert not re.search(r"80\s*%[^.<]{0,80}export|export[^.<]{0,80}80\s*%", text), page.name

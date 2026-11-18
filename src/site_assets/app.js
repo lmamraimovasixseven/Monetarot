@@ -190,7 +190,8 @@ function sourceRow(index, id) {
   var clickable = function (root) {
     var nums = (root || document).querySelectorAll("[data-ledger]"), i;
     for (i = 0; i < nums.length; i++) {
-      if ((" " + nums[i].className + " ").indexOf(" src-link ") < 0) {
+      /* chart marks (SVG) open the window by click; keyboard users reach the same numbers in the tables and readouts */
+      if (!nums[i].ownerSVGElement && (" " + nums[i].className + " ").indexOf(" src-link ") < 0) {
         nums[i].className += " src-link";
         nums[i].setAttribute("tabindex", "0");
         nums[i].setAttribute("role", "button");
@@ -248,7 +249,7 @@ function sourceRow(index, id) {
     var list = el("dl"), note = el("p", "Loading the source details ...", "caption");
     var add = function (label, value) { list.appendChild(el("dt", label)); list.appendChild(el("dd", value)); };
     add("Ledger id", id);
-    add("Shown on the page", target.textContent);
+    add("Shown on the page", target.getAttribute("data-shown") || target.textContent);
     var link = el("a", "Download the full evidence ledger (CSV)");
     link.href = csvUrl;
     link.setAttribute("download", "");
@@ -285,17 +286,56 @@ function sourceRow(index, id) {
     if (t && t.getAttribute && t.getAttribute("data-ledger") && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openPop(t); }
   });
 
-  /* Date slider under the track-record chart (D54). */
+  var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var press = function (buttons, chosen) { for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", buttons[j] === chosen ? "true" : "false"); } };
+  var all = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+  var unhide = function (sel, root) { all(sel, root).forEach(function (n) { n.hidden = false; }); };
+
+  /* Shared tooltip for chart bars and probability rows (D56): text from the element's data-tip, i.e. values already shown. */
+  var tip = el("div", "", "chart-tip");
+  tip.setAttribute("aria-hidden", "true");
+  tip.hidden = true;
+  document.body.appendChild(tip);
+  var showTip = function (text, x, y) {
+    tip.textContent = text;
+    tip.hidden = false;
+    var vw = document.documentElement.clientWidth;
+    tip.style.left = Math.max(8, Math.min(x + 12, vw - tip.offsetWidth - 8)) + "px";
+    tip.style.top = Math.max(8, y - tip.offsetHeight - 10) + "px";
+  };
+  var hideTip = function () { tip.hidden = true; };
+  var tipFor = function (e) {
+    var t = e.target.closest ? e.target.closest("[data-tip]") : null;
+    if (!t) { return; }
+    var r = t.getBoundingClientRect();
+    showTip(t.getAttribute("data-tip"), e.clientX || r.left, e.clientY || r.top);
+  };
+  document.addEventListener("mouseover", tipFor);
+  document.addEventListener("focusin", tipFor);
+  document.addEventListener("mouseout", function (e) { if (e.target.closest && e.target.closest("[data-tip]")) { hideTip(); } });
+  document.addEventListener("focusout", hideTip);
+
+  /* A. Track record of the score (D54 slider, D56 chart): the chart is redrawn from the stored series in the page. */
   var trackBox = byId("track-slider");
   if (trackBox) {
-    var pos = byId("tr-pos"), outBox = byId("tr-out"), cursor = byId("tr-cursor"), tdata = null;
-    var dots = document.querySelectorAll("#track-record circle");  /* one dot per decision, in date order */
+    var pos = byId("tr-pos"), outBox = byId("tr-out"), tdata = null, fig = byId("track-record"), svg = fig ? fig.querySelector("svg") : null;
     try { tdata = JSON.parse(byId("track-json").textContent); } catch (err) { tdata = null; }
     trackBox.hidden = false;
-    if (!tdata) {
+    if (!tdata || !svg) {
       pos.disabled = true;
       outBox.textContent = "The date slider could not read its data; the chart above shows every decision.";
     } else {
+      var NS = "http://www.w3.org/2000/svg", C = tdata.colors, W = 640, H = 300, LEFT = 44, RIGHT = 10, TOP = 14, BOTTOM = 34;
+      var NAMES = {"-1": "Decrease", "0": "Hold", "1": "Increase"}, range = "all", firstDraw = true, xOf = null, shown = [];
+      var dayOf = function (s) { var q = s.split("-"); return Date.UTC(+q[0], +q[1] - 1, +q[2]) / 864e5; };
+      var days = tdata.dates.map(dayOf);
+      var yOf = function (v) { return TOP + (H - TOP - BOTTOM) * (1.05 - v) / 2.1; };
+      var mk = function (tag, attrs, text) {
+        var node = document.createElementNS(NS, tag), k;
+        for (k in attrs) { if (attrs.hasOwnProperty(k)) { node.setAttribute(k, attrs[k]); } }
+        if (text) { node.textContent = text; }
+        return node;
+      };
       var num = function (id, text) { var s = el("span", text, "num"); s.setAttribute("data-ledger", id); return s; };
       var line = function (label, parts) {
         var p = el("p"), j;
@@ -304,11 +344,11 @@ function sourceRow(index, id) {
         outBox.appendChild(p);
       };
       var showTrack = function () {
-        var i = parseInt(pos.value, 10), r = trackReadout(tdata, i), s = tdata.stored;
-        if (dots[i]) {
-          cursor.setAttribute("x1", dots[i].getAttribute("cx"));
-          cursor.setAttribute("x2", dots[i].getAttribute("cx"));
-          cursor.setAttribute("visibility", "visible");
+        var i = parseInt(pos.value, 10), r = trackReadout(tdata, i), s = tdata.stored, cursor = byId("tr-cursor");
+        var dot = svg.querySelector('.tr-dot[data-i="' + i + '"]');
+        if (cursor) {
+          cursor.setAttribute("visibility", dot ? "visible" : "hidden");
+          if (dot) { cursor.setAttribute("x1", dot.getAttribute("cx")); cursor.setAttribute("x2", dot.getAttribute("cx")); }
         }
         pos.setAttribute("aria-valuetext", trackValueText(tdata, i));
         outBox.innerHTML = "";
@@ -325,8 +365,304 @@ function sourceRow(index, id) {
         }
         clickable(outBox);
       };
+      var drawTrack = function () {
+        var last = tdata.dates[tdata.dates.length - 1].split("-"), back = range === "3y" ? 3 : (range === "12m" ? 1 : null);
+        var from = back === null ? -Infinity : Date.UTC(+last[0] - back, +last[1] - 1, +last[2]) / 864e5, i, k, v;
+        shown = [];
+        for (i = 0; i < days.length; i++) { if (days[i] >= from) { shown.push(i); } }
+        var x0 = days[shown[0]], x1 = Math.max(days[shown[shown.length - 1]], x0 + 1);
+        xOf = function (d) { return LEFT + (W - LEFT - RIGHT) * (d - x0) / (x1 - x0); };
+        all("svg > :not(title)", fig).forEach(function (n) { n.parentNode.removeChild(n); });
+        var g = mk("g", {"class": "tr-plot"}), hs = Math.max(dayOf(tdata.holdout_start), x0);
+        if (hs <= x1) { g.appendChild(mk("rect", {x: xOf(hs), y: TOP, width: xOf(x1) - xOf(hs), height: H - TOP - BOTTOM, fill: C.shade})); }
+        g.appendChild(mk("line", {x1: LEFT, y1: yOf(0), x2: W - RIGHT, y2: yOf(0), stroke: C.axis, "stroke-dasharray": "4 4"}));
+        g.appendChild(mk("line", {x1: LEFT, y1: TOP, x2: LEFT, y2: H - BOTTOM, stroke: C.axis}));
+        for (v = -1; v <= 1; v += 0.5) { g.appendChild(mk("text", {x: LEFT - 4, y: yOf(v) + 4, "text-anchor": "end", "font-size": 11, fill: C.ink}, signed(v, 1))); }
+        var y0 = new Date(x0 * 864e5).getUTCFullYear(), y1 = new Date(x1 * 864e5).getUTCFullYear(), years = [];
+        for (k = y0 + 1; k <= y1; k++) { years.push(k); }
+        if (years.length >= 2) {
+          var step = years.length > 5 ? 2 : 1;
+          for (k = step - 1; k < years.length; k += step) {
+            g.appendChild(mk("text", {x: xOf(Date.UTC(years[k], 0, 1) / 864e5), y: H - 12, "text-anchor": "middle", "font-size": 11, fill: C.ink}, String(years[k])));
+          }
+        } else {
+          for (k = 0; k < 2; k++) {
+            var d = tdata.dates[shown[k === 0 ? 0 : shown.length - 1]];
+            g.appendChild(mk("text", {x: xOf(dayOf(d)), y: H - 12, "text-anchor": k === 0 ? "start" : "end", "font-size": 11, fill: C.ink}, shortDate(d)));
+          }
+        }
+        var path = shown.map(function (j, n) { return (n ? "L" : "M") + xOf(days[j]).toFixed(1) + "," + yOf(tdata.score[j]).toFixed(1); }).join(" ");
+        var curve = mk("path", {d: path, fill: "none", stroke: C.line, "stroke-width": 2, "class": "tr-line"});
+        g.appendChild(curve);
+        shown.forEach(function (j) {
+          var a = tdata.actual[j], cx = xOf(days[j]), cy = yOf(a), name = NAMES[String(a)];
+          var shape = a === 1 ? mk("path", {d: "M" + cx + "," + (cy - 5) + " L" + (cx + 4.5) + "," + (cy + 3) + " L" + (cx - 4.5) + "," + (cy + 3) + " Z"}) :
+            (a === -1 ? mk("path", {d: "M" + cx + "," + (cy + 5) + " L" + (cx + 4.5) + "," + (cy - 3) + " L" + (cx - 4.5) + "," + (cy - 3) + " Z"}) :
+              mk("rect", {x: cx - 3, y: cy - 3, width: 6, height: 6}));
+          shape.setAttribute("fill", C[name]);
+          shape.setAttribute("class", "m-" + name);
+          g.appendChild(shape);
+        });
+        shown.forEach(function (j) {
+          g.appendChild(mk("circle", {cx: xOf(days[j]).toFixed(1), cy: yOf(tdata.score[j]).toFixed(1), r: 3.5, fill: C.line, "class": "tr-dot",
+            "data-i": j, "data-ledger": "dashboard:track_record/score/" + j, "data-shown": signed(tdata.score[j], 3)}));
+        });
+        g.appendChild(mk("line", {id: "tr-hover", y1: TOP, y2: H - BOTTOM, stroke: C.axis, "stroke-width": 1, visibility: "hidden", "pointer-events": "none"}));
+        g.appendChild(mk("line", {id: "tr-cursor", x1: 0, y1: TOP, x2: 0, y2: H - BOTTOM, stroke: C.ink, "stroke-width": 1.5, "stroke-dasharray": "3 3", visibility: "hidden", "pointer-events": "none"}));
+        svg.appendChild(g);
+        if (!reduced) {
+          if (firstDraw && curve.getTotalLength) {
+            var len = curve.getTotalLength();
+            curve.style.strokeDasharray = len;
+            curve.style.strokeDashoffset = len;
+            var start = function () { curve.style.transition = "stroke-dashoffset 1.2s ease-out"; curve.style.strokeDashoffset = "0"; };
+            if (window.IntersectionObserver) {
+              var seen = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); seen.disconnect(); } }, {threshold: 0.3});
+              seen.observe(fig);
+            } else { start(); }
+          } else if (!firstDraw) {
+            g.style.opacity = "0";
+            window.requestAnimationFrame(function () { g.style.opacity = "1"; });
+          }
+        }
+        firstDraw = false;
+        showTrack();
+      };
+      all("[data-range]", trackBox).forEach(function (b, n, list) {
+        b.addEventListener("click", function () { range = b.getAttribute("data-range"); press(list, b); drawTrack(); });
+      });
+      all("[data-class]", trackBox).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var on = b.getAttribute("aria-pressed") !== "true";
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+          svg.classList.toggle("hide-" + b.getAttribute("data-class"), !on);
+        });
+      });
+      fig.style.position = "relative";
+      svg.style.touchAction = "pan-y";
+      var hover = function (e) {
+        if (!xOf || !svg.getScreenCTM()) { return; }
+        var pt = svg.createSVGPoint(), best = null, gap = Infinity;
+        pt.x = e.clientX; pt.y = e.clientY;
+        var sx = pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+        shown.forEach(function (j) { var dd = Math.abs(xOf(days[j]) - sx); if (dd < gap) { gap = dd; best = j; } });
+        if (best === null) { return; }
+        var hl = byId("tr-hover"), r = trackReadout(tdata, best);
+        hl.setAttribute("x1", xOf(days[best])); hl.setAttribute("x2", xOf(days[best])); hl.setAttribute("visibility", "visible");
+        showTip(shortDate(r.date) + ": score " + r.score + "; the NBK decided: " + r.decision, e.clientX, e.clientY);
+      };
+      svg.addEventListener("pointermove", hover);
+      svg.addEventListener("pointerdown", hover);
+      svg.addEventListener("pointerleave", function () { var hl = byId("tr-hover"); if (hl) { hl.setAttribute("visibility", "hidden"); } hideTip(); });
       pos.addEventListener("input", showTrack);
-      showTrack();
+      drawTrack();
     }
+  }
+
+  /* B. Probability bars of the next decisions (D56): grow into view; overlay of round 2 on round 1. */
+  var roundBox = byId("round-cards");
+  if (roundBox) {
+    var fills = all(".probability-fill", roundBox);
+    fills.forEach(function (f) { f.setAttribute("data-w", f.style.width); });
+    all(".probability-row", roundBox).forEach(function (row) {
+      var label = row.querySelector(".probability-label"), value = row.querySelector(".probability-value"), ci = row.querySelector(".probability-interval");
+      row.setAttribute("data-tip", (label ? label.textContent.replace(/^\W+/, "") : "") + ": " + (value ? value.textContent : "") + (ci ? " (" + ci.textContent + ")" : ""));
+    });
+    if (!reduced && window.IntersectionObserver) {
+      fills.forEach(function (f) { f.style.width = "0%"; });
+      var grow = new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) { fills.forEach(function (f) { f.style.width = f.getAttribute("data-w"); }); grow.disconnect(); }
+      }, {threshold: 0.2});
+      grow.observe(roundBox);
+    }
+    var layout = byId("round-layout");
+    if (layout && byId("round-2")) {
+      layout.hidden = false;
+      var layoutButtons = all("button", layout), note = el("p", "Overlay: filled bars are round 1, outlined bars are round 2.", "caption");
+      note.hidden = true;
+      layout.appendChild(note);
+      layoutButtons.forEach(function (b) {
+        b.addEventListener("click", function () {
+          var overlay = b.getAttribute("data-layout") === "overlay";
+          press(layoutButtons, b);
+          if (overlay && !roundBox.querySelector(".probability-ghost")) {
+            var second = all("#round-2 .probability-fill", roundBox);
+            all("#round-1 .probability-track", roundBox).forEach(function (track, k) {
+              var ghost = el("span", "", "probability-ghost");
+              ghost.style.width = second[k] ? second[k].getAttribute("data-w") : "0%";
+              track.appendChild(ghost);
+            });
+          }
+          roundBox.classList.toggle("overlay", overlay);
+          note.hidden = !overlay;
+        });
+      });
+    }
+  }
+
+  /* C1. Factor effects: sort by model order, size or name (D56). */
+  var fx = byId("fx-chart");
+  if (fx) {
+    unhide(".chart-tools", fx);
+    var fxRows = all(".fx-row", fx), slots = fxRows.map(function (r) { return parseFloat(r.style.transform.split(",")[1]); }).sort(function (a, b) { return a - b; });
+    var sortButtons = all("[data-sort]", fx);
+    sortButtons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        var key = b.getAttribute("data-sort"), order = fxRows.slice(0);
+        order.sort(function (a, c) {
+          if (key === "size") { return parseFloat(c.getAttribute("data-size")) - parseFloat(a.getAttribute("data-size")); }
+          if (key === "name") { return a.getAttribute("data-name") < c.getAttribute("data-name") ? -1 : 1; }
+          return parseInt(a.getAttribute("data-slot"), 10) - parseInt(c.getAttribute("data-slot"), 10);
+        });
+        order.forEach(function (r, k) { r.style.transform = "translate(0px," + slots[k] + "px)"; });
+        press(sortButtons, b);
+      });
+    });
+  }
+
+  /* C2. Frozen model against one extended model (D56). */
+  var ovb = byId("ovb-toggle");
+  if (ovb) {
+    unhide(".chart-tools", ovb);
+    var specButtons = all("[data-spec]", ovb.querySelector(".chart-tools"));
+    var pickSpec = function (spec) {
+      all(".ovb-row, .ovb-readout", ovb).forEach(function (n) {
+        var keep = n.getAttribute("data-spec") === "frozen" || n.getAttribute("data-spec") === spec;
+        n.style.display = keep ? "" : "none";
+      });
+      press(specButtons, specButtons.filter(function (b) { return b.getAttribute("data-spec") === spec; })[0]);
+    };
+    specButtons.forEach(function (b) { b.addEventListener("click", function () { pickSpec(b.getAttribute("data-spec")); }); });
+    if (specButtons.length) { pickSpec(specButtons[0].getAttribute("data-spec")); }
+  }
+
+  /* C3. Click panel with the RMSE ratio and the Diebold-Mariano test (D56). */
+  var hpButton = byId("holdout-toggle"), hpPanel = byId("holdout-panel");
+  if (hpButton && hpPanel) {
+    hpButton.hidden = false;
+    hpPanel.hidden = true;
+    hpButton.setAttribute("aria-expanded", "false");
+    hpButton.addEventListener("click", function () {
+      var open = hpPanel.hidden;
+      hpPanel.hidden = !open;
+      hpButton.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* D. Corridor band over time: follows the premium and cap sliders; what-if arithmetic on stored series (D56). */
+  var cbData = byId("cb-json"), band = byId("cb-band");
+  if (cbData && band && byId("c-prem") && byId("c-cap")) {
+    var cb = JSON.parse(cbData.textContent), gm = cb.geom, nb = cb.months.length;
+    var bx = function (i) { return gm[2] + (gm[0] - gm[2] - gm[3]) * i / (nb - 1); };
+    var by = function (v) { return gm[4] + (gm[1] - gm[4] - gm[5]) * (cb.hi - v) / (cb.hi - cb.lo); };
+    var redrawBand = function () {
+      var prem = parseFloat(byId("c-prem").value), cap = parseFloat(byId("c-cap").value), up = [], lowPts = [], below = 0, above = 0, i;
+      for (i = 0; i < nb; i++) {
+        up.push(bx(i).toFixed(1) + "," + by(cb.base[i] + cap).toFixed(1));
+        lowPts.unshift(bx(i).toFixed(1) + "," + by(cb.base[i] + prem).toFixed(1));
+        if (cb.rate[i] < cb.base[i] + prem) { below += 1; } else if (cb.rate[i] > cb.base[i] + cap) { above += 1; }
+      }
+      band.setAttribute("d", "M" + up.join(" L") + " L" + lowPts.join(" L") + " Z");
+      var lastRate = cb.rate[nb - 1], side = lastRate < cb.base[nb - 1] + prem ? "below the band" : (lastRate > cb.base[nb - 1] + cap ? "above the band" : "inside the band");
+      byId("cb-out").textContent = "What-if on stated assumptions, not a model estimate: with a premium of " + fixed(prem, 2) + " pp and a cap of " +
+        fixed(cap, 2) + " pp (your assumptions), the NBK rate is below the band in " + below + " of " + nb + " months, inside in " +
+        (nb - below - above) + " and above in " + above + "; in " + cb.months[nb - 1] + " it is " + side + ".";
+    };
+    byId("c-prem").addEventListener("input", redrawBand);
+    byId("c-cap").addEventListener("input", redrawBand);
+    redrawBand();
+  }
+
+  /* E. Sortable, filterable tables and the countdown to a pending decision (D56). */
+  all("table.sortable").forEach(function (table) {
+    var body = table.tBodies[0];
+    all("thead th", table).forEach(function (th, col) {
+      var b = el("button", th.textContent, "th-sort");
+      b.type = "button";
+      th.textContent = "";
+      th.appendChild(b);
+      th.setAttribute("aria-sort", "none");
+      b.addEventListener("click", function () {
+        var dir = th.getAttribute("aria-sort") === "ascending" ? -1 : 1, rows = all("tr", body);
+        var key = function (r) { var s = r.cells[col] ? r.cells[col].textContent.trim() : ""; var f = parseFloat(s); return isNaN(f) || !/^[-+]?\d/.test(s) ? s.toLowerCase() : f; };
+        rows.sort(function (a, c) { var x = key(a), y = key(c); return (x < y ? -1 : x > y ? 1 : 0) * dir; });
+        rows.forEach(function (r) { body.appendChild(r); });
+        all("thead th", table).forEach(function (h) { h.setAttribute("aria-sort", "none"); });
+        th.setAttribute("aria-sort", dir === 1 ? "ascending" : "descending");
+      });
+    });
+  });
+  all("input[data-filter]").forEach(function (input) {
+    input.parentNode.hidden = false;
+    var table = byId(input.getAttribute("data-filter"));
+    input.addEventListener("input", function () {
+      var q = input.value.toLowerCase();
+      all("tbody tr", table).forEach(function (r) { r.hidden = q !== "" && r.textContent.toLowerCase().indexOf(q) < 0; });
+    });
+  });
+  all(".countdown[data-target]").forEach(function (span) {
+    var now = new Date(), today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5;
+    var q = span.getAttribute("data-target").split("-"), left = Date.UTC(+q[0], +q[1] - 1, +q[2]) / 864e5 - today;
+    span.textContent += left > 0 ? "; " + left + (left === 1 ? " day" : " days") + " to go (counted in your browser)" :
+      "; the date has passed and the outcome is not in the data yet";
+  });
+
+  /* F1, F4. Read-more cards: the first sentence stays, the rest opens on request (D56). */
+  all("p.read-card").forEach(function (p, k) {
+    var rest = p.querySelector(".card-rest");
+    if (!rest) { return; }
+    rest.id = rest.id || "card-rest-" + k;
+    var b = el("button", "Read more", "read-more");
+    b.type = "button";
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-controls", rest.id);
+    rest.hidden = true;
+    p.appendChild(b);
+    b.addEventListener("click", function () {
+      var open = rest.hidden;
+      rest.hidden = !open;
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+      b.textContent = open ? "Show less" : "Read more";
+    });
+  });
+
+  /* F2. Pipeline: one stage open at a time (D56). */
+  var nodes = all(".pipe-node");
+  if (nodes.length) {
+    var openStage = function (node) {
+      nodes.forEach(function (b) {
+        var on = b === node && b.getAttribute("aria-expanded") !== "true";
+        b.setAttribute("aria-expanded", on ? "true" : "false");
+        byId(b.getAttribute("aria-controls")).hidden = !on;
+      });
+    };
+    nodes.forEach(function (b) { b.setAttribute("aria-expanded", "false"); byId(b.getAttribute("aria-controls")).hidden = true; });
+    nodes.forEach(function (b) { b.addEventListener("click", function () { openStage(b); }); });
+  }
+
+  /* F6. Glossary tips stay on screen; Esc closes the one in focus (D56). */
+  all(".gloss").forEach(function (g) {
+    var place = function () {
+      var t = g.querySelector(".gloss-tip"), vw = document.documentElement.clientWidth;
+      g.classList.remove("gloss-closed");
+      t.style.left = "0px";
+      var r = t.getBoundingClientRect();
+      if (r.right > vw - 8) { t.style.left = (vw - 8 - r.right) + "px"; }
+    };
+    g.addEventListener("mouseenter", place);
+    g.addEventListener("focus", place);
+    g.addEventListener("keydown", function (e) { if (e.key === "Escape") { g.classList.add("gloss-closed"); } });
+  });
+
+  /* F7. "On this page": highlight the section in view (D56). */
+  var onLinks = all("nav.onpage a");
+  if (onLinks.length && window.IntersectionObserver) {
+    var spy = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) { return; }
+        onLinks.forEach(function (a) { if (a.getAttribute("href") === "#" + e.target.id) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); } });
+      });
+    }, {rootMargin: "0px 0px -70% 0px"});
+    onLinks.forEach(function (a) { var t = byId(a.getAttribute("href").slice(1)); if (t) { spy.observe(t); } });
   }
 })();

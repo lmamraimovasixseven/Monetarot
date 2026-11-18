@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from src import site_dashboard as sd
+from src import site_interactive as si
 from src.site_i18n import assert_no_cyrillic, tr
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -297,7 +298,7 @@ def index_page(L: Ledger, artifact: dict) -> str:
                f'<a href="evidence.html#ev-anomalies">Raw-data anomaly screen</a></div>' if d["anomaly_warning"] else
                '<div class="box info" id="anomaly-warning">No flagged raw-data jump enters the latest score.</div>')
     target = re.search(r"\d{4}-\d{2}-\d{2}", rc["target"])
-    return f"""
+    return si.cardify(f"""
 <section class="lead" id="top"><p class="eyebrow">{esc(d['title'])}</p>
 <h1>{esc(question)}</h1>
 <p class="summary">{esc(d['intro'])} The forecast is turned into a duration decision with an explicit loss function, and the holdout comparison with Always Hold is shown as prominently as the forecast.</p>
@@ -313,9 +314,10 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}</section>
 <section id="step-3"><h2>3. The evidence</h2>{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
 <p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p></section>
-<section id="step-4"><h2>4. The forecast</h2>{sd.headline(L, d)}{sd.round_cards(L, d)}{sd.boxes(L, d)}
+<section id="step-4"><h2>4. The forecast</h2>{sd.headline(L, d)}<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden><button type="button" class="pill" data-layout="side" aria-pressed="true">Side by side</button><button type="button" class="pill" data-layout="overlay" aria-pressed="false">Overlay</button></div>{sd.round_cards(L, d)}{sd.boxes(L, d)}
 <p>Expected rate after the decision of {esc(target.group(0) if target else 'the next meeting')}: {L.num('reality_check:expected_rate', 2)}%, 80% range
-{L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.</p></section>
+{L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.</p>
+<h3>Timeline</h3>{si.timeline(forecast_timeline())}</section>
 <section id="step-5"><h2>5. The mechanism</h2><p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}</section>
 <section id="step-6"><h2>6. The risk</h2>
 <div class="box warn" id="freshness" hidden></div>{anomaly}
@@ -327,10 +329,27 @@ def index_page(L: Ledger, artifact: dict) -> str:
 <p class="caption">Caveat: this is the binary rule with equal losses from step 2. Under the three-outcome losses the action is: {EN_ACTION[decision['best_action']]}.
 The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></section>
 <script src="assets/app.js"></script>
-"""
+""")
 
 
-OVB_PATH = ROOT / "model" / "extensions" / "ovb_check.json"
+def forecast_timeline() -> list[tuple[str, str, str, str]]:
+    """F3 (D56): dates read from the repository only: the forecast log entry, the preregistration freeze, the target meeting."""
+    events = []
+    with (ROOT / "docs" / "forecast_log.csv").open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    if rows:
+        logged = rows[-1]["logged_at_utc"][:10]
+        events.append((logged, plain_date(logged), "Forecast logged before the decision", "docs/forecast_log.csv"))
+    freeze = json.loads((ROOT / "prereg" / "freeze.json").read_text(encoding="utf-8")).get("frozen_on")
+    if freeze:
+        events.append((freeze, plain_date(freeze), "Preregistration frozen", "prereg/freeze.json"))
+    if rows:
+        target = rows[-1]["target_decision_date"]
+        events.append((target, plain_date(target), "NBK decision announced; the forecast is scored after it", "config/forecast_rounds.json"))
+    return events
+
+
+OVB_PATH =ROOT / "model" / "extensions" / "ovb_check.json"
 OVB_SPECS = [("frozen", "Frozen model"), ("plus_ru_key_rate", "+ Russia key rate"), ("plus_cn_policy_rate", "+ China policy rate"),
              ("plus_ecb_deposit_rate", "+ ECB deposit rate"), ("plus_all_three", "+ all three")]
 OVB_FACTORS = [("inflation", "Inflation"), ("exports", "Exports"), ("imports", "Imports"),
@@ -528,6 +547,7 @@ def class_metrics_section(L: Ledger) -> str:
                     f"<td>{L.num(f'{base}/merton_cp', 3, signed=True)}</td></tr>")
     return (f'<h2 id="ev-classes">Per-class holdout metrics</h2><div class="box warn">{esc(result["label"])}</div>'
             f'<p class="box info" id="classes-headline">{class_metrics_headline(L)}</p>'
+            + si.recall_chart(L, CLASS_FORECASTERS, classes) +
             f'<div class="scroll"><table id="classes-table"><thead><tr><th>Forecaster</th>{head}<th>Mean class recall</th><th>Merton CP</th></tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table></div>'
             f'<p class="caption">Same {L.num("classm:holdout/n")} holdout decisions as the frozen model. Recall: share of the decisions of a '
@@ -569,11 +589,12 @@ def evidence_page(L: Ledger, artifact: dict) -> str:
     return f"""<h1>Evidence</h1><p>Holdout comparison, falsification, diagnostics, robustness, stress tests and history of the model. The numbers
 come from the <code>dashboard</code> block of the artifact; the model is not re-estimated here.</p>
 <div class="box info" id="ev-summary">{esc(ev['summary'])}</div><p>{esc(ev['inference'])}</p><p>{esc(ev['version_change'])}</p>
-<h2 id="ev-holdout">Holdout comparison</h2>{T('evidence/holdout', ev['holdout'])}
+<h2 id="ev-holdout">Holdout comparison</h2>{T('evidence/holdout', ev['holdout'])}{si.holdout_panel(L)}
 <p class="caption">RPS = ranked probability score (lower is better), exploratory and supplementary; the pre-specified verdict is the RMSE ratio.</p>
 <p class="caption">Always Hold assigns probability zero to Increase and Decrease, so the log score cannot be computed on a holdout that contains them.</p>
 <p class="caption" id="ev-criterion">{criterion} (RMSE ratio {L.num('dashboard:evidence/ratio', 3)}); {distinct}.</p>
 <p class="caption">{esc(ev['verdict_rule'])}</p><p>{esc(ev['rps_sentence'])}</p>
+<h2 id="ev-effects">Factor effects</h2>{si.factor_effects(L, d)}{si.ovb_toggle(L, OVB_SPECS)}
 <h2 id="ev-falsification">Falsification</h2>{T('evidence/falsification', ev['falsification'])}
 <h2 id="ev-diagnostics">Diagnostics</h2>{T('evidence/diagnostics', ev['diagnostics'])}
 <p class="caption" id="ev-na">Tests that do not apply to the ordinal model</p>{T('evidence/diagnostics_na', ev['diagnostics_na'])}
@@ -601,7 +622,23 @@ def methods_page(L: Ledger, artifact: dict) -> str:
 
     decision, d = artifact["decision"], artifact["dashboard"]
     links = site_links()
-    limits = "".join(f"<h3>{esc(tr(i['title']))}</h3><p>{esc(tr(i['text']))}</p>" for i in model_card.limits())
+    # F4 (D56): the limits as grouped cards (caution / note) with an icon and a word, plus the look-ahead warning of the home page.
+    limits = si.limit_cards([(tr(i["title"]), esc(tr(i["text"]))) for i in model_card.limits()]
+                            + [("Look-ahead in the factor dates", look_ahead_box(L, d["model"], d["look_ahead_sentence"]))])
+    target = re.search(r"\d{4}-\d{2}-\d{2}", artifact["reality_check"]["target"])
+    stages = [  # F2 (D56): the existing sentences of the site for each stage, each with a number from the ledger
+        ("data", "Data", "Files to download (CSV, as in the repository) are on the <a href=\"data.html\">Data</a> page. Source fields come "
+         f"from docs/facts_to_fill.csv via <code>python run.py facts</code>; usable decisions: {L.num('n:n_usable')}."),
+        ("model", "Model", f"Ordered logit on {len(d['model']['features'])} factors, frozen specification; holdout = the last "
+         f"{L.num('n:n_holdout')} of {L.num('n:n_usable')} usable decisions."),
+        ("ledger", "Evidence ledger", "Every number has a row in the <a href=\"data/evidence_ledger.csv\">evidence ledger</a>, for example the "
+         f"holdout RMSE ratio {L.num('n:rmse_ratio', 3)}."),
+        ("log", "Forecast log", "Entries are only ever appended; the GitHub commit is the external timestamp. Logged P(cut) for the next "
+         f"decision: {L.num('forecast_log:0:p_decrease')} (<a href=\"forecasts.html\">Forecast log</a>)."),
+        ("reality", "Reality Check", f"Expected rate after the decision of {esc(target.group(0) if target else 'the next meeting')}: "
+         f"{L.num('reality_check:expected_rate', 2)}%, 80% range {L.num('reality_check:interval_80/0', 2)}–"
+         f"{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%."),
+    ]
     render = (f'<p>Address of the Render app: <a href="{esc(links["render_url"])}">{esc(links["render_url"])}</a>.</p>'
               if links["render_url"].startswith("https://") else
               f'<p>The address of the Render app is not recorded in the repository ({esc(links["render_url"])}; see TODO_HUMAN.md). The app '
@@ -612,12 +649,13 @@ def methods_page(L: Ledger, artifact: dict) -> str:
               "come from config/forecast_rounds.json and are chosen in the browser from today's date.</li>"
               "<li><strong>Render time.</strong> The line “Cached dashboard render time” belongs to the Streamlit server; a static "
               "page has none.</li><li><strong>Table sorting.</strong> Streamlit tables sort when you click a column header; here "
-              "they are static, in the same row order.</li><li><strong>Scenario slider.</strong> It is recomputed in the browser with the same "
+              "the forecast-log tables can be sorted and filtered (D56); the other tables are static, in the same row order.</li><li><strong>Scenario slider.</strong> It is recomputed in the browser with the same "
               "formulas (ordered logit and the delta method) as src/app.py; a test checks the match to 1e-6.</li></ul>")
     units = "".join(f"<li>{esc(row[0])}: {esc(row[2])}</li>" for row in aligned_latest(d)["rows"])
     return (f"<h1>Methods and limits</h1><p>Model: ordered logit on {len(d['model']['features'])} factors, frozen specification; holdout = the last "
             f"{L.num('n:n_holdout')} of {L.num('n:n_usable')} usable decisions. {esc(L.raw('n:verdict_inference_sentence'))}</p>"
             f"<p>{esc(L.raw('n:rps_supplementary_sentence'))}</p>"
+            + si.pipeline(stages) +
             f'<h2 id="statuses">Statuses awaiting a person</h2><ul><li>Decision: {esc(tr(decision["decision_status"]))}.</li>'
             f'<li>Losses: {esc(tr(decision["loss_status"]))}. Until they are confirmed, the home page labels p* “with equal losses” '
             "and shows a loss-ratio slider next to it.</li>"
@@ -633,7 +671,7 @@ def methods_page(L: Ledger, artifact: dict) -> str:
               "averages the recalls over the classes with n<sub>k</sub> &gt; 0; Merton CP = (sum of those recalls − 1) / (J − 1) "
               "for the J classes that occur (Kim, Mizen and Thanaset 2006). Always Hold has recall 0 for cuts and hikes and CP 0 by "
               "construction. The pre-specified verdict (RMSE ratio) does not change.</p>"
-            + f"<h2>Limits</h2>{limits}"
+            + f'<h2 id="limits">Limits</h2>{limits}'
             + md_to_html((ROOT / "docs" / "decision_memo.md").read_text(encoding="utf-8")))
 
 
@@ -767,22 +805,53 @@ f"(upper bound set by {'the credit constraint' if block['current'].get('binding_
 f"the NBK rate of {L.num('carry_corridor:nbk_rate', 2)}% is {esc(tr(block['current']['position']))}"}.</p>
 <p>Credit constraint: slope of credit growth 6 months ahead on the real rate {L.num('carry_corridor:credit_constraint/slope', 3)} ({esc(tr(credit['note']))}).</p>
 {regression}
+<h2 id="corridor-history">The corridor over time</h2>{si.corridor_band(L, block, corridor_history())}
+<h2 id="corridor-tool">Scenario tool</h2>
 <form id="corridor" autocomplete="off" data-inflation="{float(block['kz_inflation'])!r}" data-credit="{json.dumps(credit['credit_zero_real_rate'])}" data-partner-data="{partner_data}" data-missing="{esc(missing)}">
 <label>NBK rate, %: <output id="o-rate"></output><input id="c-rate" type="range" min="5" max="25" step="0.25" value="{float(block['nbk_rate'])!r}"></label>
 <label>Russia real rate, %{esc(ru_note)}: <output id="o-ru"></output><input id="c-ru" type="range" min="-5" max="15" step="0.05" value="{ru!r}"></label>
 <label>China real rate, %{esc(cn_note)}: <output id="o-cn"></output><input id="c-cn" type="range" min="-5" max="10" step="0.05" value="{cn!r}"></label>
-<label>Risk premium, pp: <output id="o-prem"></output><input id="c-prem" type="range" min="0" max="6" step="0.25" value="{block['defaults']['premium']!r}"></label>
-<label>Cap on the real differential, pp: <output id="o-cap"></output><input id="c-cap" type="range" min="1" max="12" step="0.25" value="{block['defaults']['cap']!r}"></label>
+<label>Risk premium, pp (your assumption): <output id="o-prem"></output><input id="c-prem" type="range" min="0" max="6" step="0.25" value="{block['defaults']['premium']!r}"></label>
+<label>Cap on the real differential, pp (your assumption): <output id="o-cap"></output><input id="c-cap" type="range" min="1" max="12" step="0.25" value="{block['defaults']['cap']!r}"></label>
 </form><p id="corridor-out" aria-live="polite"></p>
 <p class="caption">Default risk premium and cap: {esc(tr(block['defaults_status']))}.</p>
 <script src="assets/corridor.js"></script><script src="assets/app.js"></script>"""
 
 
+def table_filter(table_id: str, label: str) -> str:
+    """E (D56): a text filter for a sortable table; hidden without JavaScript (the full table is shown)."""
+    return (f'<div class="table-filter" hidden><label for="{table_id}-filter">{esc(label)}</label>'
+            f'<input id="{table_id}-filter" type="search" data-filter="{table_id}" autocomplete="off"></div>')
+
+
+def corridor_history() -> dict:
+    from src import carry_corridor
+    return carry_corridor.history()
+
+
+FORECAST_CLASSES = ["Decrease", "Hold", "Increase"]  # order of p_decrease, p_hold, p_increase (src/forecast_log.py)
+
+
+def forecast_outcomes() -> dict[tuple[str, str], str]:
+    """E (D56): outcomes only from data/processed/forecast_scores.json (python run.py forecast-score); nothing else."""
+    path = ROOT / "data" / "processed" / "forecast_scores.json"
+    scored = json.loads(path.read_text(encoding="utf-8")).get("scored", []) if path.is_file() else []
+    return {(s["target_decision_date"], s["logged_at_utc"]): s["actual"] for s in scored}
+
+
 def forecasts_page(L: Ledger) -> str:
     rows = []
+    outcomes = forecast_outcomes()
     with (ROOT / "docs" / "forecast_log.csv").open(encoding="utf-8", newline="") as handle:
         for i, r in enumerate(csv.DictReader(handle)):
-            rows.append(f"<tr><td>{esc(r['logged_at_utc'])}</td><td>{esc(r['target_decision_date'])}</td><td>{L.num(f'forecast_log:{i}:p_decrease')}</td>"
+            probs = [float(r[f"p_{c.lower()}"]) for c in FORECAST_CLASSES]
+            predicted = FORECAST_CLASSES[probs.index(max(probs))]  # the rule of forecast_log.score: the most probable class
+            outcome = outcomes.get((r["target_decision_date"], r["logged_at_utc"]))
+            outcome_cell = (esc(outcome) if outcome else
+                            f'<span class="countdown" data-target="{esc(r["target_decision_date"])}">pending (decision on '
+                            f'{esc(plain_date(r["target_decision_date"]))})</span>')
+            rows.append(f"<tr><td>{esc(r['logged_at_utc'])}</td><td>{esc(r['target_decision_date'])}</td><td>{predicted}</td><td>{outcome_cell}</td>"
+                        f"<td>{L.num(f'forecast_log:{i}:p_decrease')}</td>"
                         f"<td>{L.num(f'forecast_log:{i}:p_hold')}</td><td>{L.num(f'forecast_log:{i}:p_increase')}</td><td>{L.num(f'forecast_log:{i}:expected_score')}</td>"
                         f"<td><code>{esc(r['artifact_sha256'][:12])}</code></td></tr>")
     desk = []
@@ -791,8 +860,8 @@ def forecasts_page(L: Ledger) -> str:
             desk.append(f"<tr><td>{esc(r['series'])}</td><td>{esc(r['cutoff'])}</td><td>{esc(r['target_month'])}</td><td>{esc(tr(r['method']))}</td>"
                         f"<td>{L.num(f'forecast_ledger:{i}:point', None)}</td><td>{L.num(f'forecast_ledger:{i}:lower_80')}</td><td>{L.num(f'forecast_ledger:{i}:upper_80')}</td></tr>")
     return (f"<h1>Forecast log</h1><p>Entries are only ever appended; the GitHub commit is the external timestamp.</p>"
-            f"<h2>NBK decision (docs/forecast_log.csv)</h2><div class=\"scroll\"><table><thead><tr><th>Logged (UTC)</th><th>Meeting</th><th>P(cut)</th><th>P(hold)</th><th>P(hike)</th><th>Expected score</th><th>Artifact hash</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
-            f"<h2>Series (ledger/forecast_ledger.csv)</h2><div class=\"scroll\"><table><thead><tr><th>Series</th><th>Cutoff</th><th>Month</th><th>Method</th><th>Point</th><th>80% lower</th><th>80% upper</th></tr></thead><tbody>{''.join(desk)}</tbody></table></div>")
+            f"<h2 id=\"log-nbk\">NBK decision (docs/forecast_log.csv)</h2>{table_filter('log-table', 'Filter by meeting, class or outcome')}<div class=\"scroll\"><table id=\"log-table\" class=\"sortable\"><thead><tr><th>Logged (UTC)</th><th>Meeting</th><th>Predicted class</th><th>Outcome</th><th>P(cut)</th><th>P(hold)</th><th>P(hike)</th><th>Expected score</th><th>Artifact hash</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
+            f"<h2 id=\"log-series\">Series (ledger/forecast_ledger.csv)</h2>{table_filter('series-table', 'Filter by series, month or method')}<div class=\"scroll\"><table id=\"series-table\" class=\"sortable\"><thead><tr><th>Series</th><th>Cutoff</th><th>Month</th><th>Method</th><th>Point</th><th>80% lower</th><th>80% upper</th></tr></thead><tbody>{''.join(desk)}</tbody></table></div>")
 
 
 def redteam_page() -> str:
@@ -860,9 +929,12 @@ def build(site: Path = SITE) -> dict[str, Any]:
     started = time.perf_counter()
     artifact = json.loads(ARTIFACT.read_text(encoding="utf-8"))
     L = Ledger()
-    if site.exists():
-        shutil.rmtree(site)
-    (site / "assets").mkdir(parents=True)
+    # Empty site/ but keep the folder itself: a local preview server whose working folder is site/ would block its
+    # removal on Windows (D56). The result is the same: only the files written below remain.
+    site.mkdir(parents=True, exist_ok=True)
+    for child in site.iterdir():
+        shutil.rmtree(child) if child.is_dir() else child.unlink()
+    (site / "assets").mkdir()
     (site / "data").mkdir()
     for name in ("style.css", "app.js", "corridor.js"):
         shutil.copy(ASSETS_SRC / name, site / "assets" / name)
@@ -877,7 +949,7 @@ def build(site: Path = SITE) -> dict[str, Any]:
     contents = {}
     for name, builder in builders.items():
         L.page = name
-        contents[name] = builder()
+        contents[name] = si.onpage_nav(si.glossarize(builder()))  # F6, F7 (D56)
         if "data-ledger=" in contents[name] and "assets/app.js" not in contents[name]:
             contents[name] += '\n<script src="assets/app.js"></script>'  # clickable numbers on every page that has them (D54)
     L.page = ""

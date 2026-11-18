@@ -168,3 +168,154 @@ def test_browser_source_window_and_slider():
             browser.close()
     finally:
         server.shutdown()
+
+
+# ----------------------------------------------------------------------------- D56: visual interactivity
+
+def _page(name: str) -> str:
+    return (SITE / name).read_text(encoding="utf-8")
+
+
+def test_d56_every_feature_has_its_hook_in_the_built_html():
+    home, evidence, methods = _page("index.html"), _page("evidence.html"), _page("methods.html")
+    corridor, log = _page("corridor.html"), _page("forecasts.html")
+    slider = home.split('id="track-slider"', 1)[1].split('id="tr-pos"', 1)[0]
+    assert {"all", "3y", "12m"} <= set(re.findall(r'data-range="(\w+)"', slider))                      # A2
+    assert set(re.findall(r'data-class="(\w+)"', slider)) == {"Increase", "Hold", "Decrease"}          # A3
+    assert '"colors":' in home and "Hover or touch the chart" in home                                   # A1, A4
+    assert 'id="round-layout"' in home and 'data-layout="overlay"' in home                               # B2
+    for hook in ('id="fx-chart"', 'data-sort="size"', 'data-sort="name"', 'id="ovb-toggle"', 'id="rps-chart"',
+                 'id="holdout-panel"', 'id="holdout-toggle"', 'id="recall-chart"'):                       # C1-C4
+        assert hook in evidence, hook
+    assert 'id="corridor-band"' in corridor and 'id="cb-json"' in corridor and corridor.count("(your assumption)") == 2  # D
+    assert "credit constraint is not identified" in corridor
+    assert 'class="sortable"' in log and 'data-filter="log-table"' in log and 'class="countdown"' in log    # E
+    assert 'class="read-card' in home and 'class="timeline"' in home                                    # F1, F3
+    assert methods.count('class="pipe-node"') == 5 and 'class="limit-card limit-caution"' in methods     # F2, F4
+    for page in ("index.html", "evidence.html", "methods.html"):
+        assert 'class="gloss"' in _page(page) and '<nav class="onpage"' in _page(page), page            # F6, F7
+
+
+def test_d56_controls_are_hidden_without_javascript_and_the_static_content_stays():
+    home, evidence, log, methods = _page("index.html"), _page("evidence.html"), _page("forecasts.html"), _page("methods.html")
+    assert '<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden>' in home
+    assert '<div class="chart-tools" role="group" aria-label="Sort the factors" hidden>' in evidence
+    assert 'id="holdout-toggle" aria-expanded="true" aria-controls="holdout-panel" hidden>' in evidence
+    assert '<div id="holdout-panel" class="click-panel"><p>Holdout RMSE ratio' in evidence             # panel text visible without JS
+    assert '<div class="table-filter" hidden>' in log and "pending (decision on" in log                  # countdown fallback text
+    assert not re.search(r'class="pipe-panel"[^>]*hidden', methods) and not re.search(r'class="card-rest"[^>]*hidden', home)
+    assert home.count('<figure id="track-record">') == 1 and home.count('class="tr-dot"') == 0            # the static chart is the fallback
+
+
+def test_d56_chart_data_match_the_artifact_and_the_ledger():
+    import csv as _csv
+
+    artifact = json.loads((ROOT / "model" / "artifact.json").read_text(encoding="utf-8"))
+    with (ROOT / "ledger" / "evidence_ledger.csv").open(encoding="utf-8", newline="") as handle:
+        ledger = {row["id"]: row["value"] for row in _csv.DictReader(handle)}
+    cb = json.loads(re.search(r'id="cb-json">(.*?)</script>', _page("corridor.html")).group(1))
+    block = artifact["carry_corridor"]
+    assert cb["months"][-1] == block["month"] and cb["rate"][-1] == pytest.approx(block["nbk_rate"])
+    assert cb["base"][-1] + block["defaults"]["premium"] == pytest.approx(block["current"]["lower"], abs=1e-6)
+    assert cb["base"][-1] + block["defaults"]["cap"] == pytest.approx(block["current"]["upper"], abs=1e-6)
+    pairs = [pair for page in ("evidence.html", "index.html") for pair in re.findall(r'data-ledger="([^"]+)" data-shown="([^"]+)"', _page(page))]
+    assert pairs
+    for key, shown in pairs:
+        decimals = len(shown.split(".")[-1]) if "." in shown else 0
+        assert float(shown) == pytest.approx(float(ledger[key]), abs=0.5 * 10 ** -decimals + 1e-12), key
+
+
+def test_d56_glossary_sentences_live_in_src_and_each_term_is_explained_once_per_page():
+    import html
+
+    from src import site_interactive as si
+
+    sentences = {sentence for _, sentence in si.GLOSSARY.values()}
+    for page in REPORT["pages"]:
+        tips = re.findall(r'<span class="gloss-tip" role="tooltip" id="gloss-([a-z-]+)">([^<]+)</span>', _page(page))
+        assert len(tips) == len({key for key, _ in tips}), page
+        assert all(html.unescape(text) in sentences for _, text in tips), page
+
+
+def test_d56_site_files_are_lf_and_every_local_link_resolves():
+    for path in SITE.rglob("*"):
+        if path.is_file() and path.suffix in {".html", ".js", ".css", ".json"}:
+            assert b"\r" not in path.read_bytes(), path
+    for page in REPORT["pages"]:
+        text = _page(page)
+        for ref in re.findall(r'(?:href|src)="([^"]+)"', text):
+            if re.match(r"(?:https?:|mailto:|data:)", ref):
+                continue
+            target, _, anchor = ref.partition("#")
+            file = SITE / (target or page)
+            assert file.is_file(), (page, ref)
+            if anchor and file.suffix == ".html":
+                assert f'id="{anchor}"' in file.read_text(encoding="utf-8"), (page, ref)
+        if "data-ledger=" in text:
+            assert (SITE / "data" / f"sources-{page.removesuffix('.html')}.json").is_file(), page
+
+
+def test_d56_two_builds_are_byte_identical(tmp_path):
+    from src import site_build
+
+    first, second = tmp_path / "a", tmp_path / "b"
+    site_build.build(first)
+    site_build.build(second)
+    files = sorted(p.relative_to(first) for p in first.rglob("*") if p.is_file())
+    assert files == sorted(p.relative_to(second) for p in second.rglob("*") if p.is_file())
+    for relative in files:
+        data = (first / relative).read_bytes()
+        assert data == (second / relative).read_bytes(), relative
+        if relative.suffix in {".html", ".json"}:
+            assert b"Math.random" not in data and b"Date.now" not in data, relative
+
+
+def test_d56_browser_smoke_on_every_page_at_two_widths():
+    """Playwright with a local Chrome (skipped where none is installed): zero console errors and warnings, no failed
+    request, no horizontal scroll; a number, a chart point, the slider and a legend item work."""
+    sync_api = pytest.importorskip("playwright.sync_api")
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(SITE))
+    handler.log_message = lambda *a, **k: None
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{server.server_port}"
+    try:
+        with sync_api.sync_playwright() as playwright:
+            try:
+                browser = playwright.chromium.launch(channel="chrome")
+            except Exception as exc:  # noqa: BLE001
+                pytest.skip(f"no local Chrome for Playwright: {exc}")
+            for width in (1280, 360):
+                page = browser.new_page(viewport={"width": width, "height": 900})
+                messages = []
+                page.on("console", lambda m: messages.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+                page.on("pageerror", lambda e: messages.append(f"pageerror: {e}"))
+                page.on("response", lambda r: messages.append(f"{r.status} {r.url}") if r.status >= 400 else None)
+                for name in REPORT["pages"]:
+                    page.goto(f"{base}/{name}", wait_until="load")
+                    assert page.evaluate("() => document.documentElement.scrollWidth <= document.documentElement.clientWidth"), (width, name)
+                    number = page.locator("span[data-ledger]:visible").first
+                    if number.count():
+                        number.click()
+                        page.wait_for_selector("#src-pop dt:has-text('Script')", timeout=5000)
+                        page.keyboard.press("Escape")
+                    assert not messages, (width, name, messages)
+                page.goto(f"{base}/index.html", wait_until="load")
+                page.locator("#track-record").scroll_into_view_if_needed()
+                page.locator("#track-record circle.tr-dot").nth(10).click()
+                page.wait_for_selector("#src-pop dt:has-text('Script')", timeout=5000)
+                assert "dashboard:track_record/score/10" in page.locator("#src-pop").inner_text()
+                page.keyboard.press("Escape")
+                legend = page.locator('#track-slider [data-class="Hold"]')
+                legend.click()
+                assert legend.get_attribute("aria-pressed") == "false"
+                page.locator('#track-slider [data-range="12m"]').click()
+                slider = page.locator("#tr-pos")
+                slider.focus()
+                page.keyboard.press("ArrowLeft")
+                assert "score" in slider.get_attribute("aria-valuetext")
+                assert not messages, (width, messages)
+                page.close()
+            browser.close()
+    finally:
+        server.shutdown()

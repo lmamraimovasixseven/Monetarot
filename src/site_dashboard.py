@@ -287,7 +287,7 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
         parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {signed(score, 3)}</title></circle>')
     # Date slider (D54): a cursor line that app.js moves; hidden until the script runs, so the static chart is unchanged.
     parts.append(f'<line id="tr-cursor" x1="0" y1="{top}" x2="0" y2="{height - bottom}" stroke="{palette["black"]}" '
-                 'stroke-width="1.5" stroke-dasharray="3 3" visibility="hidden" aria-hidden="true"/>')
+                 'stroke-width="1.5" stroke-dasharray="3 3" visibility="hidden" pointer-events="none" aria-hidden="true"/>')
     parts.append("</svg>")
     title = track_record_title(L, tr)
     legend = ('<p class="legend"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
@@ -312,8 +312,19 @@ def track_slider(L, d: dict) -> str:
             "actual": [int(L.raw(f"dashboard:track_record/actual/{i}")) for i in range(n)],
             "stored": {"date": d["latest_decision"],
                        "p": {c: float(L.raw(f"dashboard:probabilities/{c}")) for c in ("Decrease", "Hold", "Increase")},
-                       "band": [float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))]}}
-    return (f'<div id="track-slider" class="track-slider" hidden><label for="tr-pos">Decision date</label>'
+                       "band": [float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))]},
+            # D56: colours of the redrawn chart (the same palette as the static SVG).
+            "colors": {"line": "#0072B2", "shade": "#FFF4D6", "axis": "#6E6E6E", "ink": "#000000", **CLASS_COLOUR}}
+    ranges = "".join(f'<button type="button" class="pill" data-range="{k}" aria-pressed="{"true" if k == "all" else "false"}">{label}</button>'
+                     for k, label in (("all", "All"), ("3y", "Last 3 years"), ("12m", "Last 12 months")))
+    toggles = "".join(f'<button type="button" class="pill" data-class="{c}" aria-pressed="true"><span aria-hidden="true" class="mark {CLASS_TONE[c] if c != "Hold" else "tone-hold-grey"}">{CLASS_MARK[c]}</span> {c}</button>'
+                      for c in DISPLAY)
+    return (f'<div id="track-slider" class="track-slider" hidden>'
+            f'<div class="chart-tools" role="group" aria-label="Period shown on the chart">{ranges}</div>'
+            f'<div class="chart-tools" role="group" aria-label="Decision markers shown on the chart">{toggles}</div>'
+            '<p class="caption">Hover or touch the chart for a decision; click a point for its source. The period is counted back '
+            'from the latest decision in the data.</p>'
+            '<label for="tr-pos">Decision date</label>'
             f'<input id="tr-pos" type="range" min="0" max="{n - 1}" step="1" value="{n - 1}" aria-describedby="tr-hint">'
             '<p id="tr-hint" class="caption">Drag or use the arrow keys.</p>'
             '<div id="tr-out" class="tr-out" aria-live="polite"></div>'
