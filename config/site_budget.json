@@ -1,0 +1,6 @@
+{
+  "note": "Initial-load budget of the home page (index.html + assets/style.css + assets/app.js) for the interactive features of D54. The baseline is index_bytes_with_assets in site/build_report.json at commit aef6813, before D54; tests/test_site_interactivity.py re-reads it from git when the history is available.",
+  "baseline_commit": "aef6813",
+  "baseline_index_bytes_with_assets": 69518,
+  "max_growth_bytes": 15360
+}

@@ -49,6 +49,24 @@ function missedRounds(dates, latest, today) {
   for (i = 0; i < dates.length; i++) { if (dates[i] > latest && dates[i] < today) { out.push(dates[i]); } }
   return out;
 }
+/* Date slider under the track-record chart (D54): reads stored numbers only, computes nothing new. */
+function trackReadout(t, i) {
+  var a = t.actual[i];
+  return {date: t.dates[i], score: signed(t.score[i], 3), decision: a > 0 ? "hike" : (a < 0 ? "cut" : "hold"),
+    sample: t.dates[i] >= t.holdout_start ? "holdout (out of sample)" : "in-sample fit",
+    stored: !!(t.stored && t.stored.date === t.dates[i])};
+}
+function trackValueText(t, i) {
+  var r = trackReadout(t, i);
+  return shortDate(r.date) + ": score " + r.score + ", NBK decision " + r.decision + ", " + r.sample;
+}
+/* One row of a per-page source index (site_build.write_source_index): field name -> text. */
+function sourceRow(index, id) {
+  var refs = index.ids[id], row = {}, i;
+  if (!refs) { return null; }
+  for (i = 0; i < index.fields.length; i++) { row[index.fields[i]] = index.strings[refs[i]]; }
+  return row;
+}
 
 (function () {
   var byId = function (id) { return document.getElementById(id); };
@@ -154,5 +172,161 @@ function missedRounds(dates, latest, today) {
       for (var j = 0; j < blocks.length; j++) { blocks[j].hidden = blocks[j].getAttribute("data-t") !== select.value; }
     };
     select.addEventListener("change", show); select.value = select.options[select.options.length - 1].value; show();
+  }
+
+  /* Clickable numbers (D54): each data-ledger number opens its evidence-ledger row. The per-page index
+     (data/sources-<page>.json) is fetched on the first click only; opened from a file, the window shows the id, the
+     value on the page and the link to the CSV. */
+  if (typeof document.addEventListener !== "function" || typeof document.querySelector !== "function") { return; }
+  var el = function (tag, text, cls) {
+    var node = document.createElement(tag);
+    if (text) { node.textContent = text; }
+    if (cls) { node.className = cls; }
+    return node;
+  };
+  var current = document.querySelector('nav a[aria-current="page"]');
+  var indexUrl = "data/sources-" + (current ? current.getAttribute("href") : "index.html").replace(/\.html$/, "") + ".json";
+  var csvUrl = "data/evidence_ledger.csv", sourceIndex = null, loading = null, pop = null, opener = null;
+  var clickable = function (root) {
+    var nums = (root || document).querySelectorAll("[data-ledger]"), i;
+    for (i = 0; i < nums.length; i++) {
+      if ((" " + nums[i].className + " ").indexOf(" src-link ") < 0) {
+        nums[i].className += " src-link";
+        nums[i].setAttribute("tabindex", "0");
+        nums[i].setAttribute("role", "button");
+        nums[i].setAttribute("aria-haspopup", "dialog");
+        nums[i].setAttribute("title", "Show source");
+      }
+    }
+  };
+  var loadIndex = function (done) {
+    if (sourceIndex) { done(sourceIndex); return; }
+    if (!window.fetch || location.protocol === "file:") {
+      done(null, "Source details need the page to be opened over http(s); from a file only the id and the value are shown.");
+      return;
+    }
+    if (!loading) {
+      loading = fetch(indexUrl).then(function (r) { if (!r.ok) { throw new Error("HTTP " + r.status); } return r.json(); });
+    }
+    loading.then(function (data) { sourceIndex = data; done(data); },
+      function (e) { loading = null; done(null, "Source details could not be loaded (" + e.message + "). The CSV below has every row."); });
+  };
+  var closePop = function () {
+    if (pop && !pop.hidden) { pop.hidden = true; if (opener) { opener.focus(); } opener = null; }
+  };
+  var place = function (target) {
+    var r = target.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    var left = Math.max(8, Math.min(r.left, vw - pop.offsetWidth - 8)), top = r.bottom + 6;
+    if (top + pop.offsetHeight > vh - 8) { top = Math.max(8, r.top - pop.offsetHeight - 6); }
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+  };
+  var openPop = function (target) {
+    var id = target.getAttribute("data-ledger");
+    if (!pop) {
+      pop = el("div", "", "src-pop");
+      pop.id = "src-pop";
+      pop.setAttribute("role", "dialog");
+      pop.setAttribute("aria-labelledby", "src-pop-title");
+      pop.hidden = true;
+      document.body.appendChild(pop);
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" || e.keyCode === 27) { closePop(); } });
+      document.addEventListener("mousedown", function (e) {
+        var onNumber = e.target.closest && e.target.closest("[data-ledger]");
+        if (!pop.hidden && !pop.contains(e.target) && !onNumber) { closePop(); }
+      });
+    }
+    opener = target;
+    pop.innerHTML = "";
+    var head = el("div", "", "src-head"), title = el("p", "Source of this number", "src-title"), close = el("button", "Close", "src-close");
+    title.id = "src-pop-title";
+    close.type = "button";
+    close.setAttribute("aria-label", "Close the source window");
+    close.addEventListener("click", closePop);
+    head.appendChild(title);
+    head.appendChild(close);
+    var list = el("dl"), note = el("p", "Loading the source details ...", "caption");
+    var add = function (label, value) { list.appendChild(el("dt", label)); list.appendChild(el("dd", value)); };
+    add("Ledger id", id);
+    add("Shown on the page", target.textContent);
+    var link = el("a", "Download the full evidence ledger (CSV)");
+    link.href = csvUrl;
+    link.setAttribute("download", "");
+    pop.appendChild(head);
+    pop.appendChild(list);
+    pop.appendChild(note);
+    pop.appendChild(link);
+    pop.hidden = false;
+    place(target);
+    close.focus();
+    loadIndex(function (data, problem) {
+      if (opener !== target) { return; }
+      var row = data ? sourceRow(data, id) : null, labels, k;
+      if (!row) {
+        note.textContent = problem || "This id is not in the source index of this page; the CSV below has every row.";
+      } else {
+        note.parentNode.removeChild(note);
+        labels = {value: "Value", source: "Source", retrieved: "Retrieved", transformation: "Transformation", script: "Script", used_in: "Used in"};
+        for (k = 0; k < data.fields.length; k++) { add(labels[data.fields[k]] || data.fields[k], row[data.fields[k]]); }
+        add("Trace it", "python run.py trace " + id);
+      }
+      place(target);
+    });
+  };
+  clickable();
+  document.addEventListener("click", function (e) {
+    var target = e.target.closest ? e.target.closest("[data-ledger]") : null;
+    if (!target) { return; }
+    e.preventDefault();
+    if (pop && !pop.hidden && opener === target) { closePop(); } else { openPop(target); }
+  });
+  document.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute("data-ledger") && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openPop(t); }
+  });
+
+  /* Date slider under the track-record chart (D54). */
+  var trackBox = byId("track-slider");
+  if (trackBox) {
+    var pos = byId("tr-pos"), outBox = byId("tr-out"), cursor = byId("tr-cursor"), tdata = null;
+    var dots = document.querySelectorAll("#track-record circle");  /* one dot per decision, in date order */
+    try { tdata = JSON.parse(byId("track-json").textContent); } catch (err) { tdata = null; }
+    trackBox.hidden = false;
+    if (!tdata) {
+      pos.disabled = true;
+      outBox.textContent = "The date slider could not read its data; the chart above shows every decision.";
+    } else {
+      var num = function (id, text) { var s = el("span", text, "num"); s.setAttribute("data-ledger", id); return s; };
+      var line = function (label, parts) {
+        var p = el("p"), j;
+        p.appendChild(el("strong", label + ": "));
+        for (j = 0; j < parts.length; j++) { p.appendChild(typeof parts[j] === "string" ? document.createTextNode(parts[j]) : parts[j]); }
+        outBox.appendChild(p);
+      };
+      var showTrack = function () {
+        var i = parseInt(pos.value, 10), r = trackReadout(tdata, i), s = tdata.stored;
+        if (dots[i]) {
+          cursor.setAttribute("x1", dots[i].getAttribute("cx"));
+          cursor.setAttribute("x2", dots[i].getAttribute("cx"));
+          cursor.setAttribute("visibility", "visible");
+        }
+        pos.setAttribute("aria-valuetext", trackValueText(tdata, i));
+        outBox.innerHTML = "";
+        line("Decision", [shortDate(r.date)]);
+        line("Score", [num("dashboard:track_record/score/" + i, r.score)]);
+        line("The NBK decided", [r.decision]);
+        line("Sample", [r.sample]);
+        if (r.stored) {
+          line("Model probabilities", ["cut ", num("dashboard:probabilities/Decrease", pct1(s.p.Decrease)), ", hold ",
+            num("dashboard:probabilities/Hold", pct1(s.p.Hold)), ", hike ", num("dashboard:probabilities/Increase", pct1(s.p.Increase))]);
+          line("95% band of the score", [num("dashboard:band/0", signed(s.band[0], 3)), " to ", num("dashboard:band/1", signed(s.band[1], 3))]);
+        } else {
+          line("Model probabilities and 95% band", ["not stored for this date"]);
+        }
+        clickable(outBox);
+      };
+      pos.addEventListener("input", showTrack);
+      showTrack();
+    }
   }
 })();

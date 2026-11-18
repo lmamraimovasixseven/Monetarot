@@ -68,13 +68,17 @@ class Ledger:
 
     def __init__(self, path: Path = LEDGER) -> None:
         with Path(path).open(encoding="utf-8", newline="") as handle:
-            self.values = {row["id"]: row["value"] for row in csv.DictReader(handle)}
+            self.rows = {row["id"]: row for row in csv.DictReader(handle)}
+        self.values = {key: row["value"] for key, row in self.rows.items()}
         self.used: set[str] = set()
+        self.page = ""  # page being built: the ids it uses go into its source index (D54)
+        self.page_used: dict[str, set[str]] = {}
 
     def raw(self, key: str) -> str:
         if key not in self.values:
             raise KeyError(f"number {key!r} is not in ledger/evidence_ledger.csv")
         self.used.add(key)
+        self.page_used.setdefault(self.page, set()).add(key)
         return self.values[key]
 
     def num(self, key: str, digits: int | None = None, pct: bool = False, signed: bool = False) -> str:
@@ -824,6 +828,34 @@ def asof_page(L: Ledger, artifact: dict) -> str:
             f"<select id=\"asof-t\">{options}</select>{''.join(blocks)}<script src=\"assets/app.js\"></script>")
 
 
+SOURCE_FIELDS = ["value", "source", "retrieved", "transformation", "script", "used_in"]
+
+
+def source_index_name(page_name: str) -> str:
+    return f"data/sources-{page_name.removesuffix('.html')}.json"
+
+
+def write_source_index(site: Path, page_name: str, L: Ledger, ids: set[str]) -> None:
+    """Compact per-page index of the ledger rows a page uses (D54), loaded by app.js on the first click on a number.
+
+    Repeated strings (source, script, ...) are stored once in "strings"; each id maps to indexes into it, in SOURCE_FIELDS order.
+    """
+    strings: list[str] = []
+    position: dict[str, int] = {}
+
+    def ref(text: str) -> int:
+        if text not in position:
+            position[text] = len(strings)
+            strings.append(text)
+        return position[text]
+
+    rows = {key: [ref(L.rows[key][field]) for field in SOURCE_FIELDS] for key in sorted(ids)}
+    payload = {"csv": "data/evidence_ledger.csv", "fields": SOURCE_FIELDS, "strings": strings, "ids": rows}
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
+    assert_no_cyrillic(source_index_name(page_name), text)
+    (site / source_index_name(page_name)).write_text(text, encoding="utf-8", newline="\n")
+
+
 def build(site: Path = SITE) -> dict[str, Any]:
     started = time.perf_counter()
     artifact = json.loads(ARTIFACT.read_text(encoding="utf-8"))
@@ -837,10 +869,21 @@ def build(site: Path = SITE) -> dict[str, Any]:
     for relative in DOWNLOADS:
         if (ROOT / relative).is_file():
             shutil.copy(ROOT / relative, site / "data" / Path(relative).name)
-    contents = {"index.html": index_page(L, artifact), "evidence.html": evidence_page(L, artifact), "methods.html": methods_page(L, artifact), "run.html": run_page(),
-                "sources.html": sources_page(), "team.html": team_page(), "data.html": data_page(L, artifact),
-                "patterns.html": patterns_page(L, artifact), "corridor.html": corridor_page(L, artifact),
-                "forecasts.html": forecasts_page(L), "redteam.html": redteam_page(), "asof.html": asof_page(L, artifact)}
+    builders = {"index.html": lambda: index_page(L, artifact), "evidence.html": lambda: evidence_page(L, artifact),
+                "methods.html": lambda: methods_page(L, artifact), "run.html": run_page, "sources.html": sources_page,
+                "team.html": team_page, "data.html": lambda: data_page(L, artifact), "patterns.html": lambda: patterns_page(L, artifact),
+                "corridor.html": lambda: corridor_page(L, artifact), "forecasts.html": lambda: forecasts_page(L),
+                "redteam.html": redteam_page, "asof.html": lambda: asof_page(L, artifact)}
+    contents = {}
+    for name, builder in builders.items():
+        L.page = name
+        contents[name] = builder()
+        if "data-ledger=" in contents[name] and "assets/app.js" not in contents[name]:
+            contents[name] += '\n<script src="assets/app.js"></script>'  # clickable numbers on every page that has them (D54)
+    L.page = ""
+    for name, ids in sorted(L.page_used.items()):
+        if name:
+            write_source_index(site, name, L, ids)
     titles = dict(PAGES)
     for name, body in contents.items():
         text = page(titles[name], body, name)

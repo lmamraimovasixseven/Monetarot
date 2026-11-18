@@ -88,6 +88,21 @@ pre { overflow-x: auto; background: #eef1f5; padding: 8px; border-radius: 6px; }
 code { font-size: 0.9em; }
 .num { font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 13px; padding-top: 12px; padding-bottom: 24px; }
+/* Clickable numbers and the source window (D54) */
+.src-link { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+.src-link:hover { color: var(--accent); }
+.src-link:focus-visible, .src-close:focus-visible, .src-pop a:focus-visible, input[type=range]:focus-visible { outline: 3px solid var(--hold); outline-offset: 2px; }
+.src-pop { position: fixed; z-index: 10; width: min(380px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow-y: auto; background: var(--card); color: var(--text); border: 1px solid var(--accent); border-radius: 10px; box-shadow: 0 6px 24px rgba(23, 43, 77, 0.18); padding: 10px 14px; font-size: 0.85rem; }
+.src-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.src-title { margin: 0; font-weight: 700; color: var(--ink); }
+.src-close { font: inherit; border: 1px solid var(--line); background: var(--soft); color: var(--ink); border-radius: 6px; padding: 2px 10px; cursor: pointer; }
+.src-pop dl { margin: 6px 0; display: grid; grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr); gap: 2px 8px; }
+.src-pop dt { color: var(--muted); }
+.src-pop dd { margin: 0; overflow-wrap: anywhere; }
+/* Date slider under the track-record chart (D54) */
+.track-slider { max-width: min(100%, 860px); margin: -8px 0 16px; padding: 4px 12px 8px; }
+.tr-out p { margin: 2px 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 @media (max-width: 480px) {
   .forecast-card { padding: 16px 12px; }
   .probability-row { grid-template-columns: 86px minmax(40px, 1fr) 50px; gap: 6px; padding: 6px 4px; }

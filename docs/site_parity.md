@@ -85,3 +85,4 @@ Render; **иначе** — статичная страница не может �
   артефакта (ordered logit и дельта-метод, `src/site_assets/app.js`); совпадение с `app.ordered_probabilities` и
   `app.score_and_delta_band` до 1e-6 проверяет `tests/test_site.py::test_scenario_slider_matches_python`. Шаг ползунка
   свободный (`step="any"`), чтобы начальное значение точно совпадало с последним значением фактора.
+- **Кликабельные числа и ползунок по датам (D54)** — только на статичном сайте, в Render их нет; описание в `docs/site_interactivity.md`. Скриншоты: `docs/site_parity/site_360_index_source_window.jpg`, `site_1280_index_source_window.jpg` (окно источника), `site_360_index_slider_latest.jpg`, `site_360_index_slider_earlier.jpg`, `site_1280_index_slider_latest.jpg`, `site_1280_index_slider_earlier.jpg` (ползунок в двух положениях).

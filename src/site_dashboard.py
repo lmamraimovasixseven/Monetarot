@@ -285,6 +285,9 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
         else:
             parts.append(f'<rect x="{cx - 3:.1f}" y="{cy - 3:.1f}" width="6" height="6" fill="{colour}">{tip}</rect>')
         parts.append(f'<circle cx="{cx:.1f}" cy="{y(score):.1f}" r="2" fill="{palette["blue"]}"><title>{day}: score {signed(score, 3)}</title></circle>')
+    # Date slider (D54): a cursor line that app.js moves; hidden until the script runs, so the static chart is unchanged.
+    parts.append(f'<line id="tr-cursor" x1="0" y1="{top}" x2="0" y2="{height - bottom}" stroke="{palette["black"]}" '
+                 'stroke-width="1.5" stroke-dasharray="3 3" visibility="hidden" aria-hidden="true"/>')
     parts.append("</svg>")
     title = track_record_title(L, tr)
     legend = ('<p class="legend"><span class="key" style="border-color:#0072B2">Score (−1 cut … +1 hike)</span>'
@@ -295,7 +298,26 @@ def svg_track_record(L, d: dict, palette: dict[str, str]) -> str:
                "forecasting out of sample; earlier values are in-sample fits and flatter the model. A useful score would sit "
                "above zero before hikes and below zero before cuts.")
     return (f'<figure id="track-record"><figcaption><strong>{esc(title)}</strong></figcaption>{"".join(parts)}'
-            f'{legend}<p class="caption">{esc(caption)}</p></figure>')
+            f'{legend}<p class="caption">{esc(caption)}</p></figure>' + track_slider(L, d))
+
+
+def track_slider(L, d: dict) -> str:
+    """Date slider under the track-record chart (D54). It only reads numbers already in the ledger: the score and the
+    actual decision at each date, and the probabilities and 95% band, which are stored for the latest decision only.
+    The block is hidden until app.js runs, so the page without JavaScript is unchanged."""
+    tr, n = d["track_record"], len(d["track_record"]["dates"])
+    # Scores rounded to 6 decimals here (the page shows 3; the full value is in the ledger window) to keep the page small.
+    data = {"dates": tr["dates"], "holdout_start": tr["holdout_start"],
+            "score": [round(float(L.raw(f"dashboard:track_record/score/{i}")), 6) for i in range(n)],
+            "actual": [int(L.raw(f"dashboard:track_record/actual/{i}")) for i in range(n)],
+            "stored": {"date": d["latest_decision"],
+                       "p": {c: float(L.raw(f"dashboard:probabilities/{c}")) for c in ("Decrease", "Hold", "Increase")},
+                       "band": [float(L.raw("dashboard:band/0")), float(L.raw("dashboard:band/1"))]}}
+    return (f'<div id="track-slider" class="track-slider" hidden><label for="tr-pos">Decision date</label>'
+            f'<input id="tr-pos" type="range" min="0" max="{n - 1}" step="1" value="{n - 1}" aria-describedby="tr-hint">'
+            '<p id="tr-hint" class="caption">Drag or use the arrow keys.</p>'
+            '<div id="tr-out" class="tr-out" aria-live="polite"></div>'
+            f'<script type="application/json" id="track-json">{json.dumps(data, separators=(",", ":"))}</script></div>')
 
 
 def svg_contributions(L, d: dict, palette: dict[str, str]) -> str:
