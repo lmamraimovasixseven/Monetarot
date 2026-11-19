@@ -117,3 +117,18 @@ The assistant did not write or change either file. Both already contain your ear
 
   The secondary report (The Astana Times, 13 April 2026, https://astanatimes.com/2026/04/kazakhstans-top-10-export-partners-account-for-nearly-80-of-trade-in-2025/ and https://astanatimes.com/2026/04/kazakhstans-foreign-trade-in-2025-partners-and-trends/) gives a top-ten total that is not in the primary release; it is not used.
 - **Publication dates of the external series: UNKNOWN.** `config/external_sources.json` gives `release` as UNKNOWN for the Bank of Russia key rate and CPI, the China policy rate (BIS gives only the dataset update date), the FRED part of the China CPI, the ECB deposit rate and the exchange rates. The partner-rates page shows the stored dates of the last values, not publication dates. If you can find the publication date of each series (or of the edition used), record it in the `release` field and run `python run.py ledger` and `python run.py site`.
+
+## Home page story (D60): copy to approve
+
+The sentences below are new on the home page and appear under our names; nothing else on the page changed. They are generated from stored values; the figures shown are today's ledger values. Approve or reword them; to reword one, change it in `src/site_build.py` (`index_page`, `CONNECTORS`) and run `python run.py site`.
+
+- **Answer under the question:** "Most likely the NBK holds: hold 53.2%, cut 38.7%, hike 8.1%."
+- **Step 1:** "Before 4 December 2026 a bond holder must decide whether to extend duration, under our stated loss assumption of 1.0 unit for a wrong call either way." The loss values in `config/decision_losses.json` are still not confirmed; the item "Подтвердить решение и потери" above stays open.
+- **Step 2:** "Hold is most likely, but a cut is not ruled out: its 95% interval runs from 4.2% to 73.2%."
+- **Step 3:** "The pressure score is -0.306, and its 95% band from -0.747 to +0.136 includes zero."
+- **Step 4:** "On past decisions the model cannot be distinguished from simply predicting a hold."
+- **Step 5:** "All six factors push the score towards a cut, household and corporate lending most; move one to see how far the score shifts." (the first part is the existing chart title).
+- **Step 6:** "Look-ahead cannot be excluded: real publication lags are not documented." (existing sentence, now also the headline).
+- **Step 7:** "Do not extend duration; the forecast was logged on 12 November 2026, and the NBK decision on 4 December 2026 is the next outcome it will be scored against."
+- **Connectors:** "So what does the model expect?" / "But why is the model not more certain?" / "So can we trust it?" / "So what is behind the score, and what would change it?" / "And what could make it wrong?" / "So what should the holder do, and how will we know?"
+- **Closing section heading:** "Read further". **Rail counter:** "Step n of 7".

@@ -133,3 +133,15 @@ There is no reveal and nothing moves on scroll. Under `prefers-reduced-motion: r
 - **Export bars.** `ul.trade-bars`: name, bar and value in a grid; the bar width is the share relative to the largest share (`--w`). Under 480 px the bar moves under the name.
 - **Tables.** Tables are set in the label face, which ships weight 500 only, so `partners.css` keeps figures in tables at 500 instead of a synthesised 600. The other pages still ask for 600 in table cells (unchanged here).
 - **Research index.** The seventh link uses `--mask-partners`, a globe drawn like the other masks (24px, 1.75 stroke).
+
+## Home page as a story (D60)
+
+- **Order.** Nothing is folded and every block stays in its step:
+  - the opening section holds the question, the answer sentence (`p.story-answer`, `--text-lg`) and the three-panel answer desk;
+  - the overview and context strip follow;
+  - then steps 1 to 7, then a closing section "Read further" with the research index (four columns above 960 px).
+- **Step heads.** Each h2 reads "N. Title." (`span.step-tag`, on its own line, same face, weight and colour) and then a one-sentence action headline at `--text-xl`. A connector line (`p.story-link`, serif, `--text-lg`, ink-2) ends steps 1 to 6.
+- **Rail.** The sticky "On this page" list is the rail. On the home page its links are the step titles. `app.js` appends `p.rail-pos` ("Step n of 7", label face, `--text-xs`, muted, `aria-live="polite"`), driven by the D56 scroll spy.
+- **Figures in headings.** `h2 .num` and `.story-answer .num` inherit the weight of their text, so a figure in a head differs only by the dotted source cue (waiver 38iii in the stamp block).
+- **Colours.** No new colour; the outcome marks and their colours are unchanged.
+- **How to change a headline.** The sentences are built in `index_page` in `src/site_build.py` (`answer`, `head1` to `head7`), the connectors in `CONNECTORS` and the step titles in `STEP_TITLES`. The step titles are pinned by `tests/test_site.py`. The headline rules, and the rule that every block stays in its step, are in `tests/test_story.py`.

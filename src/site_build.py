@@ -299,6 +299,32 @@ def answer_desk(L: Ledger, d: dict, decision: dict, action: str) -> str:
 </div>"""
 
 
+STEP_TITLES = ["The decision", "The tension", "The evidence", "The forecast", "The mechanism", "The risk", "The ask"]
+CLASS_WORD = {"Increase": "hike", "Hold": "hold", "Decrease": "cut"}
+CLASS_VERB = {"Increase": "hikes", "Hold": "holds", "Decrease": "cuts"}
+CONNECTORS = ["So what does the model expect?", "But why is the model not more certain?", "So can we trust it?",
+              "So what is behind the score, and what would change it?", "And what could make it wrong?",
+              "So what should the holder do, and how will we know?"]
+
+
+def step_head(n: int, sentence: str) -> str:
+    """D60: the pinned step title as plain heading text, then the action headline (one sentence, numbers from the ledger)."""
+    return f'<h2><span class="step-tag">{n}. {STEP_TITLES[n - 1]}.</span> {sentence}</h2>'
+
+
+def connector(n: int) -> str:
+    """D60: one short line from step n into step n + 1; it carries no number and no new fact."""
+    return f'<p class="story-link">{esc(CONNECTORS[n - 1])}</p>'
+
+
+def latest_log_entry(target: str | None) -> tuple[int, dict] | None:
+    """Index and row of the latest forecast-log entry for the target decision (docs/forecast_log.csv, read only)."""
+    with (ROOT / "docs" / "forecast_log.csv").open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    found = [(i, r) for i, r in enumerate(rows) if r["target_decision_date"] == target]
+    return found[-1] if found else None
+
+
 RESEARCH_LINKS = [("evidence", "Evidence and trends", "evidence.html", DESCRIPTIONS["evidence.html"]),
                   ("methods", "Model methodology", "methods.html", DESCRIPTIONS["methods.html"]),
                   ("scenario", "Scenario analysis", "#step-5", "5. The mechanism"),
@@ -366,40 +392,88 @@ def index_page(L: Ledger, artifact: dict) -> str:
                f'<a href="evidence.html#ev-anomalies">Raw-data anomaly screen</a></div>' if d["anomaly_warning"] else
                '<div class="box info" id="anomaly-warning">No flagged raw-data jump enters the latest score.</div>')
     target = re.search(r"\d{4}-\d{2}-\d{2}", rc["target"])
+    loss_a = float(L.raw("decision:binary_losses/lengthen_but_no_cut"))
+    loss_b = float(L.raw("decision:binary_losses/not_lengthen_but_cut"))
+    unit = lambda v: "unit" if v == 1 else "units"  # noqa: E731
+    # Step 1 (D60): the losses are our stated assumption (config/decision_losses.json, not confirmed), never a fact.
+    loss_text = (f"under our stated loss assumption of {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} {unit(loss_a)} for a wrong call either way"
+                 if loss_a == loss_b else
+                 f"under our stated loss assumption of {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} {unit(loss_a)} for extending when no cut "
+                 f"follows and {L.num('decision:binary_losses/not_lengthen_but_cut', 1)} {unit(loss_b)} for not extending before a cut")
+    when = f"Before {plain_date(next_round)}" if next_round else "Before the next NBK decision"
+    head1 = f"{when} a bond holder must decide whether to extend duration, {loss_text}."
+    # Lead and step 2 (D60): the answer first, then the next most likely outcome and its 95% interval.
+    order = sorted(sd.DISPLAY, key=lambda c: -float(L.raw(f"dashboard:probabilities/{c}")))
+    answer = (f"Most likely the NBK {CLASS_VERB[most]}: "
+              + ", ".join(f"{CLASS_WORD[c]} {L.num(f'dashboard:probabilities/{c}', 1, pct=True)}" for c in order) + ".")
+    second = order[1]
+    head2 = (f"{most} is most likely, but a {CLASS_WORD[second]} is not ruled out: its 95% interval runs from "
+             f"{L.num(f'dashboard:intervals/{second}/0', 1, pct=True)} to {L.num(f'dashboard:intervals/{second}/1', 1, pct=True)}.")
+    # Step 3: the score and whether its band includes zero.
+    band = f"its 95% band from {L.num('dashboard:band/0', 3, signed=True)} to {L.num('dashboard:band/1', 3, signed=True)}"
+    if band_lo <= 0 <= band_hi:
+        head3 = f"The pressure score is {L.num('dashboard:score', 3, signed=True)}, and {band} includes zero."
+    else:
+        head3 = f"The pressure score is {L.num('dashboard:score', 3, signed=True)}, and {band} lies entirely {'above' if band_lo > 0 else 'below'} zero."
+    # Step 4: never stronger than the stored verdict wording (sd.holdout_sentence, rule 14).
+    low, high = float(L.raw("n:rmse_ratio_ci_low")), float(L.raw("n:rmse_ratio_ci_high"))
+    separates = (not (low <= 1 <= high), float(L.raw("n:dm_squared_error_p")) < 0.05)
+    if not any(separates):
+        head4 = "On past decisions the model cannot be distinguished from simply predicting a hold."
+    elif not all(separates):
+        head4 = ("On past decisions the bootstrap interval and the Diebold–Mariano test disagree on whether the model differs "
+                 "from simply predicting a hold.")
+    else:
+        head4 = "On past decisions the bootstrap interval and the Diebold–Mariano test both separate the model from simply predicting a hold."
+    # Step 5: the existing generated title of the contributions chart.
+    contrib_rows = d["contributions"]["rows"]
+    contrib = sd.contributions_title([r[0] for r in contrib_rows],
+                                     [float(L.raw(f"dashboard:contributions/rows/{i}/1")) for i in range(len(contrib_rows))])
+    head5 = f"{contrib.replace('; ', ', ', 1)}; move one to see how far the score shifts."
+    # Step 6: the existing look-ahead sentence when it applies.
+    lagged = any(float(L.values.get(f"lookahead:{f}", 0)) > 0 for f in d["model"]["features"])
+    head6 = ("Look-ahead cannot be excluded: real publication lags are not documented." if lagged else
+             "These are the limits that apply to the forecast above.")
+    # Step 7 (D60): one outcome scores the forecast; it neither confirms nor refutes it.
+    entry = latest_log_entry(next_round)
+    head7 = (f"{action}; the forecast was logged on {plain_date(entry[1]['logged_at_utc'][:10])}, and the NBK decision on "
+             f"{plain_date(next_round)} is the next outcome it will be scored against." if entry else
+             f"{action}; no forecast is logged yet for the next decision.")
     return si.cardify(f"""
 <section class="lead" id="top">
 <h1>{esc(question)}</h1>
 <p class="kicker">{esc(d['title'])}</p>
-{answer_desk(L, d, decision, action)}
-{research_links()}</section>
+<p class="story-answer" id="story-answer">{answer}</p>
+{answer_desk(L, d, decision, action)}</section>
 <!-- onpage -->
 <section class="lead-notes" id="overview"><p class="summary">{esc(d['intro'])} The forecast is turned into a duration decision with an explicit loss function, and the holdout comparison with Always Hold is shown as prominently as the forecast.</p>
 <p class="links">This page is static and fast; there is also an {render_link}. Detailed tables are on the <a href="evidence.html">Evidence</a> page.</p>
 {sd.context_strip(d)}</section>
-<section id="step-1"><h2>1. The decision</h2><p>{esc(tr(decision['decision']))}</p>
+<section id="step-1">{step_head(1, head1)}<p>{esc(tr(decision['decision']))}</p>
 <ul id="usefulness">
 <li><strong>Cost of error:</strong> lengthening duration when no cut follows costs {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} unit; not lengthening before a cut costs {L.num('decision:binary_losses/not_lengthen_but_cut', 1)} unit (relative units, not tenge; <code>config/decision_losses.json</code>). Equal losses is an assumption: the values are not confirmed by a person yet.</li>
 <li><strong>Without this note:</strong> the holder looks at the current rate and the NBK's statements and by default assumes that the rate will not change (Always Hold), which is our benchmark. This is our assumption.</li>
 <li><strong>Who benefits:</strong> holders of tenge government bonds (bank treasuries, portfolio managers), who see the probability and the threshold at which to act. Who can lose: a holder who lengthens duration and no cut follows, or who does not lengthen before a cut.</li>
-</ul></section>
-<section id="step-2"><h2>2. The tension</h2><p>{obvious}</p><p>{complication}</p>
-<p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}</section>
-<section id="step-3"><h2>3. The evidence</h2>{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
-<p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p></section>
-<section id="step-4"><h2>4. The forecast</h2>{sd.headline(L, d)}<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden><button type="button" class="pill" data-layout="side" aria-pressed="true">Side by side</button><button type="button" class="pill" data-layout="overlay" aria-pressed="false">Overlay</button></div>{sd.round_cards(L, d)}{sd.boxes(L, d)}
+</ul>{connector(1)}</section>
+<section id="step-2">{step_head(2, head2)}<p>{obvious}</p><p>{complication}</p>
+<p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}{connector(2)}</section>
+<section id="step-3">{step_head(3, head3)}{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
+<p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p>{connector(3)}</section>
+<section id="step-4">{step_head(4, head4)}{sd.headline(L, d)}<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden><button type="button" class="pill" data-layout="side" aria-pressed="true">Side by side</button><button type="button" class="pill" data-layout="overlay" aria-pressed="false">Overlay</button></div>{sd.round_cards(L, d)}{sd.boxes(L, d)}
 <p>Expected rate after the decision of {esc(target.group(0) if target else 'the next meeting')}: {L.num('reality_check:expected_rate', 2)}%, 80% range
 {L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.</p>
-<h3>Timeline</h3>{si.timeline(forecast_timeline())}</section>
-<section id="step-5"><h2>5. The mechanism</h2><p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}</section>
-<section id="step-6"><h2>6. The risk</h2>
+<h3>Timeline</h3>{si.timeline(forecast_timeline())}{connector(4)}</section>
+<section id="step-5">{step_head(5, head5)}<p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}{connector(5)}</section>
+<section id="step-6">{step_head(6, head6)}
 <div class="box warn" id="freshness" hidden></div>{anomaly}
 <div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
 <div class="box warn" id="look-ahead">{look_ahead_box(L, d["model"], d["look_ahead_sentence"])}</div>
 <h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
-<ul>{risk}</ul>{ovb_home_sentence(L)}<p><a href="methods.html">All model limits</a></p></section>
-<section class="action" id="step-7"><h2>7. The ask</h2><p class="answer" id="answer"><strong>{action}.</strong></p>
+<ul>{risk}</ul>{ovb_home_sentence(L)}<p><a href="methods.html">All model limits</a></p>{connector(6)}</section>
+<section id="step-7">{step_head(7, head7)}<div class="action"><p class="answer" id="answer"><strong>{action}.</strong></p>
 <p class="caption">Caveat: this is the binary rule with equal losses from step 2. Under the three-outcome losses the action is: {EN_ACTION[decision['best_action']]}.
-The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></section>
+The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></div></section>
+<section id="read-further"><h2>Read further</h2>{research_links()}</section>
 <script src="assets/app.js"></script>
 """)
 

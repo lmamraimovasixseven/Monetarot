@@ -643,9 +643,14 @@ function sourceRow(index, id) {
   /* F7. "On this page": highlight the section in view (D56). */
   var onLinks = all("nav.onpage a");
   if (onLinks.length && window.IntersectionObserver) {
+    /* D60: on the home page the list is the story rail: "Step n of 7" follows the scroll (created here, so absent without JS). */
+    var steps = all('section[id^="step-"]').length, railPos = steps ? el("p", "", "rail-pos") : null;
+    if (railPos) { railPos.setAttribute("aria-live", "polite"); document.querySelector("nav.onpage").appendChild(railPos); }
     var spy = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) { return; }
+        var m = /^step-(\d+)$/.exec(e.target.id);
+        if (railPos) { railPos.textContent = m ? "Step " + m[1] + " of " + steps : ""; }
         onLinks.forEach(function (a) { if (a.getAttribute("href") === "#" + e.target.id) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); } });
       });
     }, {rootMargin: "0px 0px -70% 0px"});

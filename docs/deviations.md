@@ -441,3 +441,45 @@ These corrections concern the recorded source metadata in `docs/facts_to_fill.cs
   - `ledger/forecast_ledger.csv` sha256 a765becf9d5edaef0899c27fefdf455e52422bf52e555595fe9f2572ecec97bf.
 
   All four are unchanged. The data-update runbook (rule 11) was followed where it applies. The new trade-share file is not a model input, so data, model, robust and report were not rerun: they would not change, and `update` was not to be run. `check`, the tests, acceptance and the site build were run, and the step is recorded in `docs/manual_steps_found.md`.
+
+### D60. The home page tells the seven steps as a story; presentation only
+- **What changed:** this work is on the branch `story` and is not committed. Only the presentation of `index.html` changed: story lines were added, and nothing was removed, folded or moved between steps. No number, result sentence or model output was altered, and no ledger row was added or changed.
+  - **Additions.** The page keeps every sentence, table, box and figure of the home page as before D60, visible without a click and in the same step. The additions are:
+    - one answer sentence under the question, built from the stored probabilities in order of size ("Most likely the NBK holds: hold 53.2%, cut 38.7%, hike 8.1%" with today's ledger values);
+    - a full-sentence action headline in each h2 after the pinned step title ("1. The decision." and so on), with every figure a ledger span;
+    - one connector line at the end of steps 1 to 6 ("So what does the model expect?" and five more), with no number and no fact;
+    - a "Step n of 7" counter on the sticky "On this page" list, which serves as the rail.
+  - **Headline wording.** The headlines are generated from stored values and existing sentences:
+    - step 1 states the losses as "our stated loss assumption" (the values in `config/decision_losses.json` are not confirmed);
+    - step 3 says whether the score band includes zero;
+    - step 4 follows the same three-way verdict as the holdout sentence and is never stronger than it. The verdict box remains the only "Holdout RMSE ratio" sentence;
+    - step 5 is the existing generated title of the contributions chart with "move one to see how far the score shifts";
+    - step 6 is the existing look-ahead sentence;
+    - step 7 says the forecast was logged on the stored entry date and that the next NBK decision is the next outcome it will be scored against. It does not say that one outcome will show whether the forecast was right.
+
+    Every new sentence is listed in `TODO_HUMAN.md` for the team's approval.
+  - **One block moved.** The research index ("Research sections", link texts unchanged) moved from the opening section to a closing section "Read further". The answer desk with its three panels and the overview with the context strip stay where they were. Step 7 now opens with its headline before the action box, so it appears in the "On this page" list. The list shows the short step titles, read from `span.step-tag`, not the headline sentences.
+  - **Revision.** A first version of D60 folded secondary content behind five "Read more" blocks, added a cost table and a forecast-log table, and moved two answer-desk panels. The team asked that nothing be folded or cut. Those changes were taken back, and only the additions above remain. The read-more cards that `cardify` makes from long paragraphs (D56) are as before.
+  - **Check that nothing was lost.** The visible text of `index.html` on `main` and on this branch was split into sentences: no sentence of `main` is missing (0 of 200). The 17 new sentences are the answer sentence, the seven headlines, the six connectors, "Read further" (heading and list link) and "The ask" (step 7 now in the list). Visible words: 2092 on `main`, 2301 now.
+  - **Rail.** `app.js` appends `p.rail-pos` with `aria-live="polite"` to the "On this page" list. It is driven by the D56 scroll spy and created by the script, so it is absent without JavaScript. There is no motion beyond the existing 150 ms link-colour change, which is off under reduced motion; keyboard focus uses the D58 focus style.
+  - **Budget.** The home page with its assets went from 151372 to 155168 bytes:
+    - `index.html` 64757 → 66982;
+    - `style.css` 48943 → 50017;
+    - `app.js` 37672 → 38169.
+
+    `config/site_budget.json` now allows 86016 bytes of growth over the baseline of 69518, against 81920 after D58: the measured growth of 85650 bytes, rounded up to the next KB.
+  - **Design linter.** `sloplint --render` on `index.html` and `style.css` reports no FAIL, no REFLEX and no WARN:
+    - the D59 FAIL 44d is gone, because the research index left the opening section;
+    - the research index at the end uses four columns above 960 px, so no link is left alone on a row;
+    - the REFLEX 38iii (figures inside a heading) is waived in `style.css`. The figures in step heads keep the dotted source cue of D54 but take the face, weight and colour of the head.
+
+    The four FAILs on methods.html and team.html are unchanged from the committed site; those pages were not touched.
+  - **Screenshots.** `docs/site_parity/d60_*.png`: the first screen and each step, at 1280 px, 360 px and 360 px with reduced motion.
+- **Why:** instructor feedback that the page should tell a story, not list facts. The owner asked (task D60, then its revision) to keep all content and evidence visible and change only the narrative form.
+- **What the original specification produced:** not affected; the effect on results is none. Only presentation changed; no number or result sentence was altered. The frozen model, `prereg/`, `docs/forecast_log.csv`, `ledger/forecast_ledger.csv`, `ledger/evidence_ledger.csv` and the estimated fields of `model/artifact.json` were not touched. Before (`main`) and after this work:
+  - estimated fields of `model/artifact.json` sha256 2f28cfb70ba1d41b1d8ca823edd0cca496df089b61838432d2f75b46b90b63fe;
+  - `docs/forecast_log.csv` sha256 808ea4ce311a4b34b1edc1a2b82d88ecdffb12fd4ae21c98fb4216b02f89ed4c;
+  - `ledger/forecast_ledger.csv` sha256 a765becf9d5edaef0899c27fefdf455e52422bf52e555595fe9f2572ecec97bf;
+  - `ledger/evidence_ledger.csv` sha256 10819e191120743ebe6051dd777cbf72666277eed59174e5a8dc7bfdae71d25c.
+
+  All four are unchanged.

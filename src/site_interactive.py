@@ -154,7 +154,9 @@ def onpage_nav(body: str) -> str:
     targets = []
     for match in re.finditer(r'(<section id="([^"]+)">\s*)?<h2(?: id="([^"]+)")?[^>]*>(.*?)</h2>', body, flags=re.S):
         target = match.group(3) or match.group(2)
-        label = re.sub(r"<[^>]+>", "", match.group(4)).strip()
+        # D60: a story headline carries its short step title in span.step-tag; the list shows that title, not the sentence.
+        tag = re.search(r'<span class="step-tag">(.*?)</span>', match.group(4), flags=re.S)
+        label = re.sub(r"<[^>]+>", "", tag.group(1)).strip().rstrip(".") if tag else re.sub(r"<[^>]+>", "", match.group(4)).strip()
         if target and label:
             targets.append((target, label))
     if len(targets) < 3:

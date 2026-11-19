@@ -7,6 +7,7 @@
 /* Hallmark · waive 59 · gaps between the seven steps and the evidence blocks · each step opens with a heavy ink rule; a research note keeps its steps close, landing-page section gaps would spread one argument over many screens */
 /* Hallmark · waive 49b · links inside sentences and repository file paths wrap with the text · on data.html the download links are file paths that must stay complete */
 /* Hallmark · waive 78 · step heads at the 2xl size under the question · a research note keeps section heads below the question so the figures and the decision answer carry the weight */
+/* Hallmark · waive 38iii · D60 step heads carry their figures as clickable ledger numbers · same face, weight and colour as the head; only the dotted source cue of D54 marks them */
 /* Hallmark · waive 68 · data-slot on the factor effects rows of evidence.html · in the Factor effects chart each factor row keeps its sort position in data-slot for app.js; these are not image slots */
 /* Hallmark · dismissed F18 · no image slots on the site; data-slot is the factor-effects sort hook */
 /* Hallmark · dismissed 3 · .key is a legend swatch, .timeline a hairline rail, and .action has border 0 with an ink rule on top in the D58 block */
@@ -452,3 +453,13 @@ nav.onpage a[aria-current="true"] { color: var(--color-ink); font-weight: 500; b
   .probability-row { padding: 8px 0; gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { a, header nav a, .r-link, .pill, .design-tab, .pipe-node, .src-close, .tr-plot, .fx-row { transition: none; } }
+/* D60: the home page as a story. Answer under the question, step heads as sentences, connectors, the rail counter. */
+.story-answer { font-size: var(--text-lg); line-height: 1.4; color: var(--color-ink); max-width: 40rem; margin: 0 0 16px; }
+section[id^="step-"] > h2 { font-size: var(--text-xl); line-height: 1.15; }
+.step-tag { display: block; margin-bottom: 4px; }
+.story-link { font-size: var(--text-lg); color: var(--color-ink-2); margin: 32px 0 0; }
+.rail-pos { margin: 4px 0 0; font-size: var(--text-xs); color: var(--color-muted); }
+h2 .num, .story-answer .num { font-weight: inherit; }
+#read-further .research ul { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 960px) { #read-further .research ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { #read-further .research ul { grid-template-columns: minmax(0, 1fr); } }
