@@ -54,3 +54,28 @@ Everything below is built by `python run.py site` from `src/`; never edit `site/
 | F7. "On this page" | `site_interactive.onpage_nav`: pages with at least three h2 headings | "F7. On this page" highlights the section in view | Headings come from the page; give a new h2 an `id`, or put it in a `<section id>`. |
 
 Checks: `python -m pytest -q tests/test_site_interactivity.py` covers the hooks, the data against the artifact, the fallbacks, LF line endings, local links, the double build and a browser smoke run, which is skipped without a local Chrome. `python scripts/site_smoke.py [shots]` repeats the browser run and, with `shots`, saves the screenshots `docs/site_parity/d56_*.jpg`.
+
+# Russia, China, ECB page (D59)
+
+`corridor.html` leads with the result of the omitted-variable check and adds anchored sections on the partner rates. Every number written on the page is a ledger row; the browser draws stored series and picks stored rows, and estimates nothing.
+
+| Feature | Data (stored file) | Built by | Script hook |
+|---|---|---|---|
+| Lead sentence | the ledger counts of `model/extensions/ovb_check.json` (`ovb:summary/*`) and its `label` | `site_build.ovb_headline`, `site_partners.finding` | none |
+| Export shares (HTML bars) | `data/raw/external/kz_export_shares_2025.csv` via `model/extensions/partner_context.json` (`partners:trade/*`) | `site_partners.trade` | none (numbers open the source window) |
+| Partner rates explorer | `data/raw/external/ru_key_rate_daily.csv`, `cn_policy_rate_daily.csv`, `ecb_deposit_rate_daily.csv`, `ru_cpi_yoy.csv`, `cn_cpi_yoy.csv`, `data/raw/base_rate_history.csv`, `inflation_history.csv`, read by `partner_context.history()` at build time | `site_partners.rates` → `line_figure("px", ...)`; JSON in `script.pdata` | `figure.pchart`: `[data-series]`, `[data-mode]`, `[data-range]`, `.pplot` (mouse, touch, arrow keys, Home, End, PageUp, PageDown) |
+| Spread chart | the same series; NBK minus partner computed at build time | `site_partners.spreads` → `line_figure("sx", ...)` | as above, with the zero line `.pzero` |
+| Mechanism | existing wording of the corridor page and the band caption | `site_partners.mechanism` (`ol.mech-steps`, read-more cards) | read-more cards (D56) |
+| Scenario tool | `model/artifact.json#/carry_corridor`, `partners:latest/ecb_deposit_rate/nominal` | `site_build.corridor_page` | `app.js` "corridor": `c-infl` joins the corridor inputs; `partners.js` "D": `c-ecb` and `c-rate` drive `#ecb-out` only |
+| What the model says | `ovb:specifications/*` and `ovb:partner_what_if/*` | `si.ovb_toggle`, `site_partners._holdout_chart`, `site_partners.what_if` | `#ovb-toggle` (D56); `#wi-picker`: `button[data-partner]`, `[data-variant]`, `[data-move]` show one `.wi-readout` |
+| Event counts | `partners:events/*` (definitions in `partner_context.DEFINITIONS`) | `site_partners.events` | `#ev-picker` shows one `.ev-partner` table |
+| Limitations | existing sentences plus the three D59 statements | `site_partners.limits` | none |
+
+Without JavaScript: the chart buttons, the what-if picker and the event picker are `hidden`. The static charts show all months in nominal terms, every event table is visible, and each chart has a monthly data table in `details.ptable` (newest month first). The what-if table `#wi-table` lists all twelve stored rows.
+
+## How to change things
+
+- **Window or small-sample threshold of the event counts:** `WINDOW_DAYS` and `SMALL_N` in `src/partner_context.py`, then `python run.py partners`, `python run.py ledger` and `python run.py site`. The page text and the tests read both from the JSON.
+- **The what-if move:** `WHAT_IF_MOVES` in `src/ovb_check.py`, then `python run.py ovb`, `ledger` and `site`. The stored D50 values must reproduce within the D51 tolerance (`tests/test_ovb_check.py`).
+- **Series colours or dashes:** `.ps-*` and `.ks-*` rules in `src/site_assets/partners.css` (chart tokens only; see `docs/site_design.md`).
+- **A new trade-share edition:** append the lines to `data/raw/external/kz_export_shares_2025.csv` only if they come from the same table; a new year is a new file with its own entry under `context` in `config/external_sources.json`.

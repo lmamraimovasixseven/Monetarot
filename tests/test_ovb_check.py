@@ -70,7 +70,9 @@ def test_frozen_fit_reproduces_the_artifact(stored):
 # counts, sample sizes, names, signs and significance flags exactly.
 OPTIMIZER_PATH = re.compile(r"^/specifications/[^/]+/(coefficients|wald_hc0|lr|log_likelihood|holdout/(?!rps_always_hold))"
                             r"|^/coefficient_changes/[^/]+/[^/]+/(estimate_change|relative_change)$"
-                            r"|^/frozen_reproduction/|^/summary/max_abs_relative_change$")
+                            r"|^/frozen_reproduction/|^/summary/max_abs_relative_change$"
+                            # D59: the partner what-if is computed from the same ordered-logit fits (cut-points, slopes, HC0).
+                            r"|^/partner_what_if/specifications/")
 OPTIMIZER_LABEL_PATH = re.compile(r"^/specifications/[^/]+/optimizer$")
 
 
@@ -228,3 +230,54 @@ def test_site_shows_the_section_and_one_home_sentence():
     for page in (ROOT / "site").glob("*.html"):
         text = page.read_text(encoding="utf-8").lower()
         assert not re.search(r"80\s*%[^.<]{0,80}export|export[^.<]{0,80}80\s*%", text), page.name
+
+
+# ----------------------------------------------------------------------------- D59: partner-rate what-if (exploratory)
+
+def _logistic(v: float) -> float:
+    return 1.0 / (1.0 + math.exp(-v))
+
+
+def test_partner_what_if_follows_from_the_stored_coefficients_and_the_last_usable_decision(stored):
+    """Index, score and point change recomputed from the stored slopes and cut-points and the last usable decision of the
+    panel (D59); compared within the cross-platform tolerance of the ordered-logit fits (D51)."""
+    what_if, specs = stored["partner_what_if"], stored["specifications"]
+    panel = ovb_check.build_panel()
+    last = panel.iloc[-1]
+    assert what_if["decision_date"] == last.decision_date.date().isoformat() == stored["sample"]["holdout_end"]
+    assert "not used for the forecast" in what_if["label"]
+    assert set(what_if["specifications"]) == {k for k, v in ovb_check.SPECIFICATIONS.items() if v}
+    for key, entry in what_if["specifications"].items():
+        slopes = {name: c["estimate"] for name, c in specs[key]["coefficients"].items()}
+        assert set(entry["moves"]) == set(specs[key]["controls"])
+        c0, c1 = entry["cutpoints"]["decrease_hold"], entry["cutpoints"]["hold_increase"]
+        assert c0 < c1
+
+        def score(x: dict) -> tuple[float, float]:
+            index = sum(slopes[name] * x[name] for name in slopes)
+            return index, (1 - _logistic(c1 - index)) - _logistic(c0 - index)
+
+        x = {name: float(last[name]) for name in slopes}
+        index, base = score(x)
+        assert same_within_float_tolerance(entry["latest_index"], index, rel=1e-4, abs_=1e-4)
+        assert same_within_float_tolerance(entry["latest_score"], base, rel=1e-4, abs_=1e-4)
+        for control, moves in entry["moves"].items():
+            assert moves["latest_value"] == pytest.approx(x[control])
+            for name, delta in ovb_check.WHAT_IF_MOVES.items():
+                move = moves[name]
+                assert move["move_points"] == delta
+                change = score(dict(x, **{control: x[control] + delta}))[1] - base
+                assert same_within_float_tolerance(move["score_change"], change, rel=1e-4, abs_=1e-4)
+                assert move["se"] > 0
+                assert same_within_float_tolerance(move["ci_low"], move["score_change"] - what_if["z"] * move["se"], rel=1e-9, abs_=1e-12)
+                assert same_within_float_tolerance(move["ci_high"], move["score_change"] + what_if["z"] * move["se"], rel=1e-9, abs_=1e-12)
+                assert move["interval_includes_zero"] == int(move["ci_low"] <= 0 <= move["ci_high"])
+
+
+def test_partner_what_if_verdicts_do_not_lie_within_the_tolerance_of_zero(stored):
+    """Whether an interval includes zero must not flip on another platform (D51 tolerance 1e-4)."""
+    bounds = [(f"{key}/{control}/{name}", m[bound])
+              for key, entry in stored["partner_what_if"]["specifications"].items()
+              for control, moves in entry["moves"].items() for name in ovb_check.WHAT_IF_MOVES
+              for m in [moves[name]] for bound in ("ci_low", "ci_high", "score_change")]
+    assert bounds and not [b for b in bounds if abs(b[1]) < 1e-4]

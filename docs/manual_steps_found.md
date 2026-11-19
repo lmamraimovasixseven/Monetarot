@@ -54,3 +54,15 @@ Checks made before appending:
 - The unit line in sheet «Метаданные» differs between the two files («Тысяч долларов США» for exports, «Миллион долларов США» for imports); the «Показатель» sheet is in millions in both, and the monthly sheet headers say «тыс.долларов США» in both. The monthly sheet header was used.
 - These files are a later edition than the one the existing CSV rows came from: for 2026-01 to 2026-07 they differ from the CSV by −0.02% to +0.21% (exports) and +0.01% to +1.34% (imports). The existing rows were not changed, so 2026-08 comes from a newer vintage than the earlier months.
 - The export values for 2026-06 (9820130.49) and 2026-07 (10175921.46) in this edition confirm the jump recorded in the CSV (9816470.38, 10169912.74). See `TODO_HUMAN.md`.
+
+### Export shares of 2025 (added 2026-11-19, D59)
+
+A new context file, not a model input: `data/raw/external/kz_export_shares_2025.csv`.
+
+1. Opened the Bureau of National Statistics publications page https://stat.gov.kz/en/industries/economy/foreign-market/publications/ and the release "Foreign trade turnover of the Republic of Kazakhstan (January-December 2025)", https://stat.gov.kz/en/industries/economy/foreign-market/publications/476331/ (date of publication 16.02.2026 in the release; the 2025 figures are marked preliminary).
+2. Downloaded the release PDF (https://stat.gov.kz/api/iblock/element/476331/file/en/) and the linked countries table ("Страны анг.xlsx", URL in `config/external_sources.json`, `context.kz_export_shares_2025.table_url`) on 2026-11-19.
+3. The table lists six export partners with their share of total exports: Italy 19.8, China 19.2, Russia 10.3, Netherlands 7.6, Turkiye 4.9, Uzbekistan 4.5. The release text and its chart "Countries partners" give the same six values. The release text gives total exports of 79041,2 million US dollars.
+4. Wrote these seven values as published into the new file (columns `item,value,unit`), one line each, nothing filled in. The file is append-only like every file in `data/raw/`.
+5. Checked: no full 2025 country table was reachable. The spreadsheets page lists the January-September 2026 files, and its year filter returned "no data" for 2025 and 2026. So no euro-area total is computed. The secondary report (The Astana Times, 13 April 2026) gives the same six shares; its top-ten total is not in the primary release and is not used.
+
+Not rerun, because the file is not a model input: data, model, robust and report. Run: `python run.py partners`, `ledger`, `site`, `check`, the tests and acceptance (D59).

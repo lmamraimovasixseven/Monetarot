@@ -1,0 +1,252 @@
+{
+  "label": "Descriptive context, added on 2026-11-19 after the freeze (D59): counts and spreads from stored files, nothing estimated; not used for the forecast. The frozen specification and its verdict do not change.",
+  "window_days": 60,
+  "small_n_threshold": 10,
+  "definitions": {
+    "partner_change": "a day on which the stored partner rate differs from the previous stored value (gaps skipped)",
+    "matching": "each change is matched to the first NBK decision strictly after it, if that decision is at most 60 calendar days after the change; several changes of one partner matched to the same NBK decision count once",
+    "direction": "rise if every matched change of that partner was up, cut if every one was down, mixed otherwise",
+    "baseline": "NBK decisions with no change of that partner in the 60 calendar days before them",
+    "change_matched_to_an_earlier_decision": "NBK decisions with a partner change in the 60 days before them that was matched to an earlier NBK decision",
+    "sample": "NBK decisions whose 60-day window lies inside the stored partner series",
+    "small_n": "rows with n below 10 are flagged: too few decisions to read a share",
+    "reading": "descriptive counts, not causal effects and not a forecast"
+  },
+  "partners": {
+    "ru_key_rate": {
+      "site_name": "Russia",
+      "series": "Bank of Russia key rate"
+    },
+    "cn_policy_rate": {
+      "site_name": "China",
+      "series": "China policy rate (BIS; LPR 1Y / benchmark lending rate)"
+    },
+    "ecb_deposit_rate": {
+      "site_name": "ECB",
+      "series": "ECB deposit facility rate"
+    }
+  },
+  "latest": {
+    "ru_key_rate": {
+      "date": "2026-11-13",
+      "nominal": 14.0,
+      "real_month": "2026-09",
+      "real": 7.65
+    },
+    "cn_policy_rate": {
+      "date": "2026-11-10",
+      "nominal": 3.0,
+      "real_month": "2026-09",
+      "real": 2.1
+    },
+    "ecb_deposit_rate": {
+      "date": "2026-11-16",
+      "nominal": 2.5
+    },
+    "nbk": {
+      "date": "2026-10-27",
+      "rate": 15.75
+    }
+  },
+  "spreads": {
+    "ru_key_rate": {
+      "nominal_month": "2026-10",
+      "nominal": 1.75,
+      "real_month": "2026-09",
+      "real": -0.7
+    },
+    "cn_policy_rate": {
+      "nominal_month": "2026-10",
+      "nominal": 12.75,
+      "real_month": "2026-09",
+      "real": 4.85
+    },
+    "ecb_deposit_rate": {
+      "nominal_month": "2026-10",
+      "nominal": 13.25
+    }
+  },
+  "events": {
+    "all_nbk_decisions": {
+      "n": 91,
+      "increase": 17,
+      "hold": 49,
+      "decrease": 25,
+      "small_n": 0
+    },
+    "all_nbk_decisions_period": {
+      "first": "2015-10-02",
+      "last": "2026-10-27"
+    },
+    "ru_key_rate": {
+      "sample": {
+        "n": 91,
+        "increase": 17,
+        "hold": 49,
+        "decrease": 25,
+        "small_n": 0
+      },
+      "sample_period": {
+        "first": "2015-10-02",
+        "last": "2026-10-27"
+      },
+      "partner_changes_in_period": 55,
+      "partner_rises_in_period": 19,
+      "partner_cuts_in_period": 36,
+      "rise": {
+        "n": 16,
+        "increase": 7,
+        "hold": 5,
+        "decrease": 4,
+        "small_n": 0
+      },
+      "cut": {
+        "n": 33,
+        "increase": 7,
+        "hold": 16,
+        "decrease": 10,
+        "small_n": 0
+      },
+      "mixed": {
+        "n": 0,
+        "increase": 0,
+        "hold": 0,
+        "decrease": 0,
+        "small_n": 1
+      },
+      "no_change_in_window": {
+        "n": 34,
+        "increase": 3,
+        "hold": 22,
+        "decrease": 9,
+        "small_n": 0
+      },
+      "change_matched_to_an_earlier_decision": {
+        "n": 8,
+        "increase": 0,
+        "hold": 6,
+        "decrease": 2,
+        "small_n": 1
+      }
+    },
+    "cn_policy_rate": {
+      "sample": {
+        "n": 91,
+        "increase": 17,
+        "hold": 49,
+        "decrease": 25,
+        "small_n": 0
+      },
+      "sample_period": {
+        "first": "2015-10-02",
+        "last": "2026-10-27"
+      },
+      "partner_changes_in_period": 15,
+      "partner_rises_in_period": 0,
+      "partner_cuts_in_period": 15,
+      "rise": {
+        "n": 0,
+        "increase": 0,
+        "hold": 0,
+        "decrease": 0,
+        "small_n": 1
+      },
+      "cut": {
+        "n": 13,
+        "increase": 5,
+        "hold": 7,
+        "decrease": 1,
+        "small_n": 0
+      },
+      "mixed": {
+        "n": 0,
+        "increase": 0,
+        "hold": 0,
+        "decrease": 0,
+        "small_n": 1
+      },
+      "no_change_in_window": {
+        "n": 71,
+        "increase": 11,
+        "hold": 38,
+        "decrease": 22,
+        "small_n": 0
+      },
+      "change_matched_to_an_earlier_decision": {
+        "n": 7,
+        "increase": 1,
+        "hold": 4,
+        "decrease": 2,
+        "small_n": 1
+      }
+    },
+    "ecb_deposit_rate": {
+      "sample": {
+        "n": 91,
+        "increase": 17,
+        "hold": 49,
+        "decrease": 25,
+        "small_n": 0
+      },
+      "sample_period": {
+        "first": "2015-10-02",
+        "last": "2026-10-27"
+      },
+      "partner_changes_in_period": 23,
+      "partner_rises_in_period": 12,
+      "partner_cuts_in_period": 11,
+      "rise": {
+        "n": 12,
+        "increase": 2,
+        "hold": 6,
+        "decrease": 4,
+        "small_n": 0
+      },
+      "cut": {
+        "n": 11,
+        "increase": 3,
+        "hold": 6,
+        "decrease": 2,
+        "small_n": 0
+      },
+      "mixed": {
+        "n": 0,
+        "increase": 0,
+        "hold": 0,
+        "decrease": 0,
+        "small_n": 1
+      },
+      "no_change_in_window": {
+        "n": 68,
+        "increase": 12,
+        "hold": 37,
+        "decrease": 19,
+        "small_n": 0
+      },
+      "change_matched_to_an_earlier_decision": {
+        "n": 0,
+        "increase": 0,
+        "hold": 0,
+        "decrease": 0,
+        "small_n": 1
+      }
+    }
+  },
+  "trade": {
+    "year": 2025,
+    "shares_pct": {
+      "italy": 19.8,
+      "china": 19.2,
+      "russia": 10.3,
+      "netherlands": 7.6,
+      "turkiye": 4.9,
+      "uzbekistan": 4.5
+    },
+    "total_exports_mln_usd": 79041.2,
+    "sums_pct": {
+      "russia_and_china": 29.5,
+      "named_euro_area_partners": 27.4
+    },
+    "named_partners": 6
+  }
+}

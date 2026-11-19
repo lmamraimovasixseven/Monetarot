@@ -142,20 +142,23 @@ function sourceRow(index, id) {
 
   var form = byId("corridor");
   if (form && typeof corridor === "function") {
-    var ids = ["rate", "ru", "cn", "prem", "cap"], partnerData = form.getAttribute("data-partner-data") === "true";
+    var ids = ["rate", "ru", "cn", "prem", "cap"].concat(byId("c-infl") ? ["infl"] : []), partnerData = form.getAttribute("data-partner-data") === "true";
     var missingPartners = form.getAttribute("data-missing") || "";
     var redrawCorridor = function () {
       var v = {}, i;
       for (i = 0; i < ids.length; i++) { v[ids[i]] = parseFloat(byId("c-" + ids[i]).value);
         byId("o-" + ids[i]).textContent = fixed(v[ids[i]], 2); }
       var credit = JSON.parse(form.getAttribute("data-credit"));
-      var res = corridor(v.rate, parseFloat(form.getAttribute("data-inflation")), {"Russia": v.ru, "China": v.cn}, v.prem, v.cap, credit);
+      var res = corridor(v.rate, v.infl === undefined ? parseFloat(form.getAttribute("data-inflation")) : v.infl, {"Russia": v.ru, "China": v.cn}, v.prem, v.cap, credit);
+      /* D59: how far the rate is from the bound it crosses (or from the lower bound when inside). */
+      var gap = res.code === 1 ? "; " + fixed(res.lower - v.rate, 2) + " pp below the lower bound" : res.code === 2 ? "; " +
+        fixed(v.rate - res.upper, 2) + " pp above the upper bound" : res.code === 3 ? "; " + fixed(v.rate - res.lower, 2) + " pp above the lower bound" : "";
       var bounds = "Corridor: " + fixed(res.lower, 2) + "–" + fixed(res.upper, 2) + "%";
       /* Without partner data the verdict would rest on assumed partner rates: only the bounds are shown (D42). */
       byId("corridor-out").textContent = !partnerData ? bounds + ". Illustration with your assumptions; no partner data" +
         (missingPartners ? " for " + missingPartners : "") + "." :
         bounds + "; real differential to Russia " + fixed(res.differentials["Russia"], 2) + " pp, to China " +
-        fixed(res.differentials["China"], 2) + " pp; " + res.label + ".";
+        fixed(res.differentials["China"], 2) + " pp; " + res.label + gap + ".";
     };
     for (var n = 0; n < ids.length; n++) {
       var input = byId("c-" + ids[n]);

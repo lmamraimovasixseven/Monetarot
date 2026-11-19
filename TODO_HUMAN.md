@@ -107,3 +107,13 @@ The assistant did not write or change either file. Both already contain your ear
 
 - **Muted Steel `#8FA3B8` (the D57 item above) is no longer used on the site.** D58 replaced the D57 palette with the Hallmark Editorial theme. The question of its source only matters if the dark theme comes back.
 - **Bricolage Grotesque has no release tag.** The font was downloaded from the repository `ateliertriay/bricolage` at commit `8070cdb6a383aafd10792111cd94e4d472aa0f0c` (URL and sha256 in `docs/site_design.md`). If a tagged release appears, decide whether to switch to it.
+
+## Partner rates page (D59)
+
+- **Check the 2025 export shares against the final BNS table.** The shares in `data/raw/external/kz_export_shares_2025.csv` come from the primary BNS release of 16.02.2026 (Italy 19.8, China 19.2, Russia 10.3, Netherlands 7.6, Turkiye 4.9, Uzbekistan 4.5; total exports 79041.2 million US dollars), whose 2025 figures are marked preliminary.
+  1. When the final 2025 table is published, open it on https://stat.gov.kz/en/industries/economy/foreign-market/spreadsheets/ (or the release list on the publications page).
+  2. Compare the six shares and the total.
+  3. If the full country table is available, note the euro-area total; it can then be added from that table only (not mixed with other sources).
+
+  The secondary report (The Astana Times, 13 April 2026, https://astanatimes.com/2026/04/kazakhstans-top-10-export-partners-account-for-nearly-80-of-trade-in-2025/ and https://astanatimes.com/2026/04/kazakhstans-foreign-trade-in-2025-partners-and-trends/) gives a top-ten total that is not in the primary release; it is not used.
+- **Publication dates of the external series: UNKNOWN.** `config/external_sources.json` gives `release` as UNKNOWN for the Bank of Russia key rate and CPI, the China policy rate (BIS gives only the dataset update date), the FRED part of the China CPI, the ECB deposit rate and the exchange rates. The partner-rates page shows the stored dates of the last values, not publication dates. If you can find the publication date of each series (or of the edition used), record it in the `release` field and run `python run.py ledger` and `python run.py site`.

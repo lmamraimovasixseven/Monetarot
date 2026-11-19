@@ -1,0 +1,78 @@
+/* Hallmark · D59 additions for corridor.html (Russia, China, ECB) · theme: Editorial (by request), the tokens of style.css :root only · genre: editorial · signature: kept from style.css · v2.0.0
+ * Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the page is long; anchored sections and the "On this page" list carry it, and the long text sits behind Read more */
+/* Hallmark · dismissed F25 · corridor.html: the monthly data tables sit in a closed details block and their month column is pinned (position: sticky) while the table scrolls sideways at 360 px */
+/* Loaded only on corridor.html, after style.css, so the home-page budget does not grow (config/site_budget.json). No new
+   colour: lines and bars use the chart tokens (--chart-*) that mirror PALETTE in src/site_dashboard.py; no outcome-class
+   colour is used for a partner, and each line also has its own dash. */
+
+.p-lead { font-size: var(--text-lg); line-height: 1.45; color: var(--color-ink); border-top: var(--rule-heavy) solid var(--color-ink); padding-top: 16px; margin-top: 16px; }
+
+/* Line charts: partner rates and spreads */
+.pplot { position: relative; touch-action: pan-y; }
+.pplot svg { display: block; width: 100%; height: auto; }
+.pchart svg text { font-family: var(--font-display); font-size: 11px; fill: var(--color-muted); }
+.pgrid { stroke: var(--chart-grid); stroke-width: 1; }
+.pzero { stroke: var(--color-ink); stroke-width: 1; stroke-dasharray: 4 4; }
+.pline { fill: none; stroke-width: 2; stroke-linejoin: round; }
+.ps-nbk { stroke: var(--chart-ink); stroke-width: 2.5; }
+.ps-ru_key_rate { stroke: var(--chart-orange); }
+.ps-cn_policy_rate { stroke: var(--chart-sky); stroke-dasharray: 6 4; }
+.ps-ecb_deposit_rate { stroke: var(--chart-black); stroke-dasharray: 2 3; }
+.pcursor { stroke: var(--color-ink); stroke-width: 1; }
+.key.ks-nbk { border-color: var(--chart-ink); }
+.key.ks-ru_key_rate { border-color: var(--chart-orange); }
+.key.ks-cn_policy_rate { border-color: var(--chart-sky); border-left-style: dashed; }
+.key.ks-ecb_deposit_rate { border-color: var(--chart-black); border-left-style: dotted; }
+.pill .key { display: inline-block; height: 1em; vertical-align: -0.1em; margin-right: 8px; padding-left: 0; }
+/* Series pills keep the paper ground so the swatch stays visible: on = ink rule under the label, off = muted with a faded swatch. */
+.pill[data-series][aria-pressed="true"] { background: var(--color-paper); color: var(--color-ink); border-bottom-width: var(--rule-heavy); }
+.pill[data-series][aria-pressed="false"] { color: var(--color-muted); border-color: var(--color-rule-2); }
+.pill[data-series][aria-pressed="false"] .key { opacity: 0.35; }
+.pill[data-series]:hover { background: var(--color-paper-2); }
+.ptable summary { min-height: 44px; display: flex; align-items: center; }
+.ptable table { font-size: var(--text-sm); }
+/* Tables are set in the label face, which ships 500 only: figures in them stay at 500 instead of a synthesised 600. */
+table .num { font-weight: 500; }
+/* The month column stays in view while the data table scrolls sideways at 360 px. */
+.ptable tbody th, .ptable thead th:first-child { position: sticky; left: 0; background: var(--color-paper); }
+
+/* The carry-trade mechanism as numbered steps */
+.mech-steps { counter-reset: step; list-style: none; margin: 16px 0 24px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: var(--rule-mid) solid var(--color-ink); }
+.mech-steps li { counter-increment: step; padding: 12px 16px 12px 0; border-right: var(--rule-hair) solid var(--color-rule); min-width: 0; }
+.mech-steps li + li { padding-left: 16px; }
+.mech-steps li:last-child { border-right: 0; }
+.mech-steps li::before { content: counter(step); display: block; font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--text-xl); line-height: 1; color: var(--color-ink); margin-bottom: 8px; }
+.mech-steps p { margin: 0; font-size: var(--text-sm); }
+
+/* Export shares as HTML bars */
+.trade-bars { list-style: none; margin: 8px 0 0; padding: 0; border-top: var(--rule-mid) solid var(--color-ink); }
+.tb-row { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 4rem; gap: 4px 16px; align-items: center; padding: 8px 0; border-bottom: var(--rule-hair) solid var(--color-rule); }
+.tb-name { font-family: var(--font-display); font-weight: 500; color: var(--color-ink); min-width: 0; }
+.tb-group { display: block; font-size: var(--text-xs); color: var(--color-muted); }
+.tb-track { display: block; height: 16px; }
+.tb-bar { display: block; height: 100%; width: var(--w); background: var(--chart-blue); }
+.tb-russia .tb-bar { background: var(--chart-orange); }
+.tb-china .tb-bar { background: var(--chart-sky); }
+.tb-euro .tb-bar { background: var(--chart-black); }
+.tb-val { text-align: right; font-weight: 600; color: var(--color-ink); }
+
+/* Move one partner rate */
+.wi-readout { border-top: var(--rule-hair) solid var(--color-rule-2); padding: 8px 0; }
+.wi-readout p { margin: 0 0 8px; }
+.wi-line { display: block; width: 100%; max-width: 480px; height: auto; }
+.wi-line text { font-family: var(--font-display); font-size: 12px; fill: var(--color-muted); }
+.wi-axis { stroke: var(--color-rule-2); stroke-width: 1; }
+.wi-zero { stroke: var(--color-ink); stroke-width: 1; }
+.wi-ci { stroke: var(--chart-blue); stroke-width: 3; }
+.wi-pt { fill: var(--chart-ink); }
+
+.ev-partner h3 { margin-top: 24px; }
+
+@media (max-width: 760px) {
+  .mech-steps { grid-template-columns: minmax(0, 1fr); }
+  .mech-steps li, .mech-steps li + li { padding: 12px 0; border-right: 0; border-bottom: var(--rule-hair) solid var(--color-rule); }
+}
+@media (max-width: 480px) {
+  .tb-row { grid-template-columns: minmax(0, 1fr) 4rem; }
+  .tb-track { grid-column: 1 / -1; grid-row: 2; }
+}

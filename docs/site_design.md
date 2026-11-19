@@ -122,3 +122,14 @@ The only motion is on state changes, at 150 ms or less:
 - the reorder of the factor-effects rows.
 
 There is no reveal and nothing moves on scroll. Under `prefers-reduced-motion: reduce` every transition is off.
+
+## Russia, China, ECB page (D59)
+
+- **Files.** `src/site_assets/partners.css` and `src/site_assets/partners.js`, copied to `site/assets/` and linked only from `corridor.html` (`EXTRA_CSS` in `src/site_build.py`), so the home-page budget does not carry them. `partners.css` opens with a Hallmark stamp line and uses the tokens of the first `:root` of `style.css` only; it declares no colour of its own.
+- **Series.** NBK ink `--chart-ink` (solid, 2.5px), Russia `--chart-orange` (solid), China `--chart-sky` (dashed 6 4), ECB `--chart-black` (dotted 2 3). The dash is a second cue next to the colour, and the legend swatches repeat it (`border-left-style`). No outcome-class colour is used for a partner.
+- **Contrast on the paper `#F7F5F0`.** Ink 17.81:1, ink-2 `#2A2B31` 12.95:1, warm grey `#615D57` 6.00:1, ochre `#B87F06` 3.17:1, sky `#3293C6` 3.15:1; every line and bar is at least 3:1. The gridlines `#D0CDC7` (1.46:1) are decorative.
+- **Series pills.** A pressed series pill keeps the paper ground with a heavy ink rule under it, so the swatch stays visible. An off pill is muted with a faded swatch. A series without data in the current view (the ECB in the real view) is disabled and says why in its tooltip.
+- **Mechanism.** `ol.mech-steps`: five columns under a 2px ink rule, numbered by a CSS counter in the condensed head face. It becomes one column under 760 px.
+- **Export bars.** `ul.trade-bars`: name, bar and value in a grid; the bar width is the share relative to the largest share (`--w`). Under 480 px the bar moves under the name.
+- **Tables.** Tables are set in the label face, which ships weight 500 only, so `partners.css` keeps figures in tables at 500 instead of a synthesised 600. The other pages still ask for 600 in table cells (unchanged here).
+- **Research index.** The seventh link uses `--mask-partners`, a globe drawn like the other masks (24px, 1.75 stroke).

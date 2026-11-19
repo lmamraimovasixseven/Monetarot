@@ -83,7 +83,7 @@ def split(usable: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     return usable.iloc[:estimation_n].reset_index(drop=True), usable.iloc[estimation_n:].reset_index(drop=True)
 
 
-def _coefficients(model, fitted, covariance, names: list[str]) -> tuple[dict[str, dict[str, float]], list[str], np.ndarray]:
+def _coefficients(model, fitted, covariance, names: list[str]) -> tuple[dict[str, dict[str, float]], list[str], np.ndarray, np.ndarray]:
     params = np.asarray(fitted.params, dtype=float)
     labels, estimates, named_cov = _named_parameter_covariance(model, params, covariance, feature_names=names)
     se = np.sqrt(np.maximum(np.diag(named_cov), 0))
@@ -93,7 +93,66 @@ def _coefficients(model, fitted, covariance, names: list[str]) -> tuple[dict[str
             continue
         z = float(estimate / error) if error > 0 else float("nan")
         rows[label] = {"estimate": float(estimate), "hc0_se": float(error), "z": z, "p_value": float(2 * norm.sf(abs(z)))}
-    return rows, labels, named_cov
+    return rows, labels, named_cov, np.asarray(estimates, dtype=float)
+
+
+def _logistic_density(value: float) -> float:
+    p = 1.0 / (1.0 + math.exp(-max(-700.0, min(700.0, value))))
+    return p * (1.0 - p)
+
+
+def _score_and_gradient(labels: list[str], estimates: np.ndarray, x: dict[str, float]) -> tuple[float, float, np.ndarray]:
+    """Linear index, expected score P(Increase) - P(Decrease) and its gradient in the named parameters (slopes, cut-points),
+    the same formulas as src/app.py and site/assets/app.js (scoreBand)."""
+    named = dict(zip(labels, estimates))
+    index = sum(named[name] * x[name] for name in x)
+    c0, c1 = named["cutpoint[Decrease|Hold]"], named["cutpoint[Hold|Increase]"]
+    logistic = lambda v: 1.0 / (1.0 + math.exp(-max(-700.0, min(700.0, v))))  # noqa: E731
+    score = (1.0 - logistic(c1 - index)) - logistic(c0 - index)
+    f0, f1 = _logistic_density(c0 - index), _logistic_density(c1 - index)
+    gradient = np.array([-f0 if name == "cutpoint[Decrease|Hold]" else -f1 if name == "cutpoint[Hold|Increase]"
+                         else (f0 + f1) * x[name] for name in labels])
+    return float(index), float(score), gradient
+
+
+WHAT_IF_LABEL = ("Exploratory, not used for the forecast (D59): each extended specification, estimated on the estimation sample, "
+                 "evaluated at the factor and partner-rate values of the last usable decision; the score is P(Increase) - P(Decrease); "
+                 "the change is for one partner rate moved by the stated points with the other inputs fixed; delta-method 95% interval "
+                 "with the HC0 covariance of the slopes and cut-points.")
+WHAT_IF_MOVES = {"plus_one": 1.0, "minus_one": -1.0}
+
+
+def partner_what_if(fits: dict[str, Any], latest: pd.Series) -> dict[str, Any]:
+    """D59: cut-points, latest index and score of each extended specification, and the score change for a +/-1 point move
+    of each partner rate in it. Not used for the forecast."""
+    z = float(norm.ppf(1 - ALPHA / 2))
+    out: dict[str, Any] = {"label": WHAT_IF_LABEL, "decision_date": latest.decision_date.date().isoformat(), "z": z,
+                           "specifications": {}}
+    for key, controls in SPECIFICATIONS.items():
+        if not controls:
+            continue
+        fit = fits[key]
+        labels, estimates, covariance = fit["_labels"], fit["_estimates"], fit["_named_cov"]
+        x = {name: float(latest[name]) for name in FEATURES + controls}
+        index, score, gradient = _score_and_gradient(labels, estimates, x)
+        named = dict(zip(labels, estimates))
+        moves: dict[str, Any] = {}
+        for control in controls:
+            moves[control] = {"latest_value": x[control]}
+            for name, delta in WHAT_IF_MOVES.items():
+                moved = dict(x, **{control: x[control] + delta})
+                _, moved_score, moved_gradient = _score_and_gradient(labels, estimates, moved)
+                change = moved_score - score
+                difference = moved_gradient - gradient
+                se = float(math.sqrt(max(float(difference @ covariance @ difference), 0.0)))
+                low, high = change - z * se, change + z * se
+                moves[control][name] = {"move_points": delta, "score_change": change, "se": se, "ci_low": low, "ci_high": high,
+                                        "interval_includes_zero": int(low <= 0 <= high)}
+        out["specifications"][key] = {
+            "cutpoints": {"decrease_hold": float(named["cutpoint[Decrease|Hold]"]),
+                          "hold_increase": float(named["cutpoint[Hold|Increase]"])},
+            "latest_index": index, "latest_score": score, "moves": moves}
+    return out
 
 
 def vif(train: pd.DataFrame, names: list[str]) -> dict[str, float]:
@@ -110,14 +169,15 @@ def fit_specification(train: pd.DataFrame, holdout: pd.DataFrame, controls: list
     names = FEATURES + controls
     model, fitted, covariance = _fit_ordered(train, seed=SEED, feature_names=names, newton_fallback=True)
     converged = bool(fitted.mle_retvals.get("converged", False))
-    coefficients, labels, named_cov = _coefficients(model, fitted, covariance, names)
+    coefficients, labels, named_cov, estimates = _coefficients(model, fitted, covariance, names)
     probabilities = _predict_probabilities(model, np.asarray(fitted.params, dtype=float), holdout, feature_names=names)
     actual = holdout.y.to_numpy(dtype=int)
     expected = probabilities[:, 2] - probabilities[:, 0]
     result = {"controls": controls, "converged": converged,
               "optimizer": OPTIMIZER_LABELS[1] if fitted.mle_settings.get("optimizer") == "newton" else OPTIMIZER_LABELS[0],
               "log_likelihood": float(fitted.llf), "coefficients": coefficients,
-              "_squared_error": (expected - actual) ** 2, "_rps": ordinal_rps(probabilities, actual)}
+              "_squared_error": (expected - actual) ** 2, "_rps": ordinal_rps(probabilities, actual),
+              "_labels": labels, "_estimates": estimates, "_named_cov": named_cov}
     if controls:
         index = [labels.index(name) for name in controls]
         estimates = np.array([coefficients[name]["estimate"] for name in controls])
@@ -242,6 +302,8 @@ def run(model_panel_path: Path = MODEL_PANEL_PATH, decisions_path: Path = DATA_P
                   "lr": "likelihood ratio against the frozen fit (classical, not robust)",
                   "dm": "HLN-corrected Diebold-Mariano, extended model minus frozen model; a negative mean difference favours the extended model"},
         "ols_cross_check": ols, "summary": summary,
+        # D59: appended after the D50 keys, so that every earlier value keeps its place and its ledger id.
+        "partner_what_if": partner_what_if(fits, usable.iloc[-1]),
     }
 
 
@@ -289,6 +351,20 @@ def report(result: dict[str, Any]) -> str:
         a, b = o["six_factors"]["coefficients"][feature], o["six_factors_plus_all_three"]["coefficients"][feature]
         same = f"{'yes' if o['six_factors']['same_sign_as_ordered_logit'][feature] else 'no'} / {'yes' if o['six_factors_plus_all_three']['same_sign_as_ordered_logit'][feature] else 'no'}"
         lines.append(f"| {feature} | {f(a['estimate'])} ({f(a['p_value'])}) | {f(b['estimate'])} ({f(b['p_value'])}) | {same} |")
+    w = result.get("partner_what_if")
+    if w:
+        lines += ["", "## Partner-rate what-if (exploratory, not used for the forecast; D59)", "", w["label"], "",
+                  f"Last usable decision: {w['decision_date']}.", "",
+                  "| Specification | Cut-points | Latest index | Latest score | Partner rate (latest) | Move | Score change | 95% interval | Interval includes zero |",
+                  "|---|---|---|---|---|---|---|---|---|"]
+        for key, entry in w["specifications"].items():
+            cuts = f"{f(entry['cutpoints']['decrease_hold'])}; {f(entry['cutpoints']['hold_increase'])}"
+            for control, moves in entry["moves"].items():
+                for name in WHAT_IF_MOVES:
+                    m = moves[name]
+                    lines.append(f"| {key} | {cuts} | {f(entry['latest_index'])} | {f(entry['latest_score'])} | {control} "
+                                 f"({f(moves['latest_value'], 2)}) | {m['move_points']:+.0f} | {f(m['score_change'])} | "
+                                 f"{f(m['ci_low'])} to {f(m['ci_high'])} | {'yes' if m['interval_includes_zero'] else 'no'} |")
     lines += ["", "Generated by `python run.py ovb` into model/extensions/ovb_check.json; model/artifact.json is not changed.", ""]
     return "\n".join(lines)
 

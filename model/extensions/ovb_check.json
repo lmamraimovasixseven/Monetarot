@@ -734,5 +734,166 @@
     "ols_same_signs_six_factors": 3,
     "ols_same_signs_with_controls": 3,
     "ols_significant_six_factors": 1
+  },
+  "partner_what_if": {
+    "label": "Exploratory, not used for the forecast (D59): each extended specification, estimated on the estimation sample, evaluated at the factor and partner-rate values of the last usable decision; the score is P(Increase) - P(Decrease); the change is for one partner rate moved by the stated points with the other inputs fixed; delta-method 95% interval with the HC0 covariance of the slopes and cut-points.",
+    "decision_date": "2026-10-27",
+    "z": 1.959963984540054,
+    "specifications": {
+      "plus_ru_key_rate": {
+        "cutpoints": {
+          "decrease_hold": -2.3021345826262474,
+          "hold_increase": 1.0653326594116517
+        },
+        "latest_index": -2.594630822655012,
+        "latest_score": -0.5475192883822961,
+        "moves": {
+          "ru_key_rate": {
+            "latest_value": 14.0,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": -0.09389159520030288,
+              "se": 0.0288256803860294,
+              "ci_low": -0.15038889058678315,
+              "ci_high": -0.03739429981382262,
+              "interval_includes_zero": 0
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": 0.10169129399734494,
+              "se": 0.028217101493137574,
+              "ci_low": 0.04638679132268392,
+              "ci_high": 0.15699579667200597,
+              "interval_includes_zero": 0
+            }
+          }
+        }
+      },
+      "plus_cn_policy_rate": {
+        "cutpoints": {
+          "decrease_hold": 12.061741399656386,
+          "hold_increase": 15.073080312691289
+        },
+        "latest_index": 9.876988940335533,
+        "latest_score": -0.8933642296390117,
+        "moves": {
+          "cn_policy_rate": {
+            "latest_value": 3.0,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": 0.5849833900579219,
+              "se": 0.18763980764499344,
+              "ci_low": 0.21721612500771126,
+              "ci_high": 0.9527506551081325,
+              "interval_includes_zero": 0
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": -0.09848379888553394,
+              "se": 0.15470521229080714,
+              "ci_low": -0.40170044319613923,
+              "ci_high": 0.20473284542507136,
+              "interval_includes_zero": 1
+            }
+          }
+        }
+      },
+      "plus_ecb_deposit_rate": {
+        "cutpoints": {
+          "decrease_hold": 1.612604429051141,
+          "hold_increase": 5.45861631255994
+        },
+        "latest_index": -0.0885657202938499,
+        "latest_score": -0.8418042126600037,
+        "moves": {
+          "ecb_deposit_rate": {
+            "latest_value": 2.25,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": -0.10213156575133331,
+              "se": 0.07126886245856448,
+              "ci_low": -0.24181596938925842,
+              "ci_high": 0.037552837886591806,
+              "interval_includes_zero": 1
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": 0.2185904563656479,
+              "se": 0.08432897986008023,
+              "ci_low": 0.05330869298688709,
+              "ci_high": 0.38387221974440866,
+              "interval_includes_zero": 0
+            }
+          }
+        }
+      },
+      "plus_all_three": {
+        "cutpoints": {
+          "decrease_hold": -2.9727715719606063,
+          "hold_increase": 0.9723119698105176
+        },
+        "latest_index": -4.151569179194642,
+        "latest_score": -0.7588138944718015,
+        "moves": {
+          "ru_key_rate": {
+            "latest_value": 14.0,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": -0.029302687756155632,
+              "se": 0.0347365047126667,
+              "ci_low": -0.09738498594178822,
+              "ci_high": 0.03877961042947696,
+              "interval_includes_zero": 1
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": 0.03205279806442418,
+              "se": 0.03546764496296733,
+              "ci_low": -0.03746250867944524,
+              "ci_high": 0.1015681048082936,
+              "interval_includes_zero": 1
+            }
+          },
+          "cn_policy_rate": {
+            "latest_value": 3.0,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": -0.1111677993493062,
+              "se": 0.3794973107696659,
+              "ci_low": -0.8549688606876558,
+              "ci_high": 0.6326332619890433,
+              "interval_includes_zero": 1
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": 0.1649430019528595,
+              "se": 0.638724368739056,
+              "ci_low": -1.0869337568237716,
+              "ci_high": 1.4168197607294906,
+              "interval_includes_zero": 1
+            }
+          },
+          "ecb_deposit_rate": {
+            "latest_value": 2.25,
+            "plus_one": {
+              "move_points": 1.0,
+              "score_change": -0.14207328795087182,
+              "se": 0.22277152978635087,
+              "ci_low": -0.5786974631130114,
+              "ci_high": 0.29455088721126776,
+              "interval_includes_zero": 1
+            },
+            "minus_one": {
+              "move_points": -1.0,
+              "score_change": 0.24385904854302998,
+              "se": 0.21151393762519147,
+              "ci_low": -0.17070065143059676,
+              "ci_high": 0.6584187485166567,
+              "interval_includes_zero": 1
+            }
+          }
+        }
+      }
+    }
   }
 }

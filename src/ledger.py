@@ -95,7 +95,9 @@ def series_rows(root: Path = ROOT) -> list[dict[str, str]]:
                              script="src/ingest.py", artifact_field="model/artifact.json#/data_sha256_normalized_crlf_to_lf",
                              used_in="data/processed/*; model", test="tests/test_data_contract.py"))
     if Path(EXTERNAL_SOURCES).is_file():
-        for name, spec in json.loads(Path(EXTERNAL_SOURCES).read_text(encoding="utf-8"))["series"].items():
+        config = json.loads(Path(EXTERNAL_SOURCES).read_text(encoding="utf-8"))
+        # D59: "context" holds files that are shown as context (partner trade shares), not used by the corridor or the model.
+        for name, spec in [*config["series"].items(), *config.get("context", {}).items()]:
             path = root / "data" / "raw" / "external" / spec["file"]  # D46: was data/external/, so the hash was always UNKNOWN
             rows.append(_row(id=f"external:{spec['file']}", value=normalized_sha256(path) if path.is_file() else UNKNOWN,
                              source=spec["publisher"], series=spec["title"], url=spec["url"],
@@ -108,7 +110,9 @@ def series_rows(root: Path = ROOT) -> list[dict[str, str]]:
 
 EXTENSIONS_DIR = ROOT / "model" / "extensions"
 EXTENSION_PREFIXES = {"ovb_check.json": ("ovb", "src/ovb_check.py", "tests/test_ovb_check.py"),
-                      "class_metrics.json": ("classm", "src/class_metrics.py", "tests/test_class_metrics.py")}
+                      "class_metrics.json": ("classm", "src/class_metrics.py", "tests/test_class_metrics.py"),
+                      # D59: descriptive partner context (latest rates, spreads, event counts, trade shares); nothing estimated.
+                      "partner_context.json": ("partners", "src/partner_context.py", "tests/test_partner_context.py")}
 
 
 def extension_rows(directory: Path = EXTENSIONS_DIR) -> list[dict[str, str]]:
