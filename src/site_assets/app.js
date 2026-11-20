@@ -640,6 +640,48 @@ function sourceRow(index, id) {
     g.addEventListener("keydown", function (e) { if (e.key === "Escape") { g.classList.add("gloss-closed"); } });
   });
 
+  /* D61. Story view and Full view (home page). The inline script sets the class "story" on html before the page paints;
+     Story view hides the blocks marked .detail on screen. The choice is kept in localStorage when storage works. */
+  var views = all(".view-switch button"), root = document.documentElement, VIEW_KEY = "monetarot-view";
+  if (views.length) {
+    var toggles = all("button.details-toggle");
+    var parts = function (b) {
+      var out = [];
+      b.getAttribute("aria-controls").split(" ").forEach(function (id) {
+        var box = byId(id);
+        if (box) { out = out.concat(id === "overview" ? [box] : all(".detail", box)); }
+      });
+      return out;
+    };
+    var setOpen = function (b, open) {
+      parts(b).forEach(function (x) { x.classList.toggle("open", open); });
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+      b.textContent = b.getAttribute("data-labels").split("|")[open ? 1 : 0];
+    };
+    var setView = function (v, keep) {
+      root.classList.toggle("story", v === "story");
+      views.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-view") === v ? "true" : "false"); });
+      if (keep) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* storage blocked: the choice lasts for this page */ } }
+    };
+    views[0].parentNode.hidden = false;
+    views.forEach(function (b) { b.addEventListener("click", function () { setView(b.getAttribute("data-view"), true); }); });
+    toggles.forEach(function (b) {
+      b.hidden = false;
+      b.addEventListener("click", function () { setOpen(b, b.getAttribute("aria-expanded") !== "true"); });
+    });
+    setView(root.classList.contains("story") ? "story" : "full", false);
+    /* A link to a block that Story view hides opens the details of its step. */
+    var reveal = function () {
+      var t = location.hash.length > 1 ? byId(location.hash.slice(1)) : null;
+      if (!t || !root.classList.contains("story")) { return; }
+      toggles.forEach(function (b) {
+        if (parts(b).some(function (x) { return x.contains(t); })) { setOpen(b, true); t.scrollIntoView(); }
+      });
+    };
+    reveal();
+    window.addEventListener("hashchange", reveal);
+  }
+
   /* F7. "On this page": highlight the section in view (D56). */
   var onLinks = all("nav.onpage a");
   if (onLinks.length && window.IntersectionObserver) {

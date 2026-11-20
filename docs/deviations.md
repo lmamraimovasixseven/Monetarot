@@ -483,3 +483,51 @@ These corrections concern the recorded source metadata in `docs/facts_to_fill.cs
   - `ledger/evidence_ledger.csv` sha256 10819e191120743ebe6051dd777cbf72666277eed59174e5a8dc7bfdae71d25c.
 
   All four are unchanged.
+
+### D61. Narrative voice and a Story view / Full view switch on the home page; presentation only
+- **What changed:** this work is on the branch `story2` (from `story`, D60) and is not committed. Only the presentation of `index.html` changed, and sentences were added. No number or result sentence was altered, nothing was removed, and nothing moved between steps.
+  - **Added sentences.** These are generated from stored values: the figures in them are ledger spans, and they contain no other digit.
+    - an opening scene in the second person between the opening section and the overview ("You hold tenge government bonds. …");
+    - one plain-language sentence under each of the seven headlines (`p.story-plain`, ids `plain-1` to `plain-7`).
+
+    Their wording follows the same stored conditions as the headlines: the side of the threshold, whether the score band includes zero, and the three-way holdout verdict, never stronger than the verdict sentence. The connectors are unchanged. Every new sentence is listed in `TODO_HUMAN.md` for the team's approval.
+  - **Story view and Full view.** Two buttons under the question ("Story view", "Full view", with `aria-pressed`).
+    - **When each view applies.** With JavaScript, a first visit opens in Story view, and the choice is kept in `localStorage` inside try/catch; if storage throws, the page opens in Story view and the switch still works for that page. Without JavaScript the page is the full view, and the switch and the per-step buttons stay `hidden`.
+    - **What Story view shows.** The answer sentence, the probability scale and the "Portfolio implication" panel in the opening section; then per step the headline, the plain sentence, the main block (listed below) and the connector:
+      - step 1: the decision sentence and the usefulness list;
+      - step 2: the loss-ratio slider;
+      - step 3: the track record with its controls;
+      - step 4: the verdict box;
+      - step 5: the scenario;
+      - step 6: the anomaly warning, the freshness warning when it appears, and the look-ahead box;
+      - step 7: the action box and its caveat.
+    - **What it hides.** Everything else stays in the HTML at its place, wrapped in `div.detail` (the pressure-score panel takes the class itself, and the overview is matched by its id). A screen-only CSS rule, `display: none` under `html.story`, hides these blocks, which takes them out of the tab order and the accessibility tree.
+    - **Per-step button.** "Show all details for this step" (`aria-expanded`, "Show all details for this section" in the opening section) opens the hidden blocks of that step only. A link to a hidden block (for example `index.html#falsification`) opens its step.
+    - **Print.** Printing shows the full view.
+    - **What is unchanged.** The rail counter, the source windows and every other control work in both views.
+    - **The RPS chart.** It stays in step 3, where it was, behind the step 3 button.
+  - **Check that nothing was lost.** In the full view, no sentence of the D60 page is missing (0 of 217) and none of `main` (0 of 200); the 10 new sentences are the opening scene (three) and the seven plain sentences. Visible words: 2301 at D60, 2472 in the full view now.
+  - **Words.** Measured in Playwright; "screen" means the viewport scrolled to the top of a step, so a screen can include the end of one step and the start of the next.
+    - **First screen.** 99 words at 1280 px in Story view (140 in Full view); 46 at 360 px in both views.
+    - **Per screen, steps 1 to 7.** At 1280 px: Story 246, 182, 141, 195, 153, 227, 188; Full 246, 207, 141, 217, 153, 288, 188. At 360 px: Story 175, 141, 138, 132, 129, 155, 120; Full 175, 150, 138, 121, 129, 166, 120.
+    - **Per step, all visible text.** Story / Full: opening section 124 / 159, scene 38 / 38, overview 0 / 99, then steps 1 to 7 at 193 / 193, 94 / 120, 192 / 315, 76 / 614, 144 / 144, 142 / 360, 69 / 69. Total: 1072 in Story view, 2111 in Full view.
+
+    The brief's "about 80 words per screen" is not met. Steps 1, 3 and 5 keep blocks that must stay visible: the usefulness list (a brief requirement), the track record with its axis labels and readout, and the scenario with its slider labels. Because a short step lets the next one into the same screen, the per-screen counts fall less than the per-step counts.
+  - **Budget.** The home page with its assets went from 155168 to 161639 bytes:
+    - `index.html` 66982 → 69995;
+    - `style.css` 50017 → 51268;
+    - `app.js` 38169 → 40376.
+
+    `config/site_budget.json` now allows 92160 bytes of growth over the baseline of 69518, against 86016 after D60: the measured growth of 92121 bytes, rounded up to the next KB.
+  - **Design linter.** `sloplint --render` reports no FAIL and no REFLEX on `index.html` and `style.css`. The new WARN F4 ("two filled buttons side by side") is dismissed in `style.css`: the switch is one two-state control in which only the pressed button is filled. The four FAILs on methods.html and team.html are unchanged from the committed site.
+  - **Screenshots.** `docs/site_parity/d61_*.png`:
+    - the first screen and the whole page in Story view and in Full view, at 1280 px and 360 px;
+    - the first screen without JavaScript.
+- **Why:** owner request (task D61) for a narrative voice and a shorter default reading path, with nothing deleted and every block one click away in its own step.
+- **What the original specification produced:** not affected; the effect on results is none. Only presentation changed and sentences were added; no number or result sentence was altered. The frozen model, `prereg/`, `docs/forecast_log.csv`, `ledger/forecast_ledger.csv`, `ledger/evidence_ledger.csv` and the estimated fields of `model/artifact.json` were not touched. Before (`main`) and after this work:
+  - estimated fields of `model/artifact.json` sha256 2f28cfb70ba1d41b1d8ca823edd0cca496df089b61838432d2f75b46b90b63fe;
+  - `docs/forecast_log.csv` sha256 808ea4ce311a4b34b1edc1a2b82d88ecdffb12fd4ae21c98fb4216b02f89ed4c;
+  - `ledger/forecast_ledger.csv` sha256 a765becf9d5edaef0899c27fefdf455e52422bf52e555595fe9f2572ecec97bf;
+  - `ledger/evidence_ledger.csv` sha256 10819e191120743ebe6051dd777cbf72666277eed59174e5a8dc7bfdae71d25c.
+
+  All four are unchanged.

@@ -145,3 +145,17 @@ There is no reveal and nothing moves on scroll. Under `prefers-reduced-motion: r
 - **Figures in headings.** `h2 .num` and `.story-answer .num` inherit the weight of their text, so a figure in a head differs only by the dotted source cue (waiver 38iii in the stamp block).
 - **Colours.** No new colour; the outcome marks and their colours are unchanged.
 - **How to change a headline.** The sentences are built in `index_page` in `src/site_build.py` (`answer`, `head1` to `head7`), the connectors in `CONNECTORS` and the step titles in `STEP_TITLES`. The step titles are pinned by `tests/test_site.py`. The headline rules, and the rule that every block stays in its step, are in `tests/test_story.py`.
+
+## Story view and Full view (D61)
+
+- **Switch.** Two `.pill` buttons under the question; the pressed one is filled (ink), the other outlined.
+- **Plain sentences.** `p.story-plain` sits under each step head and `p.story-scene` after the opening section. Both are serif at `--text-lg` with a 40rem measure; the scene is in ink-2.
+- **Story view.** Story view hides `.detail` blocks and the overview on screen only. In the opening section, the answer desk then uses two columns (the outcome panel and "Portfolio implication"). Hidden blocks keep their place, so opening a step shows them where they are in the full view.
+- **Per-step button.** "Show all details for this step" is a `.pill` at the end of the step, before the connector; its `aria-expanded` state is filled like a pressed pill.
+- **Print.** The switch and the per-step buttons do not print, and every block prints.
+- **Colours.** No new colour; the outcome marks and their colours are unchanged.
+- **How to change it.** In `index_page` in `src/site_build.py`:
+  - to move a block between the views, wrap it in `<div class="detail">` or take it out of the wrapper;
+  - the sentences are `STORY_SCENE` and the `plain` list, and the button labels are `DETAILS_LABELS`.
+
+  `tests/test_story.py` lists the blocks that must stay visible in Story view and the ones it hides.

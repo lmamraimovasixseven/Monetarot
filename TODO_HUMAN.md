@@ -132,3 +132,19 @@ The sentences below are new on the home page and appear under our names; nothing
 - **Step 7:** "Do not extend duration; the forecast was logged on 12 November 2026, and the NBK decision on 4 December 2026 is the next outcome it will be scored against."
 - **Connectors:** "So what does the model expect?" / "But why is the model not more certain?" / "So can we trust it?" / "So what is behind the score, and what would change it?" / "And what could make it wrong?" / "So what should the holder do, and how will we know?"
 - **Closing section heading:** "Read further". **Rail counter:** "Step n of 7".
+
+## Home page Story view (D61): copy to approve
+
+The sentences below are new on the home page and appear under our names; they are generated from stored values, and the figures shown are today's ledger values. Approve or reword them in `src/site_build.py` (`STORY_SCENE`, the `plain` list in `index_page`, `DETAILS_LABELS`, `VIEW_SWITCH`), then run `python run.py site`.
+
+- **Opening scene:** "You hold tenge government bonds. Before the NBK decision named in the question, you must choose whether to extend duration. This page walks through what the model says, how sure it is, and what would change the answer."
+- **Step 1:** "Under this assumption, you extend duration only if the probability of a cut is above 50.0%."
+- **Step 2:** "A cut has a probability of 38.7%, below that threshold, so for now the rule says: do not extend duration." (Above the threshold: "above that threshold, so for now the rule says: extend duration.")
+- **Step 3:** "In plain words: the score points towards a cut, but its band reaches past zero, so the direction is not clear." (Band clear of zero: "and its band stays on that side of zero."; score exactly zero: "the score sits at zero, so the direction is not clear.")
+- **Step 4:** "On past decisions, you could not tell its errors apart from those of always assuming no change."
+  - If the two checks disagree: "On past decisions, the two checks disagree on whether its errors differ from those of always assuming no change."
+  - If both separate the model: "On past decisions, both checks tell its errors apart from those of always assuming no change."
+- **Step 5:** "Moving a slider shows how far the score would shift if one input changed; it does not show what will happen."
+- **Step 6:** "Read every number on this page with the limits in mind."
+- **Step 7:** "For you, this means not extending duration now; the logged forecast will be compared with the next NBK decision." (When the rule says extend: "extending duration now"; with no log entry the second clause is dropped.)
+- **Controls:** "Story view" / "Full view"; "Show all details for this step" / "Hide the details of this step" ("section" in the opening section).

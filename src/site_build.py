@@ -317,6 +317,31 @@ def connector(n: int) -> str:
     return f'<p class="story-link">{esc(CONNECTORS[n - 1])}</p>'
 
 
+# D61: Story view and Full view. Story view (default with JavaScript, choice kept in localStorage) hides the blocks marked
+# "detail" with CSS on screen only; without JavaScript, and in print, the page is the full view. Nothing moves or is removed.
+VIEW_KEY = "monetarot-view"
+VIEW_SCRIPT = ('var c=document.documentElement.classList;try{if(localStorage.getItem("' + VIEW_KEY + '")!=="full")c.add("story")}'
+               'catch(e){c.add("story")}')
+VIEW_SWITCH = ('<div class="view-switch" role="group" aria-label="Page view" hidden>'
+               '<button type="button" class="pill" data-view="story" aria-pressed="true">Story view</button>'
+               '<button type="button" class="pill" data-view="full" aria-pressed="false">Full view</button></div>')
+STORY_SCENE = ("You hold tenge government bonds. Before the NBK decision named in the question, you must choose whether to extend "
+               "duration. This page walks through what the model says, how sure it is, and what would change the answer.")
+DETAILS_LABELS = ("Show all details for this {0}", "Hide the details of this {0}")
+
+
+def step_plain(n: int, sentence: str) -> str:
+    """D61: the plain-language sentence under the headline of step n (numbers are ledger spans, no other digit)."""
+    return f'<p class="story-plain" id="plain-{n}">{sentence}</p>'
+
+
+def details_toggle(controls: str, what: str = "step") -> str:
+    """D61: the per-step button of Story view; hidden until app.js shows it, so it does nothing without JavaScript."""
+    return (f'<button type="button" class="pill details-toggle" aria-expanded="false" aria-controls="{controls}" '
+            f'data-labels="{esc(DETAILS_LABELS[0].format(what))}|{esc(DETAILS_LABELS[1].format(what))}" hidden>'
+            f'{esc(DETAILS_LABELS[0].format(what))}</button>')
+
+
 def latest_log_entry(target: str | None) -> tuple[int, dict] | None:
     """Index and row of the latest forecast-log entry for the target decision (docs/forecast_log.csv, read only)."""
     with (ROOT / "docs" / "forecast_log.csv").open(encoding="utf-8", newline="") as handle:
@@ -439,38 +464,64 @@ def index_page(L: Ledger, artifact: dict) -> str:
     head7 = (f"{action}; the forecast was logged on {plain_date(entry[1]['logged_at_utc'][:10])}, and the NBK decision on "
              f"{plain_date(next_round)} is the next outcome it will be scored against." if entry else
              f"{action}; no forecast is logged yet for the next decision.")
+    # D61: one plain sentence per step (no digit except ledger numbers), generated from the same stored values.
+    extend = p_cut > threshold
+    side3 = "a hike" if float(L.raw("dashboard:score")) > 0 else "a cut"
+    plain4 = ("On past decisions, you could not tell its errors apart from those of always assuming no change." if not any(separates) else
+              "On past decisions, the two checks disagree on whether its errors differ from those of always assuming no change."
+              if not all(separates) else
+              "On past decisions, both checks tell its errors apart from those of always assuming no change.")
+    plain = [f"Under this assumption, you extend duration only if the probability of a cut is above {L.num('decision:binary_threshold_p_cut', 1, pct=True)}.",
+             f"A cut has a probability of {L.num('decision:p_cut', 1, pct=True)}, {'above' if extend else 'below'} that threshold, so for now "
+             f"the rule says: {'extend' if extend else 'do not extend'} duration.",
+             ("In plain words: the score sits at zero, so the direction is not clear." if float(L.raw("dashboard:score")) == 0 else
+              f"In plain words: the score points towards {side3}, "
+              + ("but its band reaches past zero, so the direction is not clear." if band_lo <= 0 <= band_hi else
+                 "and its band stays on that side of zero.")),
+             plain4,
+             "Moving a slider shows how far the score would shift if one input changed; it does not show what will happen.",
+             "Read every number on this page with the limits in mind.",
+             f"For you, this means {'extending' if extend else 'not extending'} duration now"
+             + ("; the logged forecast will be compared with the next NBK decision." if entry else ".")]
+    say = [step_plain(n, s) for n, s in enumerate(plain, start=1)]
+    boxes = sd.boxes(L, d)
+    cut = boxes.index("</div>", boxes.index('id="verdict-box"')) + len("</div>")
+    verdict_box, after_verdict = boxes[:cut], boxes[cut:]
     return si.cardify(f"""
+<script>{VIEW_SCRIPT}</script>
 <section class="lead" id="top">
 <h1>{esc(question)}</h1>
+{VIEW_SWITCH}
 <p class="kicker">{esc(d['title'])}</p>
 <p class="story-answer" id="story-answer">{answer}</p>
-{answer_desk(L, d, decision, action)}</section>
+{answer_desk(L, d, decision, action).replace('<div class="desk-panel desk-score">', '<div class="desk-panel desk-score detail">', 1)}{details_toggle("top overview", "section")}</section>
+<p class="story-scene" id="story-scene">{esc(STORY_SCENE)}</p>
 <!-- onpage -->
 <section class="lead-notes" id="overview"><p class="summary">{esc(d['intro'])} The forecast is turned into a duration decision with an explicit loss function, and the holdout comparison with Always Hold is shown as prominently as the forecast.</p>
 <p class="links">This page is static and fast; there is also an {render_link}. Detailed tables are on the <a href="evidence.html">Evidence</a> page.</p>
 {sd.context_strip(d)}</section>
-<section id="step-1">{step_head(1, head1)}<p>{esc(tr(decision['decision']))}</p>
+<section id="step-1">{step_head(1, head1)}{say[0]}<p>{esc(tr(decision['decision']))}</p>
 <ul id="usefulness">
 <li><strong>Cost of error:</strong> lengthening duration when no cut follows costs {L.num('decision:binary_losses/lengthen_but_no_cut', 1)} unit; not lengthening before a cut costs {L.num('decision:binary_losses/not_lengthen_but_cut', 1)} unit (relative units, not tenge; <code>config/decision_losses.json</code>). Equal losses is an assumption: the values are not confirmed by a person yet.</li>
 <li><strong>Without this note:</strong> the holder looks at the current rate and the NBK's statements and by default assumes that the rate will not change (Always Hold), which is our benchmark. This is our assumption.</li>
 <li><strong>Who benefits:</strong> holders of tenge government bonds (bank treasuries, portfolio managers), who see the probability and the threshold at which to act. Who can lose: a holder who lengthens duration and no cut follows, or who does not lengthen before a cut.</li>
 </ul>{connector(1)}</section>
-<section id="step-2">{step_head(2, head2)}<p>{obvious}</p><p>{complication}</p>
-<p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p>{loss_slider}{connector(2)}</section>
-<section id="step-3">{step_head(3, head3)}{sd.svg_track_record(L, d, PALETTE)}{sd.drivers(L, d, PALETTE)}{chart_rps}
-<p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p>{connector(3)}</section>
-<section id="step-4">{step_head(4, head4)}{sd.headline(L, d)}<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden><button type="button" class="pill" data-layout="side" aria-pressed="true">Side by side</button><button type="button" class="pill" data-layout="overlay" aria-pressed="false">Overlay</button></div>{sd.round_cards(L, d)}{sd.boxes(L, d)}
+<section id="step-2">{step_head(2, head2)}{say[1]}<div class="detail"><p>{obvious}</p><p>{complication}</p>
+<p>Action threshold p* = {L.num('decision:binary_threshold_p_cut', 3)} <strong>with equal losses</strong>; probability of a cut {L.num('decision:p_cut', 1, pct=True)}.</p></div>{loss_slider}{details_toggle("step-2")}{connector(2)}</section>
+<section id="step-3">{step_head(3, head3)}{say[2]}{sd.svg_track_record(L, d, PALETTE)}<div class="detail">{sd.drivers(L, d, PALETTE)}{chart_rps}
+<p><a href="evidence.html">Holdout, falsification, diagnostics, robustness, stress tests, history</a></p></div>{details_toggle("step-3")}{connector(3)}</section>
+<section id="step-4">{step_head(4, head4)}{say[3]}<div class="detail">{sd.headline(L, d)}<div class="chart-tools" id="round-layout" role="group" aria-label="Layout of the two rounds" hidden><button type="button" class="pill" data-layout="side" aria-pressed="true">Side by side</button><button type="button" class="pill" data-layout="overlay" aria-pressed="false">Overlay</button></div>{sd.round_cards(L, d)}</div>{verdict_box}<div class="detail">{after_verdict}
 <p>Expected rate after the decision of {esc(target.group(0) if target else 'the next meeting')}: {L.num('reality_check:expected_rate', 2)}%, 80% range
 {L.num('reality_check:interval_80/0', 2)}–{L.num('reality_check:interval_80/1', 2)}%; Always Hold benchmark: {L.num('reality_check:benchmark_always_hold', 2)}%.</p>
-<h3>Timeline</h3>{si.timeline(forecast_timeline())}{connector(4)}</section>
-<section id="step-5">{step_head(5, head5)}<p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}{connector(5)}</section>
-<section id="step-6">{step_head(6, head6)}
+<h3>Timeline</h3>{si.timeline(forecast_timeline())}</div>{details_toggle("step-4")}{connector(4)}</section>
+<section id="step-5">{step_head(5, head5)}{say[4]}<p>How the pressure changes if you move one factor and keep the others at their latest values.</p>{sd.scenario(L, d)}{connector(5)}</section>
+<section id="step-6">{step_head(6, head6)}{say[5]}
 <div class="box warn" id="freshness" hidden></div>{anomaly}
-<div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div>
+<div class="detail"><div class="box info" id="staleness">Data as of the NBK decision of {esc(d['latest_decision'])} (factor data month {esc(d['data_month'])}). The probabilities are not recomputed for later meetings.</div></div>
 <div class="box warn" id="look-ahead">{look_ahead_box(L, d["model"], d["look_ahead_sentence"])}</div>
-<h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
-<ul>{risk}</ul>{ovb_home_sentence(L)}<p><a href="methods.html">All model limits</a></p>{connector(6)}</section>
-<section id="step-7">{step_head(7, head7)}<div class="action"><p class="answer" id="answer"><strong>{action}.</strong></p>
+<div class="detail"><h3>Falsification</h3>{sd.render_table(L, 'dashboard:evidence/falsification', d['evidence']['falsification'], element_id='falsification')}
+<ul>{risk}</ul>{ovb_home_sentence(L)}<p><a href="methods.html">All model limits</a></p></div>{details_toggle("step-6")}{connector(6)}</section>
+<section id="step-7">{step_head(7, head7)}{say[6]}<div class="action"><p class="answer" id="answer"><strong>{action}.</strong></p>
 <p class="caption">Caveat: this is the binary rule with equal losses from step 2. Under the three-outcome losses the action is: {EN_ACTION[decision['best_action']]}.
 The answer changes if the probability of a cut {crossing} {L.num('decision:binary_threshold_p_cut', 3)}, or if a missed cut becomes more than {L.num('decision:switch_ratio_miss_to_false', 2)} times as costly as a false extension.</p></div></section>
 <section id="read-further"><h2>Read further</h2>{research_links()}</section>

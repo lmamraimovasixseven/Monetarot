@@ -79,3 +79,22 @@ Without JavaScript: the chart buttons, the what-if picker and the event picker a
 - **The what-if move:** `WHAT_IF_MOVES` in `src/ovb_check.py`, then `python run.py ovb`, `ledger` and `site`. The stored D50 values must reproduce within the D51 tolerance (`tests/test_ovb_check.py`).
 - **Series colours or dashes:** `.ps-*` and `.ks-*` rules in `src/site_assets/partners.css` (chart tokens only; see `docs/site_design.md`).
 - **A new trade-share edition:** append the lines to `data/raw/external/kz_export_shares_2025.csv` only if they come from the same table; a new year is a new file with its own entry under `context` in `config/external_sources.json`.
+
+# Story view and Full view (D61)
+
+The home page has two views of the same HTML. Nothing is removed or moved; Story view hides blocks with CSS only.
+
+| Part | Where | What it does |
+|---|---|---|
+| Inline view script | `VIEW_SCRIPT` in `src/site_build.py`, first element of the home page | Before the page paints, sets `class="story"` on `html` unless `localStorage["monetarot-view"]` is `"full"`. If storage throws, it also sets Story view. |
+| Switch | `VIEW_SWITCH` (markup, `hidden`); "D61" block in `app.js` | Unhides itself and sets `aria-pressed`. A click sets the view and stores it inside try/catch (`VIEW_KEY`). |
+| Hidden blocks | `div.detail` wrappers in `index_page`; the pressure-score panel; `#overview` | `@media screen { html.story .detail:not(.open), html.story #overview:not(.open) { display: none } }`: out of view, focus and the accessibility tree. |
+| Per-step button | `details_toggle(controls)` (markup, `hidden`); "D61" block in `app.js` | Shown only in Story view. It toggles `.open` on the `.detail` blocks inside the sections named in `aria-controls`, sets `aria-expanded` and swaps its label. |
+| Links into hidden blocks | "D61" block in `app.js` (`reveal`) | On load and on `hashchange`, opens the step that holds the target and scrolls to it. |
+| Print | `@media print` in `style.css` | The Story view rule applies to screens only; the switch and the buttons are not printed. |
+
+**Without JavaScript** nothing sets the class, so the page is the full view and the controls stay hidden.
+
+**Checks.** `tests/test_story.py` covers the D61 part: the default with and without JavaScript, storage inside try, the no-JavaScript fallback, that the full view keeps every sentence, the digits in new sentences, the blocks per view and one button per step.
+
+**Browser checks.** The D61 browser check (every page in both views at 1280 px, 360 px and 360 px with reduced motion; persistence, blocked storage, no JavaScript, print, links into hidden blocks) is recorded in `docs/deviations.md`, D61.

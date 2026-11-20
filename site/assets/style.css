@@ -17,6 +17,7 @@
 /* Hallmark · dismissed F1 · copy: verbatim, the straight quotes come from the existing generated site text */
 /* Hallmark · dismissed F2 · copy: verbatim, the three-period ellipses are part of source titles on sources.html */
 /* Hallmark · dismissed 49 · the evaluation-design label wraps at 360 px on purpose; nowrap would force horizontal scroll */
+/* Hallmark · dismissed F4 · D61 Story view / Full view is one two-state switch under the question: only the pressed button (aria-pressed="true") is filled, the other is outlined; the linter reads the pressed-state fill as applying to both */
 /* Hallmark · dismissed F21 · the h2 to h4 step on evidence.html is existing page structure, frozen (restyle only) */
 /* The look of the Render app (src/app.py) without external fonts: a system font stack close to Source Sans.
    Readable at 360 px: no fixed width wider than the screen. Class colours are Okabe–Ito (colour-blind safe), and every
@@ -463,3 +464,16 @@ h2 .num, .story-answer .num { font-weight: inherit; }
 #read-further .research ul { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 960px) { #read-further .research ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { #read-further .research ul { grid-template-columns: minmax(0, 1fr); } }
+/* D61: Story view and Full view on the home page. Story view (class "story" on html, set by script only) hides the blocks
+   marked .detail on screen; without JavaScript and in print the page is the full view. */
+.view-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.story-scene, .story-plain { font-size: var(--text-lg); line-height: 1.45; max-width: 40rem; }
+.story-scene { color: var(--color-ink-2); margin: 0 0 24px; }
+.details-toggle { display: block; margin: 24px 0 0; }
+.view-switch[hidden], .details-toggle[hidden], html:not(.story) .details-toggle { display: none; }
+@media screen {
+  html.story .detail:not(.open), html.story #overview:not(.open) { display: none; }
+  html.story .desk:has(> .desk-score:not(.open)) { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+}
+@media screen and (max-width: 960px) { html.story .desk-score:not(.open) + .desk-action { border-left: 0; padding-left: 0; } }
+@media print { .view-switch, .details-toggle { display: none; } }
